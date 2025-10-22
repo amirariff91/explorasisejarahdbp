@@ -1,50 +1,187 @@
-# Welcome to your Expo app 👋
+# DBP SEJARAH - Malaysian History Educational Game
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An interactive educational game built with Expo 54, React Native, and TypeScript to teach Malaysian history through gameplay.
 
-## Get started
+## 🎮 Features
 
-1. Install dependencies
+- **5 Malaysian States**: Perlis, Kedah, Negeri Sembilan, Pahang, Johor
+- **5 Question Types**:
+  - Multiple Choice (4 options)
+  - True/False
+  - Fill in the Blank
+  - Matching (9-grid)
+  - Crossword Puzzles
+- **Game Mechanics**:
+  - Start with RM100 travel money
+  - Lose RM2 for wrong answers
+  - Health meter tracking
+  - State progression system
+- **Responsive Design**: Works on phones and tablets (600dp breakpoint)
+- **Persistent Progress**: Game state saved locally with expo-secure-store
+- **Haptic Feedback**: Enhanced UX with tactile responses
 
-   ```bash
-   npm install
-   ```
+## 🏗️ Project Structure
 
-2. Start the app
+```
+app/
+  (game)/              # Route group for game screens
+    index.tsx          # State selection map
+    tutorial.tsx       # Game tutorial
+    quiz/[state].tsx   # Dynamic quiz screen
+    crossword/[state].tsx
 
-   ```bash
-   npx expo start
-   ```
+components/game/
+  StatusBar.tsx        # Health, Money, State display
+  MenuButton.tsx       # Pause overlay
+  SuccessModal.tsx     # Victory celebration
+  questions/           # 5 question type components
+    MultipleChoiceQuestion.tsx
+    TrueFalseQuestion.tsx
+    FillBlankQuestion.tsx
+    MatchingQuestion.tsx
+    CrosswordQuestion.tsx
 
-In the output, you'll find options to open the app in a
+contexts/
+  GameContext.tsx      # Global game state management
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+data/questions/        # Question data for each state
+  perlis.ts
+  kedah.ts
+  negeri-sembilan.ts
+  pahang.ts
+  johor.ts
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+types/
+  game.ts             # TypeScript interfaces
 
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+assets/images/game/    # Figma assets
+  backgrounds/         # 3 background images
+  buttons/             # 7 button images
+  ui-elements/         # 8 UI element images
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## 🚀 Getting Started
 
-## Learn more
+### Prerequisites
+- Node.js 20.19.4+
+- Yarn 4.10.2+
+- Expo CLI
 
-To learn more about developing your project with Expo, look at the following resources:
+### Installation
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+```bash
+# Install dependencies
+yarn install
 
-## Join the community
+# Start development server
+yarn start
 
-Join our community of developers creating universal apps.
+# Run on Android
+yarn android
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+# Run on iOS
+yarn ios
+```
+
+## 📱 Screens & Flow
+
+1. **Tutorial** (First time only)
+   - Explains game rules
+   - Money system introduction
+
+2. **State Selection Map**
+   - Choose Malaysian state to explore
+   - View progress (completed states)
+   - Check money and health status
+
+3. **Quiz Screen**
+   - Dynamic questions based on selected state
+   - Multiple question types
+   - Real-time score updates
+   - Menu for pause/restart
+
+4. **Success Modal**
+   - Celebration when state is completed
+   - Option to continue or replay
+
+## 🎨 Design
+
+Based on Figma design: [DBP SEJARAH](https://www.figma.com/design/65nT29eLZRN0u9Mjb66CKZ/DBP-SEJARAH)
+
+### Key UI Elements
+- Background images for immersion
+- Custom button graphics
+- Question boards matching Figma design
+- State indicator banners
+- Health and money bars
+
+## 🔧 Tech Stack
+
+- **Framework**: Expo SDK 54
+- **Language**: TypeScript 5.9
+- **Navigation**: expo-router 6 (file-based)
+- **State**: React Context + Hooks
+- **Storage**: expo-secure-store
+- **Images**: expo-image
+- **Haptics**: expo-haptics
+- **Animations**: react-native-reanimated 4
+
+## 📐 Responsive Design
+
+Uses `useWindowDimensions` hook for adaptive layouts:
+- **Phone**: < 600dp width
+- **Tablet**: ≥ 600dp width
+
+All components scale appropriately for different screen sizes.
+
+## 🎯 Game Rules
+
+- Start with RM100 and 100% health
+- Each wrong answer: -RM2, -5% health
+- Complete all questions in a state to unlock next
+- Collect all 13 states to finish the game
+
+## 🔮 Future Enhancements
+
+- [ ] Add remaining 8 Malaysian states
+- [ ] Interactive crossword grid implementation
+- [ ] Sound effects for correct/wrong answers
+- [ ] Leaderboard system
+- [ ] Multiplayer mode
+- [ ] More question types (drag-and-drop, timeline)
+- [ ] Animated transitions with Reanimated v4
+- [ ] Achievement badges
+- [ ] Daily challenges
+
+## 📝 Adding New Questions
+
+To add questions for a new state:
+
+1. Create file: `data/questions/[state].ts`
+2. Export questions array following the type definitions
+3. Import in `data/questions/index.ts`
+4. Add mapping in `getQuestionsForState` function
+
+Example:
+```typescript
+export const selangorQuestions: Question[] = [
+  {
+    id: 'selangor_1',
+    state: 'selangor',
+    type: 'multipleChoice',
+    question: 'What is the capital of Selangor?',
+    options: ['KL', 'Shah Alam', 'Putrajaya', 'Petaling Jaya'],
+    correctAnswer: 'Shah Alam',
+  },
+];
+```
+
+## 📄 License
+
+Educational use only - DBP SEJARAH
+
+## 👥 Credits
+
+- Design: Figma - DBP SEJARAH
+- Development: Built with Expo 54
+- Content: Malaysian history curriculum
