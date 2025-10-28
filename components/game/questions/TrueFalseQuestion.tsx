@@ -14,6 +14,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { playSound } from '@/utils/audio';
 import LandscapeLayout from '@/components/game/LandscapeLayout';
 import type { TrueFalseQuestion as TFQuestion } from '@/types';
 import {
@@ -61,6 +62,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
       scale.value = withSpring(1, { damping: 10 });
     }, 100);
 
+    playSound('click');
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     // Small delay for visual feedback
     setTimeout(() => {
@@ -182,7 +184,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
     <LandscapeLayout
       leftSection={leftSection}
       rightSection={rightSection}
-      leftWidth={38}
+      leftWidth={40}
       rightWidth={58}
     />
   );
@@ -200,7 +202,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   questionContent: {
-    width: '75%',
+    width: '85%', // Increased from 75% for better readability
     paddingVertical: 35,
   },
   questionText: {

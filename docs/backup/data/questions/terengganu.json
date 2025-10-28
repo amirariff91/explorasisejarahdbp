@@ -1,0 +1,131 @@
+{
+  "state": "Terengganu",
+  "questions": [
+    {
+      "id": "terengganu_q1",
+      "type": "multi_select",
+      "question": "Pilih fakta yang betul tentang Tun Dr Mahathir:",
+      "options": [
+        "Perdana Menteri keempat dan ketujuh",
+        "Dilahirkan pada 10 Julai 1925",
+        "Berkahwin dengan Tun Dr Siti Hasmah",
+        "Memerintah selama 22 tahun",
+        "Bapa Kemerdekaan",
+        "Perdana Menteri pertama",
+        "Lahir tahun 1957",
+        "Mengasaskan FELDA",
+        "Tiada pencapaian"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    },
+    {
+      "id": "terengganu_q2",
+      "type": "multi_select",
+      "question": "Pilih fakta yang betul tentang Abdullah Badawi:",
+      "options": [
+        "Berkahwin dengan Tun Jeanne Abdullah",
+        "Dilahirkan di Kampung Perlis Bayan Lepas",
+        "Digelar Bapa Pembangunan Modal Insan",
+        "Perdana Menteri ke-5",
+        "Bapa Kemerdekaan",
+        "Perdana Menteri pertama",
+        "Mengasaskan UMNO",
+        "Lahir di Johor",
+        "Digelar Bapa Pembangunan"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    },
+    {
+      "id": "terengganu_q3",
+      "type": "multi_select",
+      "question": "Pilih fakta yang betul tentang Najib Razak:",
+      "options": [
+        "Memperkenalkan Gagasan 1 Malaysia",
+        "Menjadi Perdana Menteri pada 3 April 2009",
+        "Perdana Menteri ke-6",
+        "Anak kepada Tun Abdul Razak",
+        "Bapa Kemerdekaan",
+        "Perdana Menteri pertama",
+        "Perdana Menteri ke-2",
+        "Lahir tahun 1925",
+        "Mengasaskan FELDA"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    },
+    {
+      "id": "terengganu_q4",
+      "type": "multiple_choice",
+      "question": "Siapakah Perdana Menteri Malaysia yang paling lama memerintah?",
+      "options": [
+        "Tunku Abdul Rahman",
+        "Tun Dr Mahathir",
+        "Abdullah Badawi",
+        "Najib Razak"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "terengganu_q5",
+      "type": "multiple_choice",
+      "question": "Siapakah yang digelar 'Bapa Pembangunan Modal Insan'?",
+      "options": [
+        "Tun Dr Mahathir",
+        "Abdullah Badawi",
+        "Najib Razak",
+        "Tun Abdul Razak"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "terengganu_q6",
+      "type": "multiple_choice",
+      "question": "Apakah gagasan yang diperkenalkan oleh Najib Razak?",
+      "options": [
+        "Wawasan 2020",
+        "1 Malaysia",
+        "Malaysia Boleh",
+        "Negaraku"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "terengganu_q7",
+      "type": "true_false",
+      "question": "Tun Dr Mahathir pernah menjadi Perdana Menteri dua kali.",
+      "correct_answer": true,
+      "difficulty": "easy"
+    },
+    {
+      "id": "terengganu_q8",
+      "type": "true_false",
+      "question": "Abdullah Badawi dilahirkan di Kampung Perlis, Bayan Lepas.",
+      "correct_answer": true,
+      "difficulty": "medium"
+    },
+    {
+      "id": "terengganu_q9",
+      "type": "fill_blank",
+      "question": "Perdana Menteri keempat dan ketujuh: TUN DR MA_ _TH_R",
+      "correct_answer": "MAHATHIR",
+      "difficulty": "easy",
+      "hints": ["Doktor", "8 huruf"]
+    },
+    {
+      "id": "terengganu_q10",
+      "type": "fill_blank",
+      "question": "Gagasan yang diperkenalkan oleh Najib: 1 MAL_ _S_A",
+      "correct_answer": "MALAYSIA",
+      "difficulty": "easy",
+      "hints": ["Nama negara", "8 huruf"]
+    }
+  ]
+}

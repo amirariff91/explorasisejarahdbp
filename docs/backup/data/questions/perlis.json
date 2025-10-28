@@ -1,0 +1,109 @@
+{
+  "state": "Perlis",
+  "questions": [
+    {
+      "id": "perlis_q1",
+      "type": "fill_blank",
+      "question": "Peta di atas merujuk kepada negeri: _E_A_A",
+      "correct_answer": "MELAKA",
+      "difficulty": "medium",
+      "hints": ["Negeri bersejarah", "6 huruf"]
+    },
+    {
+      "id": "perlis_q2",
+      "type": "fill_blank",
+      "question": "Siapakah nama pengasas negeri Melaka: P_RA_E_ _RA",
+      "correct_answer": "PARAMESWARA",
+      "difficulty": "medium",
+      "hints": ["Pengasas Melaka", "11 huruf"]
+    },
+    {
+      "id": "perlis_q3",
+      "type": "fill_blank",
+      "question": "Binatang apakah yang menendang anjing Parameswara: _E_AN_ _K",
+      "correct_answer": "PELANDUK",
+      "difficulty": "easy",
+      "hints": ["Binatang kecil", "8 huruf"]
+    },
+    {
+      "id": "perlis_q4",
+      "type": "fill_blank",
+      "question": "Perkataan Melaka berasal dari sebatang: _O_OK",
+      "correct_answer": "POKOK",
+      "difficulty": "easy",
+      "hints": ["Tumbuhan", "5 huruf"]
+    },
+    {
+      "id": "perlis_q5",
+      "type": "multiple_choice",
+      "question": "Apakah nama pokok yang menjadi asal nama Melaka?",
+      "options": [
+        "Pokok Melaka",
+        "Pokok Ketapang",
+        "Pokok Jati",
+        "Pokok Meranti"
+      ],
+      "correct_answer": 0,
+      "difficulty": "medium"
+    },
+    {
+      "id": "perlis_q6",
+      "type": "multiple_choice",
+      "question": "Dari manakah Parameswara berasal sebelum mengasaskan Melaka?",
+      "options": [
+        "Temasik (Singapura)",
+        "Johor",
+        "Pahang",
+        "Kedah"
+      ],
+      "correct_answer": 0,
+      "difficulty": "hard"
+    },
+    {
+      "id": "perlis_q7",
+      "type": "multiple_choice",
+      "question": "Bilakah Kesultanan Melayu Melaka ditubuhkan?",
+      "options": [
+        "1400",
+        "1511",
+        "1396",
+        "1450"
+      ],
+      "correct_answer": 2,
+      "difficulty": "hard"
+    },
+    {
+      "id": "perlis_q8",
+      "type": "true_false",
+      "question": "Parameswara adalah seorang putera dari Palembang.",
+      "correct_answer": true,
+      "difficulty": "medium"
+    },
+    {
+      "id": "perlis_q9",
+      "type": "true_false",
+      "question": "Melaka ditubuhkan di tepi Sungai Pahang.",
+      "correct_answer": false,
+      "difficulty": "easy"
+    },
+    {
+      "id": "perlis_q10",
+      "type": "multi_select",
+      "question": "Pilih fakta yang betul tentang Melaka:",
+      "options": [
+        "Diasaskan oleh Parameswara",
+        "Terletak di tepi Sungai Melaka",
+        "Menjadi pusat perdagangan",
+        "Dikuasai oleh Portugis 1511",
+        "Ibu negara Malaysia",
+        "Terletak di Sabah",
+        "Ditubuhkan tahun 1957",
+        "Negeri terbesar",
+        "Tiada sejarah"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    }
+  ]
+}

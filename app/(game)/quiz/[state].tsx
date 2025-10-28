@@ -16,55 +16,70 @@ import CrosswordQuestion from '@/components/game/questions/CrosswordQuestion';
 import StatusBar from '@/components/game/StatusBar';
 import MenuButton from '@/components/game/MenuButton';
 import SuccessModal from '@/components/game/SuccessModal';
+import FeedbackOverlay from '@/components/game/FeedbackOverlay';
+import ProgressBar from '@/components/game/ProgressBar';
 
 /**
  * Quiz Screen - Dynamic Route
  * Handles all question types for a specific state
+ * Fixed: isMounted ref prevents setState on unmounted component
  */
 export default function QuizScreen() {
   const router = useRouter();
   const { state } = useLocalSearchParams<{ state: MalaysianState }>();
   const { width } = useWindowDimensions();
-  const { gameState, answerQuestion, completeState, showSuccessModal, setShowSuccessModal } =
-    useGameContext();
+  const {
+    gameState,
+    answerQuestion,
+    completeState,
+    clearStateAnswers,
+    showSuccessModal,
+    setShowSuccessModal,
+  } = useGameContext();
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isAnswering, setIsAnswering] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [shouldComplete, setShouldComplete] = useState(false);
+
+  // Feedback overlay state
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackIsCorrect, setFeedbackIsCorrect] = useState(false);
+  const [feedbackExplanation, setFeedbackExplanation] = useState<string | undefined>(undefined);
+  const [feedbackMoneyChange, setFeedbackMoneyChange] = useState<number | undefined>(undefined);
+  const [feedbackHealthChange, setFeedbackHealthChange] = useState<number | undefined>(undefined);
+
+  // Track component mount state to prevent setState on unmounted component
+  const isMountedRef = useRef(true);
   const answerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Track mounted state and cleanup on unmount
   useEffect(() => {
-    if (state) {
+    isMountedRef.current = true;
+
+    return () => {
+      isMountedRef.current = false;
+      // Cleanup timer on unmount
+      if (answerTimerRef.current) {
+        clearTimeout(answerTimerRef.current);
+        answerTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  // Load questions for the current state
+  useEffect(() => {
+    if (state && isMountedRef.current) {
       const stateQuestions = getQuestionsForState(state);
       if (stateQuestions.length === 0) {
         setError(`No questions found for ${state}. Please try another state.`);
       } else {
         setQuestions(stateQuestions);
-        setCurrentQuestionIndex(0); // Reset index when state changes - FIX: Prevents cross-state crashes
-        setShouldComplete(false); // Reset completion flag on new state
+        setCurrentQuestionIndex(0); // Reset index when state changes
         setError(null);
       }
     }
   }, [state]);
-
-  // Cleanup timer on unmount or navigation
-  useEffect(() => {
-    return () => {
-      if (answerTimerRef.current) {
-        clearTimeout(answerTimerRef.current);
-      }
-    };
-  }, []);
-
-  // Watch for completion flag and complete state after render
-  useEffect(() => {
-    if (shouldComplete && state) {
-      completeState(state);
-      setShouldComplete(false); // Reset flag
-    }
-  }, [shouldComplete, state, completeState]);
 
   // Show error if questions failed to load
   if (error) {
@@ -102,45 +117,70 @@ export default function QuizScreen() {
   }
 
   const handleAnswer = (answer: any) => {
-    // Prevent double-submit
-    if (isAnswering) return;
-    setIsAnswering(true);
+    // Prevent double-submit or submission on unmounted component
+    if (isAnswering || !isMountedRef.current) return;
 
+    setIsAnswering(true);
     const result = answerQuestion(currentQuestion.id, answer, currentQuestion);
+
+    // Show feedback overlay with result
+    setFeedbackIsCorrect(result.isCorrect);
+    setFeedbackExplanation(result.explanation);
+    setFeedbackMoneyChange(result.moneyChange);
+    setFeedbackHealthChange(result.healthChange);
+    setShowFeedback(true);
 
     // Clear any existing timer
     if (answerTimerRef.current) {
       clearTimeout(answerTimerRef.current);
+      answerTimerRef.current = null;
     }
 
-    // Move to next question or complete state
+    // Move to next question after feedback is shown (2 seconds)
     answerTimerRef.current = setTimeout(() => {
+      // Safety check: only proceed if component is still mounted
+      if (!isMountedRef.current) return;
+
+      // Hide feedback
+      setShowFeedback(false);
+
       setCurrentQuestionIndex((prevIndex) => {
-        // Use functional update to avoid stale closure
-        if (prevIndex < questions.length - 1) {
-          setIsAnswering(false); // Re-enable for next question
-          return prevIndex + 1;
-        } else {
-          // All questions completed - flag for completion after render
+        const nextIndex = prevIndex + 1;
+
+        if (nextIndex < questions.length) {
+          // More questions remaining
           setIsAnswering(false);
-          setShouldComplete(true); // ✅ Set flag instead of calling completeState directly
+          return nextIndex;
+        } else {
+          // All questions completed
+          if (state && isMountedRef.current) {
+            completeState(state);
+          }
           return prevIndex;
         }
       });
-      answerTimerRef.current = null; // Clear ref after timer executes
-    }, 1000);
+
+      answerTimerRef.current = null;
+    }, 2000); // Increased from 1000ms to 2000ms to show feedback
+  };
+
+  const handleFeedbackDismiss = () => {
+    // Callback when feedback auto-dismisses (handled by timer above)
+    setShowFeedback(false);
   };
 
   const handleSuccessContinue = () => {
+    if (!isMountedRef.current) return;
     setShowSuccessModal(false);
     router.back(); // Return to map
   };
 
   const handleSuccessRestart = () => {
+    if (!isMountedRef.current || !state) return;
     setShowSuccessModal(false);
+    clearStateAnswers(state); // Clear previous answers for fresh start
     setCurrentQuestionIndex(0);
     setIsAnswering(false); // Reset answer lock on restart
-    setShouldComplete(false); // Reset completion flag
   };
 
   const renderQuestion = () => {
@@ -166,9 +206,26 @@ export default function QuizScreen() {
       style={styles.container}
       resizeMode="cover">
       <StatusBar state={state} />
+
+      {/* Progress Bar */}
+      <ProgressBar
+        currentQuestion={currentQuestionIndex + 1}
+        totalQuestions={questions.length}
+      />
+
       <MenuButton />
 
       <View style={styles.content}>{renderQuestion()}</View>
+
+      {/* Feedback Overlay */}
+      <FeedbackOverlay
+        visible={showFeedback}
+        isCorrect={feedbackIsCorrect}
+        explanation={feedbackExplanation}
+        moneyChange={feedbackMoneyChange}
+        healthChange={feedbackHealthChange}
+        onDismiss={handleFeedbackDismiss}
+      />
 
       <SuccessModal
         visible={showSuccessModal}

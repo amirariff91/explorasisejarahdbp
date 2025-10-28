@@ -1,0 +1,125 @@
+{
+  "state": "Kelantan",
+  "questions": [
+    {
+      "id": "kelantan_q1",
+      "type": "multi_select",
+      "question": "Pilih fakta yang betul tentang Muhyiddin Yassin:",
+      "options": [
+        "Menjadi Perdana Menteri pada 1 Mac 2020",
+        "Melanjutkan pelajaran ke English College",
+        "Perdana Menteri ke-8",
+        "Pernah menjadi Menteri Pendidikan",
+        "Bapa Kemerdekaan",
+        "Perdana Menteri pertama",
+        "Mengasaskan FELDA",
+        "Lahir tahun 1925",
+        "Tiada jawatan penting"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    },
+    {
+      "id": "kelantan_q2",
+      "type": "multi_select",
+      "question": "Pilih fakta yang betul tentang Ismail Sabri:",
+      "options": [
+        "Bersekolah di Sekolah Menengah Air Putih Kuantan",
+        "Dilahirkan di Temerloh Pahang",
+        "Pernah berkhidmat sebagai peguam",
+        "Perdana Menteri ke-9",
+        "Bapa Kemerdekaan",
+        "Perdana Menteri pertama",
+        "Mengasaskan UMNO",
+        "Lahir di Kedah",
+        "Tiada pencapaian"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    },
+    {
+      "id": "kelantan_q3",
+      "type": "multiple_choice",
+      "question": "Siapakah Perdana Menteri ke-8 Malaysia?",
+      "options": [
+        "Najib Razak",
+        "Muhyiddin Yassin",
+        "Ismail Sabri",
+        "Anwar Ibrahim"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "kelantan_q4",
+      "type": "multiple_choice",
+      "question": "Siapakah Perdana Menteri ke-9 Malaysia?",
+      "options": [
+        "Muhyiddin Yassin",
+        "Ismail Sabri Yaakob",
+        "Anwar Ibrahim",
+        "Abdullah Badawi"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "kelantan_q5",
+      "type": "multiple_choice",
+      "question": "Di manakah Ismail Sabri dilahirkan?",
+      "options": [
+        "Kuala Lumpur",
+        "Temerloh Pahang",
+        "Johor Bahru",
+        "Alor Setar"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "kelantan_q6",
+      "type": "multiple_choice",
+      "question": "Apakah profesion Ismail Sabri sebelum menjadi ahli politik?",
+      "options": [
+        "Doktor",
+        "Guru",
+        "Peguam",
+        "Jurutera"
+      ],
+      "correct_answer": 2,
+      "difficulty": "medium"
+    },
+    {
+      "id": "kelantan_q7",
+      "type": "true_false",
+      "question": "Muhyiddin Yassin menjadi Perdana Menteri pada 1 Mac 2020.",
+      "correct_answer": true,
+      "difficulty": "easy"
+    },
+    {
+      "id": "kelantan_q8",
+      "type": "true_false",
+      "question": "Ismail Sabri pernah berkhidmat sebagai peguam.",
+      "correct_answer": true,
+      "difficulty": "easy"
+    },
+    {
+      "id": "kelantan_q9",
+      "type": "fill_blank",
+      "question": "Perdana Menteri ke-8 Malaysia: MU_ _DDIN YA_ _IN",
+      "correct_answer": "MUHYIDDIN YASSIN",
+      "difficulty": "medium",
+      "hints": ["PM 2020", "16 huruf"]
+    },
+    {
+      "id": "kelantan_q10",
+      "type": "fill_blank",
+      "question": "Perdana Menteri ke-9 Malaysia: ISM_ _L SA_ _I",
+      "correct_answer": "ISMAIL SABRI",
+      "difficulty": "medium",
+      "hints": ["Dari Pahang", "12 huruf"]
+    }
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "state": "Kedah",
+  "questions": [
+    {
+      "id": "kedah_q1",
+      "type": "fill_blank",
+      "question": "Siapakah Bendahara Melaka yang pernah mempertahankan serangan tentera Siam sebanyak dua kali: _ U _ P_RA_",
+      "correct_answer": "TUN PERAK",
+      "difficulty": "hard",
+      "hints": ["Bendahara Melaka", "9 huruf"]
+    },
+    {
+      "id": "kedah_q2",
+      "type": "fill_blank",
+      "question": "Daun kelapa kering atau kain yang dicelup minyak untuk menjadi penyuluh: J_ _ U_NG",
+      "correct_answer": "JAMUNG",
+      "difficulty": "medium",
+      "hints": ["Alat penerangan", "6 huruf"]
+    },
+    {
+      "id": "kedah_q3",
+      "type": "fill_blank",
+      "question": "Ketua kumpulan setiap pedagang asing dikenali sebagai: _A_IT_N",
+      "correct_answer": "KAPITAN",
+      "difficulty": "medium",
+      "hints": ["Ketua pedagang", "7 huruf"]
+    },
+    {
+      "id": "kedah_q4",
+      "type": "fill_blank",
+      "question": "Siapakah anak Tun Perak yang dibunuh oleh Raja Muhammad: TUN _ _ _ _R",
+      "correct_answer": "TUN BESAR",
+      "difficulty": "hard",
+      "hints": ["Anak Tun Perak", "9 huruf"]
+    },
+    {
+      "id": "kedah_q5",
+      "type": "multiple_choice",
+      "question": "Berapa kali Tun Perak mempertahankan Melaka dari serangan Siam?",
+      "options": [
+        "Sekali",
+        "Dua kali",
+        "Tiga kali",
+        "Empat kali"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "kedah_q6",
+      "type": "multiple_choice",
+      "question": "Apakah jawatan Tun Perak dalam Kesultanan Melaka?",
+      "options": [
+        "Sultan",
+        "Bendahara",
+        "Laksamana",
+        "Temenggung"
+      ],
+      "correct_answer": 1,
+      "difficulty": "easy"
+    },
+    {
+      "id": "kedah_q7",
+      "type": "multiple_choice",
+      "question": "Siapakah Sultan Melaka semasa Tun Perak menjadi Bendahara?",
+      "options": [
+        "Sultan Mansur Shah",
+        "Sultan Mahmud Shah",
+        "Sultan Muhammad Shah",
+        "Sultan Alauddin Shah"
+      ],
+      "correct_answer": 0,
+      "difficulty": "hard"
+    },
+    {
+      "id": "kedah_q8",
+      "type": "true_false",
+      "question": "Tun Perak adalah Bendahara yang paling terkenal dalam sejarah Melaka.",
+      "correct_answer": true,
+      "difficulty": "easy"
+    },
+    {
+      "id": "kedah_q9",
+      "type": "true_false",
+      "question": "Jamung adalah sejenis senjata yang digunakan oleh askar Melaka.",
+      "correct_answer": false,
+      "difficulty": "medium"
+    },
+    {
+      "id": "kedah_q10",
+      "type": "multi_select",
+      "question": "Pilih peranan yang betul tentang Tun Perak:",
+      "options": [
+        "Bendahara Melaka",
+        "Mempertahankan dari Siam",
+        "Mengembangkan perdagangan",
+        "Menjaga keamanan negara",
+        "Sultan Melaka",
+        "Pembina A Famosa",
+        "Laksamana",
+        "Pengasas UMNO",
+        "Perdana Menteri"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    }
+  ]
+}

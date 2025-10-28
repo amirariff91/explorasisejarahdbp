@@ -1,0 +1,131 @@
+{
+  "state": "Pahang",
+  "questions": [
+    {
+      "id": "pahang_q1",
+      "type": "multi_select",
+      "question": "Pilih fakta yang betul tentang Tunku Abdul Rahman:",
+      "options": [
+        "Bapa Kemerdekaan",
+        "Berasal dari Alor Setar Kedah",
+        "Menubuhkan UMNO",
+        "Melanjutkan pelajaran ke Penang Free School",
+        "Perdana Menteri ke-2",
+        "Lahir di Johor",
+        "Mengasaskan FELDA",
+        "Digelar Bapa Pembangunan",
+        "Meninggal tahun 1990"
+      ],
+      "correct_answers": [0, 1, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    },
+    {
+      "id": "pahang_q2",
+      "type": "multi_select",
+      "question": "Pilih fakta yang betul tentang Tun Abdul Razak:",
+      "options": [
+        "Dilahirkan di Pulau Keladi Pekan Pahang",
+        "Mengasaskan FELDA",
+        "Digelar Bapa Pembangunan",
+        "Perdana Menteri ke-2",
+        "Bapa Kemerdekaan",
+        "Berasal dari Kedah",
+        "Perdana Menteri pertama",
+        "Mengasaskan UMNO",
+        "Tiada sumbangan"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    },
+    {
+      "id": "pahang_q3",
+      "type": "multi_select",
+      "question": "Pilih fakta yang betul tentang Tun Hussein Onn:",
+      "options": [
+        "Berkhidmat sebagai Pegawai Daerah di Klang",
+        "Berasal dari Johor Bahru",
+        "Meninggal dunia pada 29 Mei 1990",
+        "Perdana Menteri ke-3",
+        "Bapa Kemerdekaan",
+        "Mengasaskan FELDA",
+        "Perdana Menteri pertama",
+        "Lahir di Kedah",
+        "Masih hidup"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    },
+    {
+      "id": "pahang_q4",
+      "type": "multiple_choice",
+      "question": "Siapakah Perdana Menteri pertama Malaysia?",
+      "options": [
+        "Tun Abdul Razak",
+        "Tunku Abdul Rahman",
+        "Tun Hussein Onn",
+        "Tun Dr Mahathir"
+      ],
+      "correct_answer": 1,
+      "difficulty": "easy"
+    },
+    {
+      "id": "pahang_q5",
+      "type": "multiple_choice",
+      "question": "Siapakah yang digelar 'Bapa Pembangunan'?",
+      "options": [
+        "Tunku Abdul Rahman",
+        "Tun Abdul Razak",
+        "Tun Hussein Onn",
+        "Abdullah Badawi"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "pahang_q6",
+      "type": "multiple_choice",
+      "question": "Apakah yang diasaskan oleh Tun Abdul Razak?",
+      "options": [
+        "UMNO",
+        "FELDA",
+        "Universiti Malaya",
+        "Petronas"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "pahang_q7",
+      "type": "true_false",
+      "question": "Tunku Abdul Rahman berasal dari Alor Setar, Kedah.",
+      "correct_answer": true,
+      "difficulty": "easy"
+    },
+    {
+      "id": "pahang_q8",
+      "type": "true_false",
+      "question": "Tun Hussein Onn meninggal dunia pada tahun 1990.",
+      "correct_answer": true,
+      "difficulty": "medium"
+    },
+    {
+      "id": "pahang_q9",
+      "type": "fill_blank",
+      "question": "Perdana Menteri pertama Malaysia: TUNKU AB_ _L R_ _MAN",
+      "correct_answer": "ABDUL RAHMAN",
+      "difficulty": "easy",
+      "hints": ["Bapa Kemerdekaan", "12 huruf"]
+    },
+    {
+      "id": "pahang_q10",
+      "type": "fill_blank",
+      "question": "Bapa Pembangunan Malaysia: TUN AB_ _L RA_ _K",
+      "correct_answer": "ABDUL RAZAK",
+      "difficulty": "medium",
+      "hints": ["Perdana Menteri ke-2", "11 huruf"]
+    }
+  ]
+}

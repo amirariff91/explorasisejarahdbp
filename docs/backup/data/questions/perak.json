@@ -1,0 +1,109 @@
+{
+  "state": "Perak",
+  "questions": [
+    {
+      "id": "perak_q1",
+      "type": "fill_blank",
+      "question": "Tokoh yang mempertahankan kedaulatan Naning: D_L S_I_",
+      "correct_answer": "DOL SAID",
+      "difficulty": "medium",
+      "hints": ["Pahlawan Naning", "8 huruf"]
+    },
+    {
+      "id": "perak_q2",
+      "type": "fill_blank",
+      "question": "Menentang James Brooke yang menganggap orang Iban sebagai lanun: RE_T_P",
+      "correct_answer": "RENTAP",
+      "difficulty": "medium",
+      "hints": ["Pahlawan Iban", "6 huruf"]
+    },
+    {
+      "id": "perak_q3",
+      "type": "fill_blank",
+      "question": "Sharif Masahor menentang James Brooke di wilayah: S_R_K_I",
+      "correct_answer": "SARIKEI",
+      "difficulty": "hard",
+      "hints": ["Wilayah di Sarawak", "7 huruf"]
+    },
+    {
+      "id": "perak_q4",
+      "type": "multiple_choice",
+      "question": "Dato Maharaja Lela menentang British di negeri:",
+      "options": [
+        "Kuala Lumpur",
+        "Kelantan",
+        "Perak",
+        "Johor"
+      ],
+      "correct_answer": 2,
+      "difficulty": "easy"
+    },
+    {
+      "id": "perak_q5",
+      "type": "multiple_choice",
+      "question": "Terpaksa berundur ke Bukit Putus sebelum berjaya mendapatkan rundingan damai. Siapakah saya?",
+      "options": [
+        "Yamtuan Antah",
+        "Mat Kilau",
+        "Tok Janggut",
+        "Dol Said"
+      ],
+      "correct_answer": 0,
+      "difficulty": "hard"
+    },
+    {
+      "id": "perak_q6",
+      "type": "multiple_choice",
+      "question": "Siapakah yang membunuh Residen British J.W.W. Birch?",
+      "options": [
+        "Dato Maharaja Lela",
+        "Mat Kilau",
+        "Tok Janggut",
+        "Rentap"
+      ],
+      "correct_answer": 0,
+      "difficulty": "medium"
+    },
+    {
+      "id": "perak_q7",
+      "type": "true_false",
+      "question": "Dol Said mempertahankan Naning dari penjajah British.",
+      "correct_answer": true,
+      "difficulty": "easy"
+    },
+    {
+      "id": "perak_q8",
+      "type": "true_false",
+      "question": "Rentap adalah pahlawan dari negeri Perak.",
+      "correct_answer": false,
+      "difficulty": "medium"
+    },
+    {
+      "id": "perak_q9",
+      "type": "fill_blank",
+      "question": "Residen British yang dibunuh di Perak: J.W.W. _ _RCH",
+      "correct_answer": "BIRCH",
+      "difficulty": "hard",
+      "hints": ["Residen British", "5 huruf"]
+    },
+    {
+      "id": "perak_q10",
+      "type": "multi_select",
+      "question": "Pilih tokoh yang menentang penjajah:",
+      "options": [
+        "Dol Said",
+        "Rentap",
+        "Dato Maharaja Lela",
+        "Yamtuan Antah",
+        "Tunku Abdul Rahman",
+        "Hang Tuah",
+        "Parameswara",
+        "Sultan Melaka",
+        "Tun Perak"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    }
+  ]
+}

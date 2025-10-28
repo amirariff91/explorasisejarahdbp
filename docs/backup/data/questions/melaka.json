@@ -1,0 +1,125 @@
+{
+  "state": "Melaka",
+  "questions": [
+    {
+      "id": "melaka_q1",
+      "type": "multiple_choice",
+      "question": "Apakah maksud 'Rukun Negara'?",
+      "options": [
+        "Prinsip asas perpaduan dan keharmonian",
+        "Undang-undang negara",
+        "Lagu rasmi",
+        "Buku teks sejarah"
+      ],
+      "correct_answer": 0,
+      "difficulty": "easy"
+    },
+    {
+      "id": "melaka_q2",
+      "type": "multiple_choice",
+      "question": "Apakah maksud Jalur Gemilang?",
+      "options": [
+        "Warna kegemaran",
+        "Lambang kebanggaan dan kemegahan negara",
+        "Gambar lukisan",
+        "Nama makanan"
+      ],
+      "correct_answer": 1,
+      "difficulty": "easy"
+    },
+    {
+      "id": "melaka_q3",
+      "type": "multiple_choice",
+      "question": "Lagu kebangsaan Malaysia ialah...?",
+      "options": [
+        "Malaysia Maju",
+        "Negaraku",
+        "Wawasan 2020",
+        "Jalur Gemilang"
+      ],
+      "correct_answer": 1,
+      "difficulty": "easy"
+    },
+    {
+      "id": "melaka_q4",
+      "type": "multiple_choice",
+      "question": "Rukun Negara mempunyai berapa prinsip?",
+      "options": [
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "melaka_q5",
+      "type": "multiple_choice",
+      "question": "Lambang rasmi negara Malaysia ialah...?",
+      "options": [
+        "Jalur Gemilang",
+        "Jata Negara",
+        "Tugu Negara",
+        "Parlimen"
+      ],
+      "correct_answer": 1,
+      "difficulty": "easy"
+    },
+    {
+      "id": "melaka_q6",
+      "type": "multiple_choice",
+      "question": "Pakaian tradisional Melayu lelaki ialah...?",
+      "options": [
+        "Cheongsam",
+        "Baju Melayu",
+        "Saree",
+        "Kimono"
+      ],
+      "correct_answer": 1,
+      "difficulty": "easy"
+    },
+    {
+      "id": "melaka_q7",
+      "type": "true_false",
+      "question": "Jalur Gemilang mempunyai 14 jalur.",
+      "correct_answer": true,
+      "difficulty": "medium"
+    },
+    {
+      "id": "melaka_q8",
+      "type": "fill_blank",
+      "question": "Lagu kebangsaan Malaysia: N_G_R_KU",
+      "correct_answer": "NEGARAKU",
+      "difficulty": "easy",
+      "hints": ["Lagu kebangsaan", "8 huruf"]
+    },
+    {
+      "id": "melaka_q9",
+      "type": "fill_blank",
+      "question": "Bendera Malaysia dikenali sebagai: JALUR G_M_L_NG",
+      "correct_answer": "GEMILANG",
+      "difficulty": "easy",
+      "hints": ["Nama bendera", "8 huruf"]
+    },
+    {
+      "id": "melaka_q10",
+      "type": "multi_select",
+      "question": "Pilih simbol rasmi Malaysia:",
+      "options": [
+        "Jalur Gemilang",
+        "Negaraku",
+        "Jata Negara",
+        "Rukun Negara",
+        "UMNO",
+        "Petronas",
+        "Baju Melayu",
+        "Nasi Lemak",
+        "Tugu Negara"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "medium"
+    }
+  ]
+}

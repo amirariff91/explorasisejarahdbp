@@ -6,6 +6,7 @@ import { kedahQuestions } from './kedah';
 import { pulauPinangQuestions } from './pulau-pinang';
 import { perakQuestions } from './perak';
 import { selangorQuestions } from './selangor';
+import { kualaLumpurQuestions } from './kuala-lumpur';
 import { negeriSembilanQuestions } from './negeri-sembilan';
 import { melakaQuestions } from './melaka';
 import { johorQuestions } from './johor';
@@ -25,6 +26,7 @@ export function getQuestionsForState(state: MalaysianState): Question[] {
     'pulau-pinang': pulauPinangQuestions,
     perak: perakQuestions,
     selangor: selangorQuestions,
+    'kuala-lumpur': kualaLumpurQuestions,
     'negeri-sembilan': negeriSembilanQuestions,
     melaka: melakaQuestions,
     johor: johorQuestions,
@@ -48,6 +50,7 @@ export function getAllQuestions(): Question[] {
     ...pulauPinangQuestions,
     ...perakQuestions,
     ...selangorQuestions,
+    ...kualaLumpurQuestions,
     ...negeriSembilanQuestions,
     ...melakaQuestions,
     ...johorQuestions,

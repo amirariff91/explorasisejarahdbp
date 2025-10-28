@@ -14,6 +14,7 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { playSound } from '@/utils/audio';
 import LandscapeLayout from '@/components/game/LandscapeLayout';
 import type { MultipleChoiceQuestion as MCQuestion } from '@/types';
 import {
@@ -94,6 +95,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
       buttonScales[index].value = withSpring(1, { damping: 10 });
     }, 100);
 
+    playSound('click');
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelectedAnswer(answer);
     setShowNext(true);
@@ -101,6 +103,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
 
   const handleNext = async () => {
     if (selectedAnswer) {
+      playSound('click');
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onAnswer(selectedAnswer);
     }
@@ -169,7 +172,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                   ]}
                   numberOfLines={2}
                   adjustsFontSizeToFit
-                  minimumFontScale={0.8}
+                  minimumFontScale={0.85}
                   allowFontScaling={allowScaling}>
                   {option}
                 </Text>
@@ -209,7 +212,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                     ]}
                     numberOfLines={2}
                     adjustsFontSizeToFit
-                    minimumFontScale={0.8}
+                    minimumFontScale={0.85}
                     allowFontScaling={allowScaling}>
                     {option}
                   </Text>
@@ -251,7 +254,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
       leftSection={leftSection}
       rightSection={rightSection}
       footer={footer}
-      leftWidth={38}
+      leftWidth={40}
       rightWidth={58}
     />
   );
@@ -269,7 +272,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   questionContent: {
-    width: '75%',
+    width: '85%', // Increased from 75% for better readability
     paddingVertical: 35,
   },
   questionText: {

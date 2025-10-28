@@ -1,0 +1,130 @@
+{
+  "state": "Selangor",
+  "questions": [
+    {
+      "id": "selangor_q1",
+      "type": "multiple_choice",
+      "question": "UMNO ditubuhkan pada tahun...?",
+      "options": [
+        "1957",
+        "1955",
+        "1946",
+        "1963"
+      ],
+      "correct_answer": 2,
+      "difficulty": "medium"
+    },
+    {
+      "id": "selangor_q2",
+      "type": "multiple_choice",
+      "question": "Mengapakah rakyat menentang Malayan Union?",
+      "options": [
+        "Mengurangkan kuasa Raja-Raja Melayu",
+        "Menghapuskan sekolah",
+        "Memberi makanan percuma",
+        "Menurunkan cukai"
+      ],
+      "correct_answer": 0,
+      "difficulty": "medium"
+    },
+    {
+      "id": "selangor_q3",
+      "type": "multiple_choice",
+      "question": "Siapakah pemimpin yang mengetuai rundingan kemerdekaan di London?",
+      "options": [
+        "Tun Tan Cheng Lock",
+        "Tunku Abdul Rahman",
+        "Dato' Onn Jaafar",
+        "Tun Hussein Onn"
+      ],
+      "correct_answer": 1,
+      "difficulty": "easy"
+    },
+    {
+      "id": "selangor_q4",
+      "type": "multiple_choice",
+      "question": "Apakah slogan yang dilaungkan pada hari kemerdekaan?",
+      "options": [
+        "Merdeka!",
+        "Malaysia!",
+        "Bebas!",
+        "Hidup Rakyat!"
+      ],
+      "correct_answer": 0,
+      "difficulty": "easy"
+    },
+    {
+      "id": "selangor_q5",
+      "type": "multiple_choice",
+      "question": "Apakah simbol perpaduan rakyat sebelum merdeka?",
+      "options": [
+        "Pembukaan sekolah",
+        "Parti Perikatan",
+        "Polis Diraja",
+        "Perpaduan ekonomi"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "selangor_q6",
+      "type": "multiple_choice",
+      "question": "Dato' Onn Jaafar dikenali sebagai...",
+      "options": [
+        "Pengasas UMNO",
+        "Perdana Menteri pertama",
+        "Ketua polis",
+        "Gabenor Malaya"
+      ],
+      "correct_answer": 0,
+      "difficulty": "easy"
+    },
+    {
+      "id": "selangor_q7",
+      "type": "multiple_choice",
+      "question": "Siapakah yang mengumumkan kemerdekaan di Stadium Merdeka?",
+      "options": [
+        "Tunku Abdul Rahman",
+        "Sultan Selangor",
+        "Tun Abdul Razak",
+        "British High Commissioner"
+      ],
+      "correct_answer": 0,
+      "difficulty": "easy"
+    },
+    {
+      "id": "selangor_q8",
+      "type": "true_false",
+      "question": "Parti Perikatan terdiri daripada UMNO, MCA dan MIC.",
+      "correct_answer": true,
+      "difficulty": "medium"
+    },
+    {
+      "id": "selangor_q9",
+      "type": "fill_blank",
+      "question": "Malayan Union ditentang kerana mengurangkan kuasa: R_J_-R_J_",
+      "correct_answer": "RAJA-RAJA",
+      "difficulty": "medium",
+      "hints": ["Pemerintah Melayu", "9 huruf"]
+    },
+    {
+      "id": "selangor_q10",
+      "type": "multi_select",
+      "question": "Pilih fakta yang betul tentang UMNO:",
+      "options": [
+        "Ditubuhkan tahun 1946",
+        "Diasaskan oleh Dato' Onn",
+        "Menentang Malayan Union",
+        "Parti politik Melayu",
+        "Ditubuhkan 1957",
+        "Parti asing",
+        "Menentang kemerdekaan",
+        "Tiada pengaruh",
+        "Parti Komunis"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    }
+  ]
+}

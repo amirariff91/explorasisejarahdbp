@@ -205,3 +205,83 @@ export const getComponentShadowStyle = (shadowPreset: typeof Shadows.component.m
   shadowOpacity: shadowPreset.shadowOpacity,
   shadowRadius: shadowPreset.shadowRadius,
 });
+
+// State Visual Identities (Gradients + Icons)
+import type { MalaysianState } from '@/types';
+
+export const StateVisuals: Record<MalaysianState, {
+  color: string;          // Main solid color
+  borderColor: string;    // Darker border for depth
+  emoji: string;          // Emoji icon
+}> = {
+  'perlis': {
+    color: '#FFD700',        // Bright gold (rice fields)
+    borderColor: '#DAA520',  // Darker gold
+    emoji: '🌾',
+  },
+  'kedah': {
+    color: '#8BC34A',        // Lime green (rice bowl)
+    borderColor: '#689F38',  // Darker green
+    emoji: '🌾',
+  },
+  'pulau-pinang': {
+    color: '#00BCD4',        // Cyan (island)
+    borderColor: '#0097A7',  // Darker cyan
+    emoji: '🏝️',
+  },
+  'perak': {
+    color: '#90A4AE',        // Gray-blue (mountains)
+    borderColor: '#607D8B',  // Darker gray
+    emoji: '⛰️',
+  },
+  'selangor': {
+    color: '#AB47BC',        // Purple (urban)
+    borderColor: '#7B1FA2',  // Darker purple
+    emoji: '🏙️',
+  },
+  'kuala-lumpur': {
+    color: '#42A5F5',        // Bright blue (capital)
+    borderColor: '#1976D2',  // Darker blue
+    emoji: '🏛️',
+  },
+  'negeri-sembilan': {
+    color: '#FF9800',        // Orange
+    borderColor: '#F57C00',  // Darker orange
+    emoji: '🏡',
+  },
+  'melaka': {
+    color: '#FF5722',        // Red-orange (port)
+    borderColor: '#E64A19',  // Darker red
+    emoji: '⚓',
+  },
+  'johor': {
+    color: '#66BB6A',        // Green (palm trees)
+    borderColor: '#43A047',  // Darker green
+    emoji: '🌴',
+  },
+  'pahang': {
+    color: '#4CAF50',        // Forest green (rainforest)
+    borderColor: '#2E7D32',  // Darker forest green
+    emoji: '🌲',
+  },
+  'terengganu': {
+    color: '#26C6DA',        // Teal (ocean/turtles)
+    borderColor: '#00ACC1',  // Darker teal
+    emoji: '🐢',
+  },
+  'kelantan': {
+    color: '#EC407A',        // Pink (culture)
+    borderColor: '#C2185B',  // Darker pink
+    emoji: '🎭',
+  },
+  'sabah': {
+    color: '#A1887F',        // Brown (orangutan/rainforest)
+    borderColor: '#6D4C41',  // Darker brown
+    emoji: '🦧',
+  },
+  'sarawak': {
+    color: '#9CCC65',        // Light green (hornbill/jungle)
+    borderColor: '#689F38',  // Darker green
+    emoji: '🦜',
+  },
+};

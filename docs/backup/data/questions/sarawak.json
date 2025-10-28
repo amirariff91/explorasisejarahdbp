@@ -1,0 +1,114 @@
+{
+  "state": "Sarawak",
+  "questions": [
+    {
+      "id": "sarawak_q1",
+      "type": "multiple_choice",
+      "question": "Bilakah Sarawak menyertai Malaysia?",
+      "options": [
+        "31 Ogos 1957",
+        "16 September 1963",
+        "9 Ogos 1965",
+        "1 Januari 1960"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "sarawak_q2",
+      "type": "multiple_choice",
+      "question": "Siapakah Ketua Menteri Sarawak yang pertama?",
+      "options": [
+        "Tun Abdul Rahman Ya'kub",
+        "Stephen Kalong Ningkan",
+        "Abdul Taib Mahmud",
+        "Adenan Satem"
+      ],
+      "correct_answer": 1,
+      "difficulty": "hard"
+    },
+    {
+      "id": "sarawak_q3",
+      "type": "multiple_choice",
+      "question": "Sarawak dikenali sebagai negeri apa?",
+      "options": [
+        "Negeri Selat",
+        "Negeri Enggang",
+        "Negeri Badak",
+        "Negeri Gajah"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "sarawak_q4",
+      "type": "multiple_choice",
+      "question": "Siapakah 'White Rajah' pertama Sarawak?",
+      "options": [
+        "Charles Brooke",
+        "James Brooke",
+        "Vyner Brooke",
+        "Anthony Brooke"
+      ],
+      "correct_answer": 1,
+      "difficulty": "hard"
+    },
+    {
+      "id": "sarawak_q5",
+      "type": "fill_blank",
+      "question": "Sarawak adalah negeri _____ di Malaysia.",
+      "correct_answer": "terbesar",
+      "difficulty": "easy",
+      "hints": ["Saiz", "8 huruf"]
+    },
+    {
+      "id": "sarawak_q6",
+      "type": "fill_blank",
+      "question": "Ibu negeri Sarawak ialah _____.",
+      "correct_answer": "Kuching",
+      "difficulty": "easy",
+      "hints": ["Nama haiwan", "7 huruf"]
+    },
+    {
+      "id": "sarawak_q7",
+      "type": "fill_blank",
+      "question": "Sarawak terkenal dengan Gua _____, salah satu sistem gua terbesar di dunia.",
+      "correct_answer": "Mulu",
+      "difficulty": "medium",
+      "hints": ["Taman Negara", "4 huruf"]
+    },
+    {
+      "id": "sarawak_q8",
+      "type": "true_false",
+      "question": "Sarawak pernah diperintah oleh keluarga Brooke selama lebih 100 tahun.",
+      "correct_answer": true,
+      "difficulty": "medium"
+    },
+    {
+      "id": "sarawak_q9",
+      "type": "true_false",
+      "question": "Sarawak berada di Semenanjung Malaysia.",
+      "correct_answer": false,
+      "difficulty": "easy"
+    },
+    {
+      "id": "sarawak_q10",
+      "type": "multi_select",
+      "question": "Pilih kaum pribumi Sarawak yang betul:",
+      "options": [
+        "Iban",
+        "Bidayuh",
+        "Melanau",
+        "Orang Ulu",
+        "Kadazan",
+        "Dusun",
+        "Jawa",
+        "Cina",
+        "India"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    }
+  ]
+}

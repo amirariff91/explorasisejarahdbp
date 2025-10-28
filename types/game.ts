@@ -10,6 +10,7 @@ export type MalaysianState =
   | 'pulau-pinang'
   | 'perak'
   | 'selangor'
+  | 'kuala-lumpur'
   | 'negeri-sembilan'
   | 'melaka'
   | 'johor'

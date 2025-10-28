@@ -8,9 +8,20 @@
     "scheme": "explorasisejarahdbp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "assetBundlePatterns": [
+      "assets/audio/**/*",
+      "assets/images/game/backgrounds/**/*",
+      "assets/images/game/buttons/**/*",
+      "assets/images/game/ui-elements/**/*"
+    ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.amirariff.explorasisejarahdbp"
+      "bundleIdentifier": "com.amirariff.explorasisejarahdbp",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ]
+      }
     },
     "android": {
       "package": "com.amirariff.explorasisejarahdbp",
@@ -42,7 +53,8 @@
           }
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,

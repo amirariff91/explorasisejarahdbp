@@ -1,0 +1,125 @@
+{
+  "state": "Johor",
+  "questions": [
+    {
+      "id": "johor_q1",
+      "type": "crossword",
+      "question": "Selesaikan teka silang kata berdasarkan petunjuk yang diberi.",
+      "clues_across": [
+        "Negara yang ditubuhkan pada 16 September 1963",
+        "Keluar daripada Malaysia pada tahun 1965",
+        "Kebebasan sesebuah negara daripada kuasa asing"
+      ],
+      "clues_down": [
+        "Negeri berjiran dengan Sabah dan menyertai Malaysia pada 1963",
+        "Undang-undang tertinggi negara",
+        "Proses perbincangan antara dua pihak"
+      ],
+      "answers_across": ["MALAYSIA", "SINGAPURA", "KEMERDEKAAN"],
+      "answers_down": ["SARAWAK", "PERLEMBAGAAN", "RUNDINGAN"],
+      "grid_size": "15x15",
+      "difficulty": "hard"
+    },
+    {
+      "id": "johor_q2",
+      "type": "multiple_choice",
+      "question": "Bilakah Malaysia ditubuhkan?",
+      "options": [
+        "31 Ogos 1957",
+        "16 September 1963",
+        "9 Ogos 1965",
+        "1 Januari 1960"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "johor_q3",
+      "type": "multiple_choice",
+      "question": "Bilakah Singapura keluar dari Malaysia?",
+      "options": [
+        "1963",
+        "1964",
+        "1965",
+        "1966"
+      ],
+      "correct_answer": 2,
+      "difficulty": "medium"
+    },
+    {
+      "id": "johor_q4",
+      "type": "fill_blank",
+      "question": "Negara yang ditubuhkan pada 16 September 1963: M_L_YS_ _",
+      "correct_answer": "MALAYSIA",
+      "difficulty": "easy",
+      "hints": ["Negara kita", "8 huruf"]
+    },
+    {
+      "id": "johor_q5",
+      "type": "fill_blank",
+      "question": "Negara yang keluar dari Malaysia: S_NG_ _UR_",
+      "correct_answer": "SINGAPURA",
+      "difficulty": "easy",
+      "hints": ["Negara jiran", "9 huruf"]
+    },
+    {
+      "id": "johor_q6",
+      "type": "true_false",
+      "question": "Malaysia ditubuhkan dengan menggabungkan Tanah Melayu, Sabah, Sarawak dan Singapura.",
+      "correct_answer": true,
+      "difficulty": "medium"
+    },
+    {
+      "id": "johor_q7",
+      "type": "true_false",
+      "question": "Singapura masih menjadi sebahagian daripada Malaysia.",
+      "correct_answer": false,
+      "difficulty": "easy"
+    },
+    {
+      "id": "johor_q8",
+      "type": "multiple_choice",
+      "question": "Apakah maksud 'perlembagaan'?",
+      "options": [
+        "Undang-undang tertinggi negara",
+        "Nama pemimpin",
+        "Jenis makanan",
+        "Tempat tinggal"
+      ],
+      "correct_answer": 0,
+      "difficulty": "easy"
+    },
+    {
+      "id": "johor_q9",
+      "type": "multiple_choice",
+      "question": "Negeri manakah yang menyertai Malaysia pada 1963 bersama Sabah?",
+      "options": [
+        "Kelantan",
+        "Sarawak",
+        "Johor",
+        "Melaka"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "johor_q10",
+      "type": "multi_select",
+      "question": "Pilih negeri/negara yang menjadi sebahagian Malaysia pada 1963:",
+      "options": [
+        "Tanah Melayu",
+        "Sabah",
+        "Sarawak",
+        "Singapura",
+        "Brunei",
+        "Indonesia",
+        "Thailand",
+        "Filipina",
+        "Vietnam"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    }
+  ]
+}

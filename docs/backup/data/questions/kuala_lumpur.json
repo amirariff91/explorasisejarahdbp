@@ -1,0 +1,119 @@
+{
+  "state": "Kuala Lumpur",
+  "questions": [
+    {
+      "id": "kuala_lumpur_q1",
+      "type": "multiple_choice",
+      "question": "Dato' Bahaman menyerang Balai Polis Lubuk Terua pada tahun:",
+      "options": [
+        "1890",
+        "1892",
+        "1895",
+        "1891"
+      ],
+      "correct_answer": 3,
+      "difficulty": "hard"
+    },
+    {
+      "id": "kuala_lumpur_q2",
+      "type": "multiple_choice",
+      "question": "Tok Janggut terkorban dalam serangan British di:",
+      "options": [
+        "Besut",
+        "Teluk Panglima Garang",
+        "Kampung Baru",
+        "Kampung Saring"
+      ],
+      "correct_answer": 3,
+      "difficulty": "medium"
+    },
+    {
+      "id": "kuala_lumpur_q3",
+      "type": "multiple_choice",
+      "question": "Bilakah Tanah Melayu mencapai kemerdekaan?",
+      "options": [
+        "31 Ogos 1957",
+        "31 Ogos 1963",
+        "16 September 1963",
+        "1 Januari 1956"
+      ],
+      "correct_answer": 0,
+      "difficulty": "easy"
+    },
+    {
+      "id": "kuala_lumpur_q4",
+      "type": "multiple_choice",
+      "question": "Siapakah Perdana Menteri pertama Malaysia?",
+      "options": [
+        "Tun Abdul Razak",
+        "Tunku Abdul Rahman",
+        "Tun Dr Mahathir",
+        "Dato' Onn Jaafar"
+      ],
+      "correct_answer": 1,
+      "difficulty": "easy"
+    },
+    {
+      "id": "kuala_lumpur_q5",
+      "type": "multiple_choice",
+      "question": "Apakah maksud 'merdeka'?",
+      "options": [
+        "Membuka sempadan negara",
+        "Bebas daripada penjajahan",
+        "Menyertai peperangan",
+        "Melawat negara asing"
+      ],
+      "correct_answer": 1,
+      "difficulty": "easy"
+    },
+    {
+      "id": "kuala_lumpur_q6",
+      "type": "true_false",
+      "question": "Stadium Merdeka terletak di Kuala Lumpur.",
+      "correct_answer": true,
+      "difficulty": "easy"
+    },
+    {
+      "id": "kuala_lumpur_q7",
+      "type": "true_false",
+      "question": "Malaysia mencapai kemerdekaan pada tahun 1963.",
+      "correct_answer": false,
+      "difficulty": "medium"
+    },
+    {
+      "id": "kuala_lumpur_q8",
+      "type": "fill_blank",
+      "question": "Kemerdekaan Tanah Melayu diisytiharkan di Stadium: M_ _D_KA",
+      "correct_answer": "MERDEKA",
+      "difficulty": "easy",
+      "hints": ["Nama stadium", "7 huruf"]
+    },
+    {
+      "id": "kuala_lumpur_q9",
+      "type": "fill_blank",
+      "question": "Tok Janggut menentang British di negeri: K_L_N_ _N",
+      "correct_answer": "KELANTAN",
+      "difficulty": "medium",
+      "hints": ["Negeri di timur", "8 huruf"]
+    },
+    {
+      "id": "kuala_lumpur_q10",
+      "type": "multi_select",
+      "question": "Pilih fakta yang betul tentang Kemerdekaan Tanah Melayu:",
+      "options": [
+        "31 Ogos 1957",
+        "Tunku Abdul Rahman",
+        "Stadium Merdeka",
+        "Laung 'Merdeka!'",
+        "16 September 1963",
+        "Pulau Pinang",
+        "Tahun 1965",
+        "British menyerah",
+        "Tiada perayaan"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "medium"
+    }
+  ]
+}

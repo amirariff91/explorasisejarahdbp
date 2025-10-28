@@ -170,17 +170,17 @@ export const UIElements = {
 export const LayoutRatios = {
   // Two-column layouts (Question | Answers)
   twoColumn: {
-    // Standard (Multiple Choice, True/False, Fill Blank)
+    // Standard (Multiple Choice, True/False, Fill Blank, Matching)
     standard: {
-      left: 38, // %
+      left: 40, // % - Increased from 38% for consistent spacing
       right: 58, // %
-      gap: 4, // % (remaining)
+      gap: 2, // % (remaining) - Managed by LandscapeLayout flexbox gap
     },
-    // Matching (Title | Grid)
+    // Matching (Title | Grid) - Uses same ratios as standard
     matching: {
       left: 40, // %
-      right: 55, // %
-      gap: 5, // %
+      right: 58, // % - Updated from 55% for consistency
+      gap: 2, // % - Updated from 5%
     },
     // Tutorial (Title | Content)
     tutorial: {

@@ -1,0 +1,114 @@
+{
+  "state": "Sabah",
+  "questions": [
+    {
+      "id": "sabah_q1",
+      "type": "multiple_choice",
+      "question": "Bilakah Sabah menyertai Malaysia?",
+      "options": [
+        "31 Ogos 1957",
+        "16 September 1963",
+        "9 Ogos 1965",
+        "1 Januari 1960"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "sabah_q2",
+      "type": "multiple_choice",
+      "question": "Siapakah Ketua Menteri Sabah yang pertama?",
+      "options": [
+        "Tun Fuad Stephens",
+        "Tun Mustapha Harun",
+        "Joseph Pairin Kitingan",
+        "Harris Salleh"
+      ],
+      "correct_answer": 0,
+      "difficulty": "hard"
+    },
+    {
+      "id": "sabah_q3",
+      "type": "multiple_choice",
+      "question": "Gunung apakah yang paling tinggi di Malaysia?",
+      "options": [
+        "Gunung Tahan",
+        "Gunung Kinabalu",
+        "Gunung Korbu",
+        "Gunung Ledang"
+      ],
+      "correct_answer": 1,
+      "difficulty": "easy"
+    },
+    {
+      "id": "sabah_q4",
+      "type": "multiple_choice",
+      "question": "Apakah nama lama Sabah?",
+      "options": [
+        "Sarawak Utara",
+        "Borneo Utara",
+        "Kalimantan Utara",
+        "Brunei Timur"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "sabah_q5",
+      "type": "fill_blank",
+      "question": "Sabah dikenali sebagai 'Negeri Di Bawah _____'.",
+      "correct_answer": "Bayu",
+      "difficulty": "medium",
+      "hints": ["Angin", "4 huruf"]
+    },
+    {
+      "id": "sabah_q6",
+      "type": "fill_blank",
+      "question": "Ibu negeri Sabah ialah Kota _____.",
+      "correct_answer": "Kinabalu",
+      "difficulty": "easy",
+      "hints": ["Nama gunung", "8 huruf"]
+    },
+    {
+      "id": "sabah_q7",
+      "type": "fill_blank",
+      "question": "Sabah pernah diperintah oleh syarikat British North Borneo sehingga tahun _____.",
+      "correct_answer": "1963",
+      "difficulty": "hard",
+      "hints": ["Tahun kemerdekaan Malaysia", "4 digit"]
+    },
+    {
+      "id": "sabah_q8",
+      "type": "true_false",
+      "question": "Sabah mempunyai pusat pemulihan orang utan yang terkenal di Sepilok.",
+      "correct_answer": true,
+      "difficulty": "easy"
+    },
+    {
+      "id": "sabah_q9",
+      "type": "true_false",
+      "question": "Sabah adalah negeri terbesar di Malaysia.",
+      "correct_answer": false,
+      "difficulty": "medium"
+    },
+    {
+      "id": "sabah_q10",
+      "type": "multi_select",
+      "question": "Pilih kaum pribumi Sabah yang betul:",
+      "options": [
+        "Kadazan",
+        "Dusun",
+        "Murut",
+        "Bajau",
+        "Iban",
+        "Melanau",
+        "Jawa",
+        "Cina",
+        "India"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    }
+  ]
+}

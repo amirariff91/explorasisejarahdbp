@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Modal, View, Text, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
 import Animated, {
   useSharedValue,
@@ -10,6 +10,7 @@ import Animated, {
   withSequence,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
+import { playCelebration, playSound } from '@/utils/audio';
 import type { SuccessModalProps } from '@/types';
 import {
   Colors,
@@ -48,6 +49,9 @@ export default function SuccessModal({ visible, onContinue, onRestart }: Success
     if (visible) {
       // Success haptic
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      // Celebration audio (voice + SFX)
+      playCelebration();
 
       // Star rotation (continuous)
       starRotation.value = withRepeat(withTiming(360, { duration: 3000 }), -1, false);
@@ -89,8 +93,21 @@ export default function SuccessModal({ visible, onContinue, onRestart }: Success
     transform: [{ translateY: contentTranslateY.value }],
   }));
 
+  // Button handlers with click sound
+  const handleContinue = () => {
+    playSound('click');
+    onContinue();
+  };
+
+  const handleRestart = () => {
+    playSound('click');
+    onRestart();
+  };
+
+  // Don't render if not visible
+  if (!visible) return null;
+
   return (
-    <Modal visible={visible} transparent animationType="fade">
       <View style={styles.overlay}>
         {/* Flare Background Effect - Animated */}
         <Animated.View style={[styles.flareContainer, flareAnimatedStyle]}>
@@ -166,7 +183,7 @@ export default function SuccessModal({ visible, onContinue, onRestart }: Success
                 height: buttonSize.height,
               },
             ]}
-            onPress={onContinue}
+            onPress={handleContinue}
             hitSlop={TouchTargets.hitSlop}>
             <Image
               source={require('@/assets/images/game/ui-elements/button-teruskan.png')}
@@ -196,7 +213,7 @@ export default function SuccessModal({ visible, onContinue, onRestart }: Success
                 height: buttonSize.height,
               },
             ]}
-            onPress={onRestart}
+            onPress={handleRestart}
             hitSlop={TouchTargets.hitSlop}>
             <Image
               source={require('@/assets/images/game/ui-elements/button-teruskan.png')}
@@ -218,16 +235,20 @@ export default function SuccessModal({ visible, onContinue, onRestart }: Success
           </Pressable>
         </Animated.View>
       </View>
-    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
   overlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: Colors.backgroundOverlayDark,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 9999, // Ensure it appears on top of everything
   },
   flareContainer: {
     position: 'absolute',

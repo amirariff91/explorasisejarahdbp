@@ -1,0 +1,114 @@
+{
+  "state": "Pulau Pinang",
+  "questions": [
+    {
+      "id": "pulau_pinang_q1",
+      "type": "fill_blank",
+      "question": "Laksamana termasyhur semasa Kesultanan Melayu Melaka: H_NG _UA_",
+      "correct_answer": "HANG TUAH",
+      "difficulty": "easy",
+      "hints": ["Laksamana Melaka", "9 huruf"]
+    },
+    {
+      "id": "pulau_pinang_q2",
+      "type": "fill_blank",
+      "question": "Nama tempat kelahiran Hang Tuah: S_NG_I D_Y_NG",
+      "correct_answer": "SUNGAI DUYUNG",
+      "difficulty": "hard",
+      "hints": ["Tempat lahir", "13 huruf"]
+    },
+    {
+      "id": "pulau_pinang_q3",
+      "type": "multi_select",
+      "question": "Siapakah empat sahabat Hang Tuah?",
+      "options": [
+        "Hang Lekir",
+        "Hang Nadim",
+        "Hang Lekiu",
+        "Hang Kebun",
+        "Hang Jebat",
+        "Hang Kasturi",
+        "Hang Mahmud",
+        "Hang Ali",
+        "Hang Ahmad"
+      ],
+      "correct_answers": [0, 2, 4, 5],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    },
+    {
+      "id": "pulau_pinang_q4",
+      "type": "multiple_choice",
+      "question": "Ilmu mempertahankan diri yang digunakan Hang Tuah dan sahabatnya:",
+      "options": [
+        "Muay Thai",
+        "Wushu",
+        "Taekwondo",
+        "Silat"
+      ],
+      "correct_answer": 3,
+      "difficulty": "easy"
+    },
+    {
+      "id": "pulau_pinang_q5",
+      "type": "multiple_choice",
+      "question": "Apakah jawatan Hang Tuah dalam Kesultanan Melaka?",
+      "options": [
+        "Bendahara",
+        "Laksamana",
+        "Temenggung",
+        "Sultan"
+      ],
+      "correct_answer": 1,
+      "difficulty": "easy"
+    },
+    {
+      "id": "pulau_pinang_q6",
+      "type": "multiple_choice",
+      "question": "Siapakah sahabat Hang Tuah yang memberontak terhadap Sultan?",
+      "options": [
+        "Hang Lekir",
+        "Hang Lekiu",
+        "Hang Jebat",
+        "Hang Kasturi"
+      ],
+      "correct_answer": 2,
+      "difficulty": "medium"
+    },
+    {
+      "id": "pulau_pinang_q7",
+      "type": "true_false",
+      "question": "Hang Tuah dikenali sebagai pahlawan yang setia kepada Raja.",
+      "correct_answer": true,
+      "difficulty": "easy"
+    },
+    {
+      "id": "pulau_pinang_q8",
+      "type": "true_false",
+      "question": "Hang Tuah dan sahabatnya pandai menggunakan senjata keris.",
+      "correct_answer": true,
+      "difficulty": "easy"
+    },
+    {
+      "id": "pulau_pinang_q9",
+      "type": "multiple_choice",
+      "question": "Berapa orang sahabat karib Hang Tuah?",
+      "options": [
+        "Tiga orang",
+        "Empat orang",
+        "Lima orang",
+        "Enam orang"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "pulau_pinang_q10",
+      "type": "fill_blank",
+      "question": "Senjata terkenal yang digunakan oleh pahlawan Melayu: K_ _IS",
+      "correct_answer": "KERIS",
+      "difficulty": "easy",
+      "hints": ["Senjata tradisional", "5 huruf"]
+    }
+  ]
+}

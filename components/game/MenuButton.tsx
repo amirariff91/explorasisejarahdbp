@@ -4,12 +4,13 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  Modal,
   useWindowDimensions,
 } from 'react-native';
 import { Image } from 'expo-image';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useGameContext } from '@/contexts/GameContext';
+import { playSound } from '@/utils/audio';
 import {
   Colors,
   Typography,
@@ -30,24 +31,34 @@ export default function MenuButton() {
   const router = useRouter();
   const { resetGame, gameState, setAllowFontScaling } = useGameContext();
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const isLandscape = isLandscapeMode(width);
   const menuButtonSize = isLandscape ? ButtonSizes.menu.landscape : ButtonSizes.menu.portrait;
 
+  const handleOpenMenu = () => {
+    playSound('click');
+    setShowMenu(true);
+  };
+
   const handleResume = () => {
+    playSound('click');
     setShowMenu(false);
   };
 
   const handleRestart = () => {
+    playSound('click');
     setShowMenu(false);
     // TODO: Restart current level
   };
 
   const handleQuit = () => {
+    playSound('click');
     setShowMenu(false);
     router.back();
   };
 
   const toggleTextScaling = () => {
+    playSound('click');
     setAllowFontScaling(!gameState.allowFontScaling);
   };
 
@@ -60,9 +71,11 @@ export default function MenuButton() {
           {
             width: menuButtonSize.width,
             height: menuButtonSize.height,
+            bottom: insets.bottom + 20, // Add safe area padding to prevent home indicator overlap
+            left: Math.max(insets.left, 12), // Ensure spacing from left edge, even with notches
           },
         ]}
-        onPress={() => setShowMenu(true)}>
+        onPress={handleOpenMenu}>
         <Image
           source={require('@/assets/images/game/buttons/menu-button.png')}
           style={styles.menuButtonImage}
@@ -70,8 +83,8 @@ export default function MenuButton() {
         />
       </Pressable>
 
-      {/* Menu Modal */}
-      <Modal visible={showMenu} transparent animationType="fade">
+      {/* Menu Overlay - Only render when visible */}
+      {showMenu && (
         <View style={styles.modalOverlay}>
           <View
             style={[
@@ -109,7 +122,7 @@ export default function MenuButton() {
           </Pressable>
         </View>
       </View>
-    </Modal>
+      )}
     </>
   );
 }
@@ -117,8 +130,7 @@ export default function MenuButton() {
 const styles = StyleSheet.create({
   menuButton: {
     position: 'absolute',
-    bottom: 20,
-    left: 12,
+    // bottom and left set dynamically with safe area insets
     zIndex: 10,
   },
   menuButtonImage: {
@@ -126,10 +138,15 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   modalOverlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     backgroundColor: Colors.backgroundOverlay,
     justifyContent: 'center',
     alignItems: 'center',
+    zIndex: 9998, // Just below SuccessModal but above everything else
   },
   menuContainer: {
     backgroundColor: Colors.cardBackground,

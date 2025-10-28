@@ -9,10 +9,11 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
+import { playSound } from '@/utils/audio';
 import LandscapeLayout from '@/components/game/LandscapeLayout';
-import { Typography } from '@/constants/theme';
+import { Typography, Colors, getResponsiveFontSize } from '@/constants/theme';
 import type { MatchingQuestion as MQQuestion } from '@/types';
-import { getEdgeMargin, LayoutRatios } from '@/constants/layout';
+import { getEdgeMargin, LayoutRatios, isLandscapeMode, QuestionBoard, ButtonSizes } from '@/constants/layout';
 import { useGameContext } from '@/contexts/GameContext';
 
 interface Props {
@@ -31,9 +32,13 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [showNext, setShowNext] = useState(false);
   const { width } = useWindowDimensions();
-  const isLandscape = width >= 800; // Landscape mode threshold (Figma: 895px)
+  const isLandscape = isLandscapeMode(width); // Use consistent landscape detection
+  const questionBoardSize = isLandscape
+    ? QuestionBoard.standard.landscape
+    : QuestionBoard.standard.portrait;
 
   const handleToggleOption = async (option: string) => {
+    playSound('click');
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     setSelectedOptions((prev) => {
@@ -52,6 +57,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   };
 
   const handleSubmit = async () => {
+    playSound('click');
     await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     onAnswer(selectedOptions);
   };
@@ -59,11 +65,15 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   // Compute responsive grid cell width so 3 columns always fit the right column
   const edgeMargin = getEdgeMargin(isLandscape);
   const contentWidth = width - edgeMargin * 2;
-  const rightPercent = LayoutRatios.twoColumn.matching.right; // 55
+  const rightPercent = LayoutRatios.twoColumn.matching.right; // 58 (updated for consistency)
   const rightSectionWidth = (contentWidth * rightPercent) / 100;
   const cellGap = 12; // matches styles.gridRow gap
-  const gridSize = Math.floor((rightSectionWidth - cellGap * 2) / 3);
-  const fontSize = Math.max(9, Math.floor(gridSize / 14));
+  const gridCellWidth = Math.floor((rightSectionWidth - cellGap * 2) / 3);
+
+  // Calculate height based on jawapan-button aspect ratio (uses same button as MultipleChoice)
+  const buttonAspectRatio = ButtonSizes.answerOption.landscape.height / ButtonSizes.answerOption.landscape.width; // 70/190 = 0.368
+  const gridCellHeight = Math.round(gridCellWidth * buttonAspectRatio);
+  const fontSize = Math.max(10, Math.floor(gridCellWidth / 14)); // Increased min from 9 to 10
 
   // Left Section: Question Board with Title
   const leftSection = (
@@ -73,14 +83,17 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
         style={[
           styles.questionBoard,
           {
-            width: isLandscape ? 290 : 240,
-            height: isLandscape ? 200 : 180,
+            width: questionBoardSize.width,
+            height: questionBoardSize.height,
           },
         ]}
         resizeMode="contain">
         <View style={styles.questionContent}>
           <Text
-            style={[styles.titleText, { fontSize: isLandscape ? 18 : 16 }]}
+            style={[
+              styles.titleText,
+              { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
+            ]}
             numberOfLines={2}
             adjustsFontSizeToFit
             minimumFontScale={0.85}
@@ -88,7 +101,10 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
             {question.title}
           </Text>
           <Text
-            style={[styles.questionText, { fontSize: isLandscape ? 16 : 14 }]}
+            style={[
+              styles.questionText,
+              { fontSize: getResponsiveFontSize(Typography.body, isLandscape) },
+            ]}
             numberOfLines={2}
             adjustsFontSizeToFit
             minimumFontScale={0.85}
@@ -114,8 +130,8 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
                   style={[
                     styles.gridCell,
                     {
-                      width: gridSize,
-                      height: gridSize * 0.32,
+                      width: gridCellWidth,
+                      height: gridCellHeight,
                     },
                     isSelected && styles.gridCellSelected,
                   ]}
@@ -131,7 +147,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
                       style={[styles.gridCellText, { fontSize }]}
                       numberOfLines={2}
                       adjustsFontSizeToFit
-                      minimumFontScale={0.8}
+                      minimumFontScale={0.85}
                       allowFontScaling={allowScaling}>
                       {isSelected && '✓ '}
                       {option}
@@ -175,7 +191,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
       rightSection={rightSection}
       footer={footer}
       leftWidth={40}
-      rightWidth={55}
+      rightWidth={58}
     />
   );
 }
@@ -192,23 +208,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   questionContent: {
-    width: '80%',
+    width: '85%', // Increased from 80% for better readability
     paddingVertical: 25,
   },
   titleText: {
     fontFamily: Typography.fontFamily,
-    fontSize: 16,
-    color: '#000',
+    color: Colors.textPrimary,
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontWeight: Typography.fontWeight.bold,
     marginBottom: 10,
   },
   questionText: {
     fontFamily: Typography.fontFamily,
-    fontSize: 14,
-    color: '#000',
+    color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: Typography.lineHeight.normal,
   },
 
   // Right Section: Grid
@@ -240,10 +254,9 @@ const styles = StyleSheet.create({
   },
   gridCellText: {
     fontFamily: Typography.fontFamily,
-    fontSize: 9,
-    color: '#fff',
+    color: Colors.textLight,
     textAlign: 'center',
-    fontWeight: '600',
+    fontWeight: Typography.fontWeight.semiBold,
   },
 
   // Footer: Next Button

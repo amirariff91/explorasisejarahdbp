@@ -1,0 +1,113 @@
+{
+  "state": "Negeri Sembilan",
+  "questions": [
+    {
+      "id": "negeri_sembilan_q1",
+      "type": "true_false",
+      "question": "Tempoh perkhidmatan YDP Agong ialah selama 3 tahun.",
+      "correct_answer": false,
+      "difficulty": "medium"
+    },
+    {
+      "id": "negeri_sembilan_q2",
+      "type": "true_false",
+      "question": "Tuanku Abdul Rahman adalah YDP Agong pertama Malaysia.",
+      "correct_answer": true,
+      "difficulty": "easy"
+    },
+    {
+      "id": "negeri_sembilan_q3",
+      "type": "multiple_choice",
+      "question": "Di manakah letaknya Istana Negara?",
+      "options": [
+        "Putrajaya",
+        "Kuala Lumpur",
+        "Selangor",
+        "Negeri Sembilan"
+      ],
+      "correct_answer": 1,
+      "difficulty": "easy"
+    },
+    {
+      "id": "negeri_sembilan_q4",
+      "type": "multiple_choice",
+      "question": "Siapakah yang memilih YDP Agong?",
+      "options": [
+        "Parlimen",
+        "Majlis Raja-Raja",
+        "Rakyat",
+        "Perdana Menteri"
+      ],
+      "correct_answer": 1,
+      "difficulty": "medium"
+    },
+    {
+      "id": "negeri_sembilan_q5",
+      "type": "multiple_choice",
+      "question": "Berikut adalah BUKAN simbol kebesaran YDP Agong, KECUALI?",
+      "options": [
+        "Mahkota dan keris",
+        "Jata negeri",
+        "Kad pengenalan",
+        "Jalur Gemilang"
+      ],
+      "correct_answer": 0,
+      "difficulty": "medium"
+    },
+    {
+      "id": "negeri_sembilan_q6",
+      "type": "true_false",
+      "question": "YDP Agong adalah ketua negara Malaysia.",
+      "correct_answer": true,
+      "difficulty": "easy"
+    },
+    {
+      "id": "negeri_sembilan_q7",
+      "type": "fill_blank",
+      "question": "Tempoh perkhidmatan YDP Agong adalah: _ TAHUN",
+      "correct_answer": "5 TAHUN",
+      "difficulty": "medium",
+      "hints": ["Lima", "6 huruf"]
+    },
+    {
+      "id": "negeri_sembilan_q8",
+      "type": "fill_blank",
+      "question": "YDP Agong dipilih oleh: MAJLIS R_J_-R_J_",
+      "correct_answer": "RAJA-RAJA",
+      "difficulty": "medium",
+      "hints": ["Majlis pemerintah", "9 huruf"]
+    },
+    {
+      "id": "negeri_sembilan_q9",
+      "type": "multiple_choice",
+      "question": "Berapa lama tempoh perkhidmatan YDP Agong?",
+      "options": [
+        "3 tahun",
+        "4 tahun",
+        "5 tahun",
+        "6 tahun"
+      ],
+      "correct_answer": 2,
+      "difficulty": "medium"
+    },
+    {
+      "id": "negeri_sembilan_q10",
+      "type": "multi_select",
+      "question": "Pilih fakta yang betul tentang YDP Agong:",
+      "options": [
+        "Ketua negara Malaysia",
+        "Dipilih oleh Majlis Raja-Raja",
+        "Tempoh 5 tahun",
+        "Tinggal di Istana Negara",
+        "Tempoh 3 tahun",
+        "Dipilih rakyat",
+        "Bukan ketua negara",
+        "Tiada kuasa",
+        "Tinggal di Putrajaya"
+      ],
+      "correct_answers": [0, 1, 2, 3],
+      "grid_size": "3x3",
+      "difficulty": "hard"
+    }
+  ]
+}

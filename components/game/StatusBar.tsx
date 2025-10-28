@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGameContext } from '@/contexts/GameContext';
 import type { MalaysianState } from '@/types';
 import {
@@ -24,6 +25,7 @@ interface StatusBarProps {
 export default function StatusBar({ state }: StatusBarProps) {
   const { gameState } = useGameContext();
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const isLandscape = isLandscapeMode(width);
   const edgeMargin = getEdgeMargin(isLandscape);
   const statusBarSizes = UIElements.statusBar;
@@ -35,6 +37,7 @@ export default function StatusBar({ state }: StatusBarProps) {
     'pulau-pinang': 'P.PINANG',
     perak: 'PERAK',
     selangor: 'SELANGOR',
+    'kuala-lumpur': 'KUALA LUMPUR',
     'negeri-sembilan': 'NEGERI SEMBILAN',
     melaka: 'MELAKA',
     johor: 'JOHOR',
@@ -46,7 +49,7 @@ export default function StatusBar({ state }: StatusBarProps) {
   };
 
   return (
-    <View style={[styles.container, { paddingHorizontal: edgeMargin }]}>
+    <View style={[styles.container, { paddingHorizontal: edgeMargin, paddingTop: insets.top + 8 }]}>
       {/* Health Bar - Left */}
       <View style={styles.statusItem}>
         <Image
@@ -144,7 +147,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 40, // Account for status bar (landscape)
+    // paddingTop set dynamically with safe area insets
     paddingBottom: 8,
     // paddingHorizontal set dynamically for dead zones
   },

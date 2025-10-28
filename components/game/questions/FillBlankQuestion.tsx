@@ -10,9 +10,11 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
+import { playSound } from '@/utils/audio';
 import LandscapeLayout from '@/components/game/LandscapeLayout';
-import { Typography } from '@/constants/theme';
+import { Typography, Colors, getResponsiveFontSize } from '@/constants/theme';
 import type { FillBlankQuestion as FBQuestion } from '@/types';
+import { isLandscapeMode, QuestionBoard } from '@/constants/layout';
 import { useGameContext } from '@/contexts/GameContext';
 
 interface Props {
@@ -28,12 +30,16 @@ interface Props {
 export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const [answer, setAnswer] = useState('');
   const { width } = useWindowDimensions();
-  const isLandscape = width >= 800; // Landscape mode threshold (Figma: 895px)
+  const isLandscape = isLandscapeMode(width); // Use consistent landscape detection
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
+  const questionBoardSize = isLandscape
+    ? QuestionBoard.standard.landscape
+    : QuestionBoard.standard.portrait;
 
   const handleSubmit = async () => {
     if (answer.trim()) {
+      playSound('click');
       await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
       onAnswer(answer);
     }
@@ -47,14 +53,17 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
         style={[
           styles.questionBoard,
           {
-            width: isLandscape ? 340 : 280,
-            height: isLandscape ? 220 : 260,
+            width: questionBoardSize.width,
+            height: questionBoardSize.height,
           },
         ]}
         resizeMode="contain">
         <View style={styles.questionContent}>
           <Text
-            style={[styles.questionText, { fontSize: isLandscape ? 20 : 18 }]}
+            style={[
+              styles.questionText,
+              { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
+            ]}
             numberOfLines={3}
             adjustsFontSizeToFit
             minimumFontScale={0.85}
@@ -84,14 +93,14 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
           style={[
             styles.input,
             {
-              fontSize: isLandscape ? 17 : 16,
+              fontSize: getResponsiveFontSize(Typography.body, isLandscape),
               paddingHorizontal: isLandscape ? 24 : 20,
             },
           ]}
           value={answer}
           onChangeText={setAnswer}
           placeholder="Masukkan jawapan..."
-          placeholderTextColor="#999"
+          placeholderTextColor={Colors.textSecondary}
           autoCapitalize="sentences"
           autoCorrect={false}
           returnKeyType="done"
@@ -130,7 +139,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
     <LandscapeLayout
       leftSection={leftSection}
       rightSection={rightSection}
-      leftWidth={38}
+      leftWidth={40}
       rightWidth={58}
     />
   );
@@ -148,13 +157,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   questionContent: {
-    width: '75%',
+    width: '85%', // Increased from 75% for better readability
     paddingVertical: 35,
   },
   questionText: {
     fontFamily: Typography.fontFamily,
-    fontSize: 18,
-    color: '#000',
+    color: Colors.textPrimary,
     textAlign: 'center',
     lineHeight: Typography.lineHeight.relaxed,
   },
@@ -171,8 +179,7 @@ const styles = StyleSheet.create({
   },
   input: {
     fontFamily: Typography.fontFamily,
-    fontSize: 16,
-    color: '#000',
+    color: Colors.textPrimary,
     textAlign: 'center',
     width: '90%',
   },

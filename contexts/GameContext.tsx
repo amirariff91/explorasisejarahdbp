@@ -3,9 +3,12 @@ import {
   useContext,
   useState,
   useEffect,
+  useMemo,
+  useCallback,
   type ReactNode,
 } from 'react';
 import * as SecureStore from 'expo-secure-store';
+import { debounce } from '@/utils/debounce';
 import type {
   GameState,
   GameProgress,
@@ -20,10 +23,13 @@ interface GameContextType {
   showSuccessModal: boolean;
   answerQuestion: (questionId: string, answer: any, question: Question) => AnswerResult;
   completeState: (state: MalaysianState) => void;
+  clearStateAnswers: (state: MalaysianState) => void;
   markTutorialComplete: () => void;
   resetGame: () => void;
   setShowSuccessModal: (show: boolean) => void;
   setAllowFontScaling: (allow: boolean) => void;
+  saveError: string | null;
+  isLoading: boolean;
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined);
@@ -31,7 +37,8 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 const STORAGE_KEY = 'dbp_sejarah_game_progress';
 const INITIAL_MONEY = 100;
 const INITIAL_HEALTH = 100;
-const MONEY_PENALTY = 2;
+const MONEY_PENALTY = 1;
+const HEALTH_PENALTY = 2;
 
 const initialGameState: GameState = {
   money: INITIAL_MONEY,
@@ -47,19 +54,33 @@ const initialGameState: GameState = {
 
 export function GameProvider({ children }: { children: ReactNode }) {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Create debounced save function (max one save per second)
+  const debouncedSaveProgress = useMemo(
+    () =>
+      debounce((retryCount = 0) => {
+        saveProgress(retryCount);
+      }, 1000),
+    []
+  );
 
   // Load saved progress on mount
   useEffect(() => {
     loadProgress();
   }, []);
 
-  // Save progress whenever game state changes
+  // Save progress whenever game state changes (debounced)
   useEffect(() => {
-    saveProgress();
-  }, [gameState]);
+    if (!isLoading) {
+      // Only save after initial load is complete
+      debouncedSaveProgress();
+    }
+  }, [gameState, isLoading, debouncedSaveProgress]);
 
   const loadProgress = async () => {
+    setIsLoading(true);
     try {
       const savedData = await SecureStore.getItemAsync(STORAGE_KEY);
       if (savedData) {
@@ -74,12 +95,17 @@ export function GameProvider({ children }: { children: ReactNode }) {
           allowFontScaling: progress.allowFontScaling ?? false,
         }));
       }
+      setSaveError(null); // Clear any previous errors
     } catch (error) {
       console.error('Failed to load progress:', error);
+      setSaveError('Gagal memuatkan data. Menggunakan data lalai.');
+      // Continue with default state - don't block the app
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const saveProgress = async () => {
+  const saveProgress = async (retryCount = 0) => {
     try {
       const progress: GameProgress = {
         money: gameState.money,
@@ -90,9 +116,24 @@ export function GameProvider({ children }: { children: ReactNode }) {
         timestamp: Date.now(),
         allowFontScaling: gameState.allowFontScaling,
       };
+
       await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(progress));
+      setSaveError(null); // Clear any previous errors on successful save
     } catch (error) {
       console.error('Failed to save progress:', error);
+
+      // Retry logic: attempt up to 2 retries with exponential backoff
+      if (retryCount < 2) {
+        const retryDelay = Math.pow(2, retryCount) * 1000; // 1s, 2s
+        console.log(`Retrying save in ${retryDelay}ms...`);
+        setSaveError(`Menyimpan kemajuan... cuba lagi (${retryCount + 1}/2)`);
+
+        setTimeout(() => {
+          saveProgress(retryCount + 1);
+        }, retryDelay);
+      } else {
+        setSaveError('Gagal menyimpan kemajuan. Sila cuba lagi.');
+      }
     }
   };
 
@@ -152,7 +193,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   ): AnswerResult => {
     const isCorrect = checkAnswer(question, answer);
     const moneyChange = isCorrect ? 0 : -MONEY_PENALTY;
-    const healthChange = isCorrect ? 0 : -5;
+    const healthChange = isCorrect ? 0 : -HEALTH_PENALTY;
 
     setGameState((prev) => ({
       ...prev,
@@ -178,8 +219,25 @@ export function GameProvider({ children }: { children: ReactNode }) {
       completedStates: [...new Set([...prev.completedStates, state])],
       currentState: null,
       currentQuestionIndex: 0,
+      showSuccessModal: true,
     }));
-    setShowSuccessModal(true);
+  };
+
+  const clearStateAnswers = (state: MalaysianState) => {
+    // Clear all answers for questions belonging to this state
+    // Questions are prefixed with state name (e.g., "johor-1", "johor-2")
+    setGameState((prev) => {
+      const updatedAnswers = { ...prev.answers };
+      Object.keys(updatedAnswers).forEach((questionId) => {
+        if (questionId.startsWith(`${state}-`)) {
+          delete updatedAnswers[questionId];
+        }
+      });
+      return {
+        ...prev,
+        answers: updatedAnswers,
+      };
+    });
   };
 
   const markTutorialComplete = () => {
@@ -194,18 +252,31 @@ export function GameProvider({ children }: { children: ReactNode }) {
     SecureStore.deleteItemAsync(STORAGE_KEY);
   };
 
-  const value: GameContextType = {
-    gameState,
-    hasSeenTutorial: gameState.hasSeenTutorial,
-    showSuccessModal,
-    answerQuestion,
-    completeState,
-    markTutorialComplete,
-    resetGame,
-    setShowSuccessModal,
-    setAllowFontScaling: (allow: boolean) =>
-      setGameState((prev) => ({ ...prev, allowFontScaling: allow })),
+  const setShowSuccessModal = (show: boolean) => {
+    setGameState((prev) => ({ ...prev, showSuccessModal: show }));
   };
+
+  const setAllowFontScaling = (allow: boolean) => {
+    setGameState((prev) => ({ ...prev, allowFontScaling: allow }));
+  };
+
+  const value: GameContextType = useMemo(
+    () => ({
+      gameState,
+      hasSeenTutorial: gameState.hasSeenTutorial,
+      showSuccessModal: gameState.showSuccessModal,
+      answerQuestion,
+      completeState,
+      clearStateAnswers,
+      markTutorialComplete,
+      resetGame,
+      setShowSuccessModal,
+      setAllowFontScaling,
+      saveError,
+      isLoading,
+    }),
+    [gameState, saveError, isLoading]
+  );
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }
