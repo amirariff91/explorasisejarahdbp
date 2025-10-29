@@ -37,7 +37,7 @@ export default function StateSelectionScreen() {
   if (isLoading) {
     return (
       <ImageBackground
-        source={require('@/assets/images/game/backgrounds/bg-main.jpg')}
+        source={require('@/assets/images/game/backgrounds/bg-main.png')}
         style={styles.container}
         resizeMode="cover">
         <View style={styles.loadingContainer}>
@@ -52,7 +52,7 @@ export default function StateSelectionScreen() {
 
   return (
     <ImageBackground
-      source={require('@/assets/images/game/backgrounds/bg-main.jpg')}
+      source={require('@/assets/images/game/backgrounds/bg-main.png')}
       style={styles.container}
       resizeMode="cover">
 
