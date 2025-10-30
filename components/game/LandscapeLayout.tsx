@@ -7,9 +7,10 @@ interface LandscapeLayoutProps {
   leftSection?: ReactNode;
   rightSection?: ReactNode;
   footer?: ReactNode;
-  leftWidth?: number; // Percentage (0-100)
-  rightWidth?: number; // Percentage (0-100)
+  leftWidth?: number; // Flex ratio (not percentage)
+  rightWidth?: number; // Flex ratio (not percentage)
   backgroundColor?: string;
+  onRightSectionLayout?: (event: any) => void; // Optional layout callback for right section
 }
 
 /**
@@ -26,9 +27,10 @@ export default function LandscapeLayout({
   leftSection,
   rightSection,
   footer,
-  leftWidth = 45,
-  rightWidth = 50,
+  leftWidth = 40,
+  rightWidth = 58,
   backgroundColor = 'transparent',
+  onRightSectionLayout,
 }: LandscapeLayoutProps) {
   const { width } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
@@ -50,14 +52,16 @@ export default function LandscapeLayout({
       <View style={[styles.mainContent, { paddingHorizontal: edgeMargin, gap: spacing }]}>
         {/* Left Section */}
         {leftSection && (
-          <View style={[styles.section, { width: `${leftWidth}%` as any }]}>
+          <View style={[styles.section, { flex: leftWidth }]}>
             {leftSection}
           </View>
         )}
 
         {/* Right Section */}
         {rightSection && (
-          <View style={[styles.section, { width: `${rightWidth}%` as any }]}>
+          <View
+            style={[styles.section, { flex: rightWidth }]}
+            onLayout={onRightSectionLayout}>
             {rightSection}
           </View>
         )}
@@ -95,7 +99,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   section: {
-    flex: 1,
+    // flex value is set dynamically via props (flex: leftWidth or flex: rightWidth)
+    // Do not set flex: 1 here as it conflicts with explicit flex ratios
     justifyContent: 'center',
     alignItems: 'center',
   },

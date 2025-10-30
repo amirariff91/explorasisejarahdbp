@@ -1,64 +1,54 @@
-import { View, Text, StyleSheet, ImageBackground, Pressable, useWindowDimensions, ScrollView } from 'react-native';
-import { useRouter, Redirect } from 'expo-router';
+import { useMemo, useCallback } from 'react';
+import { View, Text, StyleSheet, ImageBackground, Pressable, useWindowDimensions, ScrollView, ActivityIndicator } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Image } from 'expo-image';
 import { Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
-import StateCard from '@/components/game/StateCard';
+import { playSound } from '@/utils/audio';
+import MenuButton from '@/components/game/MenuButton';
+import MalaysiaMapSVG from '@/components/game/MalaysiaMapSVG';
 import type { MalaysianState } from '@/types';
 
-// State display names (visuals like gradients + icons now in theme.ts)
-const stateDisplayNames: Record<MalaysianState, string> = {
-  'perlis': 'PERLIS',
-  'kedah': 'KEDAH',
-  'pulau-pinang': 'P. PINANG',
-  'perak': 'PERAK',
-  'selangor': 'SELANGOR',
-  'kuala-lumpur': 'KL',
-  'negeri-sembilan': 'N. SEMBILAN',
-  'melaka': 'MELAKA',
-  'johor': 'JOHOR',
-  'pahang': 'PAHANG',
-  'terengganu': 'TERENGGANU',
-  'kelantan': 'KELANTAN',
-  'sabah': 'SABAH',
-  'sarawak': 'SARAWAK',
-};
-
-// Geographic layout - Peninsula states positioned roughly by geography
-const peninsulaLayout: (MalaysianState | null)[][] = [
-  // Row 1 - North
-  ['perlis', 'kedah', 'kelantan', 'terengganu'],
-  // Row 2 - North-Central
-  ['pulau-pinang', 'perak', 'pahang', null],
-  // Row 3 - Central
-  ['selangor', 'kuala-lumpur', null, null],
-  // Row 4 - Central-South
-  ['negeri-sembilan', null, null, null],
-  // Row 5 - South
-  ['melaka', 'johor', null, null],
-];
-
-// Borneo states
-const borneoStates: MalaysianState[] = ['sabah', 'sarawak'];
-
 /**
- * State Selection Screen - Visual Grid Map
- * Geographic layout teaches Malaysian geography while allowing state selection
+ * State Selection Screen - Interactive SVG Map
+ * Interactive Malaysia map similar to mypeta.ai
+ * Users can tap on states to start the quiz
  */
 export default function StateSelectionScreen() {
   const router = useRouter();
   const { width, height } = useWindowDimensions();
-  const { gameState, hasSeenTutorial } = useGameContext();
+  const { gameState, isLoading, saveError } = useGameContext();
+  const insets = useSafeAreaInsets();
   const isLandscape = width >= 800;
   const allowScaling = gameState.allowFontScaling;
 
-  // Check if user needs to see tutorial
-  if (!hasSeenTutorial) {
-    return <Redirect href="/tutorial" />;
-  }
-
-  const handleStateSelect = (state: MalaysianState) => {
+  // Memoize callback to prevent recreating function on every render
+  const handleStateSelect = useCallback((state: MalaysianState) => {
     router.push(`/quiz/${state}`);
-  };
+  }, [router]);
+
+  const handleTutorial = useCallback(() => {
+    playSound('click');
+    router.push('/tutorial');
+  }, [router]);
+
+  // Show loading screen while GameContext initializes
+  if (isLoading) {
+    return (
+      <ImageBackground
+        source={require('@/assets/images/game/backgrounds/bg-main.png')}
+        style={styles.container}
+        resizeMode="cover">
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#4CAF50" />
+          <Text style={styles.loadingText} allowFontScaling={allowScaling}>
+            Memuatkan kemajuan...
+          </Text>
+        </View>
+      </ImageBackground>
+    );
+  }
 
   return (
     <ImageBackground
@@ -66,95 +56,59 @@ export default function StateSelectionScreen() {
       style={styles.container}
       resizeMode="cover">
 
+      {/* Top Bar */}
+      <View style={[styles.topBar, { top: insets.top + 12 }]}>
+        {/* Left Section - Menu + Tutorial */}
+        <View style={styles.topBarLeft}>
+          <MenuButton size="small" position="top-left" />
+          <Pressable style={styles.tutorialButtonCompact} onPress={handleTutorial}>
+            <Text style={styles.tutorialButtonText} allowFontScaling={allowScaling}>
+              📖 Tutorial
+            </Text>
+          </Pressable>
+        </View>
+
+        {/* Middle Section - Title */}
+        <View style={styles.topBarCenter}>
+          <Text style={styles.mapTitle} allowFontScaling={allowScaling}>
+            Peta Malaysia
+          </Text>
+        </View>
+
+        {/* Right Section - Stats */}
+        <View style={styles.topBarRight}>
+          <View style={styles.statItemCompact}>
+            <Text style={styles.statTextCompact} allowFontScaling={allowScaling}>
+              💰 RM{gameState.money}
+            </Text>
+          </View>
+          <View style={styles.statItemCompact}>
+            <Text style={styles.statTextCompact} allowFontScaling={allowScaling}>
+              ❤️ {gameState.health}%
+            </Text>
+          </View>
+          <View style={styles.statItemCompact}>
+            <Text style={styles.statTextCompact} allowFontScaling={allowScaling}>
+              {gameState.completedStates.length}/14
+            </Text>
+          </View>
+        </View>
+      </View>
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={[styles.title, { fontSize: isLandscape ? 28 : 24 }]} allowFontScaling={allowScaling}>
-            EKSPLORASI{'\n'}SEJARAH DBP
-          </Text>
-          <Text style={[styles.subtitle, { fontSize: isLandscape ? 16 : 14 }]} allowFontScaling={allowScaling}>
-            Pilih negeri untuk bermula
-          </Text>
-        </View>
-
-        {/* Map Grid Container */}
-        <View style={styles.mapContainer}>
-
-          {/* Peninsula Region */}
-          <View style={styles.peninsulaRegion}>
-            <Text style={[styles.regionTitle, { fontSize: isLandscape ? 17 : 15 }]} allowFontScaling={allowScaling}>
-              Semenanjung Malaysia
-            </Text>
-            {peninsulaLayout.map((row, rowIndex) => (
-              <View key={`row-${rowIndex}`} style={styles.row}>
-                {row.map((stateId, colIndex) =>
-                  stateId ? (
-                    <StateCard
-                      key={stateId}
-                      stateId={stateId}
-                      stateName={stateDisplayNames[stateId]}
-                      isCompleted={gameState.completedStates.includes(stateId)}
-                      onPress={handleStateSelect}
-                    />
-                  ) : (
-                    <View key={`spacer-${rowIndex}-${colIndex}`} style={styles.cardSpacer} />
-                  )
-                )}
-              </View>
-            ))}
+        {/* Error Banner */}
+        {saveError && (
+          <View style={styles.errorBanner}>
+            <Text style={styles.errorIcon}>⚠️</Text>
+            <Text style={styles.errorText} allowFontScaling={allowScaling}>{saveError}</Text>
           </View>
+        )}
 
-          {/* Borneo Region */}
-          <View style={styles.borneoRegion}>
-            <Text style={[styles.regionTitle, { fontSize: isLandscape ? 17 : 15 }]} allowFontScaling={allowScaling}>
-              Malaysia Timur
-            </Text>
-            <View style={styles.borneoCards}>
-              {borneoStates.map(stateId => (
-                <StateCard
-                  key={stateId}
-                  stateId={stateId}
-                  stateName={stateDisplayNames[stateId]}
-                  isCompleted={gameState.completedStates.includes(stateId)}
-                  onPress={handleStateSelect}
-                />
-              ))}
-            </View>
-          </View>
-        </View>
-
-        {/* Stats Footer */}
-        <View style={styles.footer}>
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Text style={[styles.statText, { fontSize: isLandscape ? 16 : 14 }]} allowFontScaling={allowScaling}>
-                💰 RM{gameState.money}
-              </Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statText, { fontSize: isLandscape ? 16 : 14 }]} allowFontScaling={allowScaling}>
-                ❤️ {gameState.health}%
-              </Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statText, { fontSize: isLandscape ? 16 : 14 }]} allowFontScaling={allowScaling}>
-                ✅ {gameState.completedStates.length}/14
-              </Text>
-            </View>
-          </View>
-
-          <Pressable
-            style={styles.tutorialButton}
-            onPress={() => router.push('/tutorial')}
-          >
-            <Text style={[styles.tutorialButtonText, { fontSize: isLandscape ? 15 : 14 }]} allowFontScaling={allowScaling}>
-              📖 Panduan
-            </Text>
-          </Pressable>
-        </View>
+        {/* Interactive SVG Malaysia Map */}
+        <MalaysiaMapSVG onStateSelect={handleStateSelect} />
       </ScrollView>
     </ImageBackground>
   );
@@ -166,30 +120,115 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     flexGrow: 1,
-    paddingVertical: 16,
+    paddingTop: 52, // Reduced to minimize scrolling
+    paddingBottom: 16,
     paddingHorizontal: 24,
   },
 
-  // Header
-  header: {
+  // Loading State
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    gap: 16,
   },
-  title: {
+  loadingText: {
     fontFamily: Typography.fontFamily,
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+  },
+
+  // Error Banner
+  errorBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(244, 67, 54, 0.9)',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginBottom: 12,
+    gap: 8,
+  },
+  errorIcon: {
+    fontSize: 20,
+  },
+  errorText: {
+    flex: 1,
+    fontFamily: Typography.fontFamily,
+    fontSize: 13,
+    color: '#fff',
+  },
+
+  // Top Bar
+  topBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    zIndex: 100,
+  },
+  topBarLeft: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 8,
+  },
+  topBarCenter: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  topBarRight: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+  tutorialButtonCompact: {
+    backgroundColor: '#2196F3',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  tutorialButtonText: {
+    fontFamily: Typography.fontFamily,
+    fontSize: 13,
+    color: '#fff',
+    fontWeight: 'bold',
+  },
+  statItemCompact: {
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  statTextCompact: {
+    fontFamily: Typography.fontFamily,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#000',
+    textAlign: 'center',
+  },
+  mapTitle: {
+    fontFamily: Typography.fontFamily,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#000',
     textAlign: 'center',
-    lineHeight: 32,
-    textShadowColor: '#fff',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 4,
-  },
-  subtitle: {
-    fontFamily: Typography.fontFamily,
-    color: '#333',
-    textAlign: 'center',
-    marginTop: 8,
   },
 
   // Map Container
@@ -233,51 +272,5 @@ const styles = StyleSheet.create({
   },
   borneoCards: {
     gap: 8,
-  },
-
-  // Footer Stats
-  footer: {
-    alignItems: 'center',
-    gap: 12,
-    marginTop: 12,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 16,
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-  },
-  statItem: {
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 18,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  statText: {
-    fontFamily: Typography.fontFamily,
-    fontWeight: '600',
-    color: '#000',
-    textAlign: 'center',
-  },
-  tutorialButton: {
-    backgroundColor: '#2196F3',
-    paddingHorizontal: 28,
-    paddingVertical: 12,
-    borderRadius: 25,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
-  },
-  tutorialButtonText: {
-    fontFamily: Typography.fontFamily,
-    color: '#fff',
-    fontWeight: 'bold',
   },
 });

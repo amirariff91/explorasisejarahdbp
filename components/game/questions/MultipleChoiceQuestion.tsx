@@ -51,6 +51,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const { gameState } = useGameContext();
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showNext, setShowNext] = useState(false);
+  const [measuredRightWidth, setMeasuredRightWidth] = useState(0);
   const { width } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
   const allowScaling = gameState.allowFontScaling;
@@ -62,15 +63,29 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
     : ButtonSizes.answerOption.portrait;
   const nextButtonSize = isLandscape ? ButtonSizes.next.landscape : ButtonSizes.next.portrait;
 
-  // Compute responsive button width so two options always fit the right column
-  const edgeMargin = getEdgeMargin(isLandscape);
-  const contentWidth = width - edgeMargin * 2;
-  const rightPercent = LayoutRatios.twoColumn.standard.right; // 58
-  const rightSectionWidth = (contentWidth * rightPercent) / 100;
+  // Callback to measure actual right section width
+  const handleRightSectionLayout = (event: any) => {
+    const { width: layoutWidth } = event.nativeEvent.layout;
+    setMeasuredRightWidth(layoutWidth);
+  };
+
+  // Compute responsive button width from measured px (not theoretical %)
   const horizontalGap = Spacing.lg; // gap between two buttons in a row
-  const computedButtonWidth = Math.floor((rightSectionWidth - horizontalGap) / 2);
+  const computedButtonWidth = measuredRightWidth > 0
+    ? Math.floor((measuredRightWidth - horizontalGap) / 2)
+    : buttonSize.width; // fallback to constant if not measured yet
+
+  // Clamp width with min/max bounds for ergonomics
+  const minButtonWidth = buttonSize.width * 0.8;
+  const maxButtonWidth = buttonSize.width * 1.2;
+  const clampedButtonWidth = Math.max(
+    minButtonWidth,
+    Math.min(computedButtonWidth, maxButtonWidth)
+  );
+
+  // Preserve aspect ratio for height
   const buttonHeightRatio = buttonSize.height / buttonSize.width;
-  const computedButtonHeight = Math.round(computedButtonWidth * buttonHeightRatio);
+  const computedButtonHeight = Math.round(clampedButtonWidth * buttonHeightRatio);
 
   // Animation values for each button
   const buttonScales = [
@@ -150,7 +165,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
               style={[
                 styles.optionButton,
                 {
-                  width: computedButtonWidth,
+                  width: clampedButtonWidth,
                   height: computedButtonHeight,
                 },
                 selectedAnswer === option && styles.optionButtonSelected,
@@ -158,6 +173,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
               ]}
               onPress={() => handleSelect(option, btnIndex)}
               hitSlop={TouchTargets.hitSlop}
+              pressRetentionOffset={TouchTargets.hitSlop}
               accessibilityRole="button"
               accessibilityLabel={`Jawapan ${btnIndex + 1}: ${option}`}
               accessibilityState={{ selected: selectedAnswer === option }}>
@@ -190,7 +206,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                 style={[
                   styles.optionButton,
                   {
-                    width: computedButtonWidth,
+                    width: clampedButtonWidth,
                     height: computedButtonHeight,
                   },
                   selectedAnswer === option && styles.optionButtonSelected,
@@ -198,6 +214,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                 ]}
                 onPress={() => handleSelect(option, index)}
                 hitSlop={TouchTargets.hitSlop}
+                pressRetentionOffset={TouchTargets.hitSlop}
                 accessibilityRole="button"
                 accessibilityLabel={`Jawapan ${index + 1}: ${option}`}
                 accessibilityState={{ selected: selectedAnswer === option }}>
@@ -256,6 +273,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
       footer={footer}
       leftWidth={40}
       rightWidth={58}
+      onRightSectionLayout={handleRightSectionLayout}
     />
   );
 }
@@ -289,6 +307,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   optionsContainer: {
+    width: '100%', // Constrain to container width
+    alignItems: 'center', // Center the grid horizontally
     gap: Spacing.xxxl, // 32px - Increased vertical spacing
   },
   optionRow: {
