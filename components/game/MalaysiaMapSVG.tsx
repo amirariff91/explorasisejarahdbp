@@ -75,31 +75,36 @@ export default function MalaysiaMapSVG({ onStateSelect }: MalaysiaMapSVGProps) {
 
   // Calculate responsive map dimensions based on available space
   const { mapWidth, mapHeight } = useMemo(() => {
+    const SCALE_BOOST = 1.76; // enlarge overall map footprint ~76% vs original
     const DESIRED_WIDTH_RATIO = isLandscape ? 0.88 : 0.94;
     const MIN_WIDTH_RATIO = isLandscape ? 0.68 : 0.75;
-    const MAX_HEIGHT_RATIO = isLandscape ? 0.95 : 0.78; // allow map to dominate vertical space
+    const MAX_HEIGHT_RATIO = isLandscape ? 1 : 0.92; // loosen cap so map can scale taller
+    const MAP_ASPECT_RATIO = 0.667; // Height = width * aspect ratio (roughly 2:3)
 
     const desiredWidth = width * DESIRED_WIDTH_RATIO;
     const minWidth = width * MIN_WIDTH_RATIO;
     const maxMapHeight = height * MAX_HEIGHT_RATIO;
 
-    let mapHeight = Math.min(desiredWidth * 0.667, maxMapHeight);
-    let mapWidth = mapHeight / 0.667;
+    let mapHeight = Math.min(desiredWidth * MAP_ASPECT_RATIO, maxMapHeight);
+    let mapWidth = mapHeight / MAP_ASPECT_RATIO;
 
     if (mapWidth < minWidth) {
       mapWidth = minWidth;
-      mapHeight = Math.min(mapWidth * 0.667, maxMapHeight);
+      mapHeight = Math.min(mapWidth * MAP_ASPECT_RATIO, maxMapHeight);
     }
+
+    mapHeight = Math.min(mapHeight * SCALE_BOOST, maxMapHeight);
+    mapWidth = mapHeight / MAP_ASPECT_RATIO;
 
     return { mapWidth, mapHeight };
   }, [width, height, isLandscape]);
 
   const mapVerticalOffset = useMemo(
-    () => -Math.max(mapHeight * 0.2, 30),
+    () => -Math.max(mapHeight * 0.3, 30),
     [mapHeight],
   );
 
-  const borneoOffsetX = useMemo(() => -40, []); // Pull East Malaysia closer to peninsula with scaling
+  const borneoOffsetX = useMemo(() => -170, []); // Shift Borneo left so scaled map fits the SVG viewBox
 
   const handleStatePress = async (state: MalaysianState) => {
     playSound("click");
@@ -194,17 +199,17 @@ export default function MalaysiaMapSVG({ onStateSelect }: MalaysiaMapSVGProps) {
           <Svg
             width={mapWidth}
             height={mapHeight}
-            viewBox="-200 -150 1650 1100"
+            viewBox="-220 -180 2000 1200"
           >
             {/* Peninsular Malaysia - Scaled up to fill more canvas */}
-            <G origin="250, 400" scale="1.55">
+            <G origin="250, 400" scale="1.7">
               {peninsulaStates.map((state) =>
                 renderStatePath(state, statePaths[state]),
               )}
             </G>
 
             {/* East Malaysia (Borneo) - Shifted and enlarged */}
-            <G transform={`translate(${borneoOffsetX} 0)`} scale="1.35">
+            <G transform={`translate(${borneoOffsetX} 0)`} scale="1.485">
               {borneoStates.map((state) =>
                 renderStatePath(state, statePaths[state]),
               )}
@@ -314,8 +319,8 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 8.5,
-    paddingTop: 0,
+    paddingHorizontal: 8.5,
+    paddingBottom: 8.5,
     alignSelf: "stretch",
   },
   // Top Section: Groups dropdown + map together

@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   nextButtonContainer: {
     alignItems: "center",
     justifyContent: "center",
-    top: "35%",
+    top: "50%",
     paddingBottom: 15,
   },
   nextButton: {

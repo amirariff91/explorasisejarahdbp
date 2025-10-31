@@ -15,7 +15,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { playSound } from '@/utils/audio';
-import LandscapeLayout from '@/components/game/LandscapeLayout';
 import type { TrueFalseQuestion as TFQuestion } from '@/types';
 import {
   Colors,
@@ -24,7 +23,7 @@ import {
   getTextShadowStyle,
   Shadows,
 } from '@/constants/theme';
-import { isLandscapeMode, QuestionBoard, ButtonSizes, TouchTargets, getQuestionOffsets } from '@/constants/layout';
+import { isLandscapeMode, QuestionBoard, ButtonSizes, TouchTargets, EdgeMargins, getQuestionOffsets } from '@/constants/layout';
 import { useGameContext } from '@/contexts/GameContext';
 
 interface Props {
@@ -33,27 +32,36 @@ interface Props {
 }
 
 /**
- * True/False Question - Landscape Optimized (Figma Screen 10)
- * Left: Question board (45% width)
- * Right: Large BETUL / SALAH buttons (50% width)
+ * True/False Question - Single Board Layout
+ * Question at top of board
+ * BETUL and SALAH buttons side-by-side at bottom of board
  */
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   const { gameState } = useGameContext();
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
   const allowScaling = gameState.allowFontScaling;
-  const offsets = getQuestionOffsets('trueFalse', isLandscape);
+  const offsets = getQuestionOffsets('trueFalseSingle', isLandscape);
   const baseBoardSize = isLandscape
-    ? QuestionBoard.standard.landscape
-    : QuestionBoard.standard.portrait;
-  const boardScale = 1.87;
-  const scaledBoardWidth = baseBoardSize.width * boardScale;
-  const scaledBoardHeight = baseBoardSize.height * boardScale;
-  const maxBoardWidth = width * (isLandscape ? 0.504 : 1.056); // Increased by 20%
-  const boardWidth = Math.min(scaledBoardWidth, maxBoardWidth);
-  const boardHeight = (scaledBoardHeight / scaledBoardWidth) * boardWidth;
+    ? QuestionBoard.singleBoardTrueFalse.landscape
+    : QuestionBoard.singleBoardTrueFalse.portrait;
+
+  // Responsive board sizing - 80% width, 88% height max
+  const maxBoardWidth = width * 0.80;
+  const maxBoardHeight = height * 0.88;
+  const aspectRatio = baseBoardSize.width / baseBoardSize.height;
+
+  let boardWidth = Math.min(baseBoardSize.width, maxBoardWidth);
+  let boardHeight = boardWidth / aspectRatio;
+
+  // Check if height exceeds limit, recalculate if needed
+  if (boardHeight > maxBoardHeight) {
+    boardHeight = maxBoardHeight;
+    boardWidth = boardHeight * aspectRatio;
+  }
+
   const buttonSize = isLandscape ? ButtonSizes.answer.landscape : ButtonSizes.answer.portrait;
 
   // Animation values for buttons
@@ -84,142 +92,137 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
     transform: [{ scale: salahScale.value }],
   }));
 
-  // Left Section: Question Board
-  const leftSection = (
-    <View style={[styles.questionSection, { marginTop: offsets.questionSection.marginTop, marginLeft: offsets.questionSection.marginLeft }]}>
-      <ImageBackground
-        source={require('@/assets/images/game/backgrounds/soalan-board.png')}
-        style={[
-          styles.questionBoard,
-          {
-            width: boardWidth,
-            height: boardHeight,
-          },
-        ]}
-        resizeMode="contain">
-        <View style={[
-          styles.questionContent,
-          {
-            width: offsets.questionContent.width,
-            paddingVertical: offsets.questionContent.paddingVertical,
-            paddingHorizontal: offsets.questionContent.paddingHorizontal,
-            gap: offsets.questionContent.gap,
-          },
-        ]}>
-          <Text
-            style={[
-              styles.questionText,
-              { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
-            ]}
-            numberOfLines={3}
-            adjustsFontSizeToFit
-            minimumFontScale={0.85}
-            allowFontScaling={allowScaling}>
-            {question.question}
-          </Text>
-        </View>
-      </ImageBackground>
-    </View>
-  );
-
-  // Right Section: BETUL/SALAH Buttons with Animations
-  const rightSection = (
-    <View style={[styles.buttonsSection, { marginTop: offsets.buttonsSection.marginTop, marginRight: offsets.buttonsSection.marginRight }]}>
-      {/* BETUL Button */}
-      <AnimatedPressable
-        style={[
-          styles.button,
-          {
-            width: buttonSize.width,
-            height: buttonSize.height,
-          },
-          betulAnimatedStyle,
-        ]}
-        onPress={() => handleAnswer(true)}
-        hitSlop={TouchTargets.hitSlop}
-        accessibilityRole="button"
-        accessibilityLabel="Jawapan: Betul">
-        <Image
-          source={require('@/assets/images/game/buttons/betul-button.png')}
-          style={styles.buttonImage}
-          contentFit="contain"
-        />
-        <Text
-          style={[
-            styles.buttonText,
-            { fontSize: getResponsiveFontSize(Typography.button, isLandscape) + 6 },
-          ]}
-          allowFontScaling={allowScaling}
-          numberOfLines={1}
-          adjustsFontSizeToFit={true}
-          minimumFontScale={0.75}
-          ellipsizeMode="tail">
-          BETUL
-        </Text>
-      </AnimatedPressable>
-
-      {/* SALAH Button */}
-      <AnimatedPressable
-        style={[
-          styles.button,
-          {
-            width: buttonSize.width,
-            height: buttonSize.height,
-            marginTop: offsets.buttonGap,
-          },
-          salahAnimatedStyle,
-        ]}
-        onPress={() => handleAnswer(false)}
-        hitSlop={TouchTargets.hitSlop}
-        accessibilityRole="button"
-        accessibilityLabel="Jawapan: Salah">
-        <Image
-          source={require('@/assets/images/game/buttons/salah-button.png')}
-          style={styles.buttonImage}
-          contentFit="contain"
-        />
-        <Text
-          style={[
-            styles.buttonText,
-            { fontSize: getResponsiveFontSize(Typography.button, isLandscape) + 6 },
-          ]}
-          allowFontScaling={allowScaling}
-          numberOfLines={1}
-          adjustsFontSizeToFit={true}
-          minimumFontScale={0.75}
-          ellipsizeMode="tail">
-          SALAH
-        </Text>
-      </AnimatedPressable>
-    </View>
-  );
-
   return (
-    <LandscapeLayout
-      leftSection={leftSection}
-      rightSection={rightSection}
-      leftWidth={40}
-      rightWidth={58}
-    />
+    <View style={styles.container}>
+      <View style={styles.boardContainer}>
+        <ImageBackground
+          source={require('@/assets/images/game/backgrounds/soalan-board.png')}
+          style={[
+            styles.board,
+            {
+              width: boardWidth,
+              height: boardHeight,
+              paddingTop: offsets.boardPaddingTop,
+              paddingBottom: offsets.boardPaddingBottom,
+              paddingHorizontal: offsets.boardPaddingHorizontal,
+            },
+          ]}
+          resizeMode="contain">
+          {/* Question Section - Top */}
+          <View style={[styles.questionSection, { height: offsets.questionAreaHeight, marginBottom: offsets.buttonsAreaTop }]}>
+            <Text
+              style={[
+                styles.questionText,
+                { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
+              ]}
+              numberOfLines={5}
+              adjustsFontSizeToFit
+              minimumFontScale={0.85}
+              allowFontScaling={allowScaling}>
+              {question.question}
+            </Text>
+          </View>
+
+          {/* Buttons Section - Bottom (Horizontal Side-by-Side) */}
+          <View style={styles.buttonsSection}>
+            <View style={[styles.buttonsRow, { gap: offsets.buttonGap }]}>
+              {/* BETUL Button */}
+              <AnimatedPressable
+                style={[
+                  styles.button,
+                  {
+                    width: buttonSize.width,
+                    height: buttonSize.height,
+                  },
+                  betulAnimatedStyle,
+                ]}
+                onPress={() => handleAnswer(true)}
+                hitSlop={TouchTargets.hitSlop}
+                accessibilityRole="button"
+                accessibilityLabel="Jawapan: Betul">
+                <Image
+                  source={require('@/assets/images/game/buttons/betul-button.png')}
+                  style={[styles.buttonImage, { width: buttonSize.width, height: buttonSize.height }]}
+                  contentFit="fill"
+                />
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { fontSize: getResponsiveFontSize(Typography.button, isLandscape) + 6 },
+                  ]}
+                  allowFontScaling={allowScaling}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  minimumFontScale={0.75}
+                  ellipsizeMode="tail">
+                  BETUL
+                </Text>
+              </AnimatedPressable>
+
+              {/* SALAH Button */}
+              <AnimatedPressable
+                style={[
+                  styles.button,
+                  {
+                    width: buttonSize.width,
+                    height: buttonSize.height,
+                  },
+                  salahAnimatedStyle,
+                ]}
+                onPress={() => handleAnswer(false)}
+                hitSlop={TouchTargets.hitSlop}
+                accessibilityRole="button"
+                accessibilityLabel="Jawapan: Salah">
+                <Image
+                  source={require('@/assets/images/game/buttons/salah-button.png')}
+                  style={[styles.buttonImage, { width: buttonSize.width, height: buttonSize.height }]}
+                  contentFit="fill"
+                />
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { fontSize: getResponsiveFontSize(Typography.button, isLandscape) + 6 },
+                  ]}
+                  allowFontScaling={allowScaling}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  minimumFontScale={0.75}
+                  ellipsizeMode="tail">
+                  SALAH
+                </Text>
+              </AnimatedPressable>
+            </View>
+          </View>
+        </ImageBackground>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  // Left Section: Question
-  questionSection: {
+  // Container
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: EdgeMargins.landscape,
+  },
+  boardContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  questionBoard: {
-    justifyContent: 'center',
+  board: {
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
-  questionContent: {
-    width: '82%',
-    paddingVertical: 32,
+
+  // Question Section (Top of board)
+  questionSection: {
+    width: '100%',
+    maxWidth: '70%',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 16,
   },
   questionText: {
     fontFamily: Typography.fontFamily,
@@ -228,9 +231,15 @@ const styles = StyleSheet.create({
     lineHeight: Typography.lineHeight.relaxed,
   },
 
-  // Right Section: Buttons
+  // Buttons Section (Bottom of board - Horizontal)
   buttonsSection: {
+    width: '100%',
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonsRow: {
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -238,6 +247,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignItems: 'center',
     justifyContent: 'center',
+    overflow: 'hidden',
   },
   buttonImage: {
     width: '100%',

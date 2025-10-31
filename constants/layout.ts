@@ -61,8 +61,18 @@ export const QuestionBoard = {
   },
   // Single Board (Multiple Choice - question + answers on same board)
   singleBoardMC: {
-    landscape: { width: 700, height: 350 },
-    portrait: { width: 500, height: 400 },
+    landscape: { width: 700, height: 480 },
+    portrait: { width: 500, height: 520 },
+  },
+  // Single Board (Matching - question + 3x3 grid on same board)
+  singleBoardMatching: {
+    landscape: { width: 750, height: 450 },
+    portrait: { width: 550, height: 480 },
+  },
+  // Single Board (True/False - question + BETUL/SALAH buttons on same board)
+  singleBoardTrueFalse: {
+    landscape: { width: 700, height: 400 },
+    portrait: { width: 500, height: 440 },
   },
 } as const;
 
@@ -303,7 +313,7 @@ export const QuestionOffsets = {
       questionAreaHeight: 100,
       answerAreaTop: 20,
       optionsContainer: { gap: 24 },
-      optionRow: { gap: 18 },
+      optionRow: { gap: 11 }, // Reduced by another 20% (was 14)
       footerContainer: { marginBottom: 20, marginRight: 40 },
     },
     portrait: {
@@ -313,8 +323,48 @@ export const QuestionOffsets = {
       questionAreaHeight: 90,
       answerAreaTop: 15,
       optionsContainer: { gap: 20 },
-      optionRow: { gap: 16 },
+      optionRow: { gap: 10 }, // Reduced by another 20% (was 13)
       footerContainer: { marginBottom: 15, marginRight: 30 },
+    },
+  },
+  matchingSingle: {
+    landscape: {
+      boardPaddingTop: 35,
+      boardPaddingBottom: 25,
+      boardPaddingHorizontal: 35,
+      questionAreaHeight: 110,
+      gridAreaTop: 18,
+      gridContainer: { gap: 14 },
+      gridRow: { gap: 14 },
+      footerContainer: { marginBottom: 20, marginRight: 40 },
+    },
+    portrait: {
+      boardPaddingTop: 30,
+      boardPaddingBottom: 20,
+      boardPaddingHorizontal: 28,
+      questionAreaHeight: 100,
+      gridAreaTop: 15,
+      gridContainer: { gap: 12 },
+      gridRow: { gap: 12 },
+      footerContainer: { marginBottom: 15, marginRight: 30 },
+    },
+  },
+  trueFalseSingle: {
+    landscape: {
+      boardPaddingTop: 35,
+      boardPaddingBottom: 25,
+      boardPaddingHorizontal: 40,
+      questionAreaHeight: 110,
+      buttonsAreaTop: 20,
+      buttonGap: 16, // Reduced by 20% (was 20)
+    },
+    portrait: {
+      boardPaddingTop: 30,
+      boardPaddingBottom: 20,
+      boardPaddingHorizontal: 30,
+      questionAreaHeight: 100,
+      buttonsAreaTop: 18,
+      buttonGap: 14, // Reduced by 20% (was 18)
     },
   },
 } as const;

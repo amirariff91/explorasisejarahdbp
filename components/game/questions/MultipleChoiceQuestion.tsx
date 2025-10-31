@@ -57,9 +57,9 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
     ? QuestionBoard.singleBoardMC.landscape
     : QuestionBoard.singleBoardMC.portrait;
 
-  // Responsive board sizing - 80% width, 82% height max
+  // Responsive board sizing - 80% width, 88% height max
   const maxBoardWidth = width * 0.80;
-  const maxBoardHeight = height * 0.82;
+  const maxBoardHeight = height * 0.88;
   const aspectRatio = baseBoardSize.width / baseBoardSize.height;
 
   let boardWidth = Math.min(baseBoardSize.width, maxBoardWidth);
@@ -144,7 +144,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                 styles.questionText,
                 { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
               ]}
-              numberOfLines={3}
+              numberOfLines={5}
               adjustsFontSizeToFit
               minimumFontScale={0.85}
               allowFontScaling={allowScaling}>
@@ -294,6 +294,7 @@ const styles = StyleSheet.create({
   // Question Section (Top of board)
   questionSection: {
     width: '100%',
+    maxWidth: '70%',
     justifyContent: 'center',
     alignItems: 'center',
   },

@@ -36,10 +36,10 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const baseBoardSize = isLandscape
     ? QuestionBoard.standard.landscape
     : QuestionBoard.standard.portrait;
-  const boardScale = 1.87;
+  const boardScale = 2.057; // Increased by 10% (was 1.87)
   const scaledBoardWidth = baseBoardSize.width * boardScale;
   const scaledBoardHeight = baseBoardSize.height * boardScale;
-  const maxBoardWidth = width * (isLandscape ? 0.504 : 1.056); // Increased by 20%
+  const maxBoardWidth = width * (isLandscape ? 0.5544 : 1.1616); // Increased by 10%
   const boardWidth = Math.min(scaledBoardWidth, maxBoardWidth);
   const boardHeight = (scaledBoardHeight / scaledBoardWidth) * boardWidth;
 
