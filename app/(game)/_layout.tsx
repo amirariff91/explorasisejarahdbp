@@ -25,6 +25,12 @@ export default function GameLayout() {
           }}>
           <Stack.Screen name="index" />
           <Stack.Screen
+            name="log-masuk"
+            options={{
+              animation: 'fade',
+            }}
+          />
+          <Stack.Screen
             name="map"
             options={{
               animation: 'fade',

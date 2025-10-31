@@ -20,6 +20,7 @@ import {
   BorderRadius,
 } from '@/constants/theme';
 import { isLandscapeMode, ButtonSizes } from '@/constants/layout';
+import { ASSETS } from '@/constants/assets';
 
 /**
  * MenuButton Component - Bottom-left pause button
@@ -86,7 +87,7 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
         ]}
         onPress={handleOpenMenu}>
         <Image
-          source={require('@/assets/images/game/buttons/menu-button.png')}
+          source={ASSETS.shared.buttons.menu.default}
           style={styles.menuButtonImage}
           contentFit="contain"
         />

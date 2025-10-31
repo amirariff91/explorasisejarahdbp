@@ -176,6 +176,61 @@ export const selangorQuestions: Question[] = [
 ];
 ```
 
+## 🖼️ Asset Management System
+
+The project uses a modular asset system for scalability across multiple mini-games.
+
+### Asset Structure
+```
+/assets/images/
+├── shared/          # Cross-game reusable assets
+│   ├── backgrounds/ # Jungle theme, boards
+│   ├── buttons/     # Menu, next, OK buttons
+│   ├── ui/          # Health/money bars, effects
+│   └── icons/       # Settings, audio, navigation
+├── games/
+│   └── dbp-sejarah/ # Game-specific assets
+│       └── ...      # Crossword, answer buttons
+└── branding/
+    └── ...          # Logo, splash screens
+```
+
+### Using Assets in Components
+```typescript
+import { ASSETS } from '@/constants/assets';
+
+// Shared assets (used across all games)
+<Image source={ASSETS.shared.ui.healthBar} />
+<Image source={ASSETS.shared.buttons.menu.default} />
+
+// Game-specific assets
+<Image source={ASSETS.games.dbpSejarah.soalanBoard} />
+
+// Branding assets
+<Image source={ASSETS.branding.logoDbp} />
+```
+
+### Button State Management
+```typescript
+import { ASSETS, getButtonState } from '@/constants/assets';
+
+<Pressable>
+  {({ pressed, disabled }) => (
+    <Image source={getButtonState(ASSETS.shared.buttons.next, pressed, disabled)} />
+  )}
+</Pressable>
+```
+
+### Adding New Assets
+1. Place files in appropriate category folder
+2. Add to `/constants/assets.ts` manifest
+3. Use TypeScript autocomplete to access: `ASSETS.category.subcategory.assetName`
+
+### Documentation
+- **Asset Plan**: See `docs/ASSET_PLAN.md` for full specification
+- **Export Guide**: See `docs/ASSET_EXPORT_CHECKLIST.md` for designers
+- **Migration**: See `docs/ASSET_MIGRATION_GUIDE.md` for developers
+
 ## 📄 License
 
 Educational use only - DBP SEJARAH

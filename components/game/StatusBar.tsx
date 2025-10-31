@@ -11,6 +11,7 @@ import {
   Shadows,
 } from '@/constants/theme';
 import { isLandscapeMode, getEdgeMargin, UIElements } from '@/constants/layout';
+import { ASSETS } from '@/constants/assets';
 
 interface StatusBarProps {
   state: MalaysianState;
@@ -62,7 +63,7 @@ export default function StatusBar({ state }: StatusBarProps) {
       {/* Health Bar - Left */}
       <View style={styles.statusItem}>
         <Image
-          source={require('@/assets/images/game/ui-elements/health-bar.png')}
+          source={ASSETS.shared.ui.healthBar}
           style={[
             styles.barImage,
             {
@@ -90,7 +91,7 @@ export default function StatusBar({ state }: StatusBarProps) {
       {/* State Name - Center */}
       <View style={styles.stateContainer}>
         <Image
-          source={require('@/assets/images/game/ui-elements/bg-nation.png')}
+          source={ASSETS.shared.ui.bgNation}
           style={[
             styles.stateImage,
             {
@@ -119,7 +120,7 @@ export default function StatusBar({ state }: StatusBarProps) {
       {/* Money Bar - Right */}
       <View style={styles.statusItem}>
         <Image
-          source={require('@/assets/images/game/ui-elements/duit-bar.png')}
+          source={ASSETS.shared.ui.duitBar}
           style={[
             styles.barImage,
             {

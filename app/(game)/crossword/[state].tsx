@@ -1,15 +1,19 @@
 import { View, Text, StyleSheet, ImageBackground } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import type { MalaysianState } from '@/types';
+import JohorCrossword from '@/components/game/crossword/JohorCrossword';
 import StatusBar from '@/components/game/StatusBar';
 import MenuButton from '@/components/game/MenuButton';
 
 /**
- * Crossword Screen - Figma Screen 12
- * Special crossword puzzle format
+ * Crossword Screen - Dynamic loader that delegates to state-specific crossword experiences.
  */
 export default function CrosswordScreen() {
   const { state } = useLocalSearchParams<{ state: MalaysianState }>();
+
+  if (state === 'johor') {
+    return <JohorCrossword />;
+  }
 
   return (
     <ImageBackground
@@ -21,7 +25,7 @@ export default function CrosswordScreen() {
 
       <View style={styles.content}>
         <Text style={styles.placeholder}>Crossword Puzzle - {state}</Text>
-        <Text style={styles.placeholder}>Coming soon...</Text>
+        <Text style={styles.placeholder}>Kandungan dalam pembangunan.</Text>
       </View>
     </ImageBackground>
   );

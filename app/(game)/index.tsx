@@ -10,6 +10,7 @@ import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import { playSound } from "@/utils/audio";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useGameContext } from "@/contexts/GameContext";
 
 /**
  * Homepage / Splash Screen
@@ -19,6 +20,7 @@ export default function Homepage() {
   const router = useRouter();
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const { gameState } = useGameContext();
   const isLandscape = width > height;
 
   // Responsive sizing
@@ -29,7 +31,12 @@ export default function Homepage() {
 
   const handlePlay = () => {
     playSound("click");
-    router.push("/map");
+    // Check if player profile exists
+    if (!gameState.playerProfile) {
+      router.push("/log-masuk");
+    } else {
+      router.push("/map");
+    }
   };
 
   return (

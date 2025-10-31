@@ -3,6 +3,8 @@
  * Malaysian History Educational Game
  */
 
+import type { ReactNode } from 'react';
+
 // Malaysian States
 export type MalaysianState =
   | 'perlis'
@@ -84,6 +86,51 @@ export interface CrosswordQuestion extends BaseQuestion {
   clues: CrosswordClue[];
 }
 
+// Enhanced crossword puzzle definition for dedicated mini-game scenes
+export interface CrosswordPuzzleWord {
+  /** Unique identifier used to track the word in UI interactions */
+  id: string;
+  /** Correct answer spelled in uppercase characters */
+  answer: string;
+  /** Word orientation on the grid */
+  direction: 'across' | 'down';
+  /** Zero-based starting row position (top to bottom) */
+  startRow: number;
+  /** Zero-based starting column position (left to right) */
+  startCol: number;
+  /** Clue identifier that references the clue entry in the puzzle definition */
+  clueId: string;
+}
+
+export interface CrosswordPuzzleClue {
+  /** Unique clue identifier used to connect to a word */
+  id: string;
+  /** Display number (e.g., 1, 2, 3) */
+  number: number;
+  /** Short label shown alongside the clue number (e.g., "MENEGAK") */
+  label: string;
+  /** Full clue text displayed in the clue card */
+  text: string;
+  /** Direction that determines which clue card the entry lives in */
+  direction: 'across' | 'down';
+  /** Linked crossword word identifier */
+  wordId: string;
+}
+
+export interface CrosswordPuzzleDefinition {
+  /** Puzzle identifier (used for routing / analytics) */
+  id: string;
+  /** Total number of rows and columns in the grid */
+  gridSize: { rows: number; cols: number };
+  /** Ordered list of clue metadata grouped by orientation */
+  clues: {
+    across: CrosswordPuzzleClue[];
+    down: CrosswordPuzzleClue[];
+  };
+  /** Collection of word placements that fill the grid */
+  words: CrosswordPuzzleWord[];
+}
+
 // Union type for all questions
 export type Question =
   | MultipleChoiceQuestion
@@ -99,6 +146,12 @@ export type AnswerValue =
   | string[]  // For matching
   | Record<number, string>;  // For crossword (clue number -> answer)
 
+// Player Profile
+export interface PlayerProfile {
+  name: string;
+  age: number;
+}
+
 // Game State
 export interface GameState {
   money: number; // Starts at 100, -2 per wrong answer
@@ -109,6 +162,7 @@ export interface GameState {
   answers: Record<string, AnswerValue>; // questionId -> answer
   showSuccessModal: boolean;
   hasSeenTutorial: boolean;
+  playerProfile: PlayerProfile | null;
   // UI settings
   allowFontScaling: boolean;
 }
@@ -138,6 +192,7 @@ export interface GameProgress {
   hasSeenTutorial: boolean;
   lastPlayedState: MalaysianState | null;
   timestamp: number;
+  playerProfile?: PlayerProfile | null;
   // Optional UI settings for persistence
   allowFontScaling?: boolean;
 }
@@ -156,6 +211,18 @@ export type MenuAction = 'resume' | 'restart' | 'quit' | 'settings';
 // Success Modal Props
 export interface SuccessModalProps {
   visible: boolean;
+  onContinue: () => void;
+  onRestart: () => void;
+}
+
+export interface CongratsOverlayProps {
+  visible: boolean;
+  title?: string;
+  stars?: number;
+  reward?: ReactNode;
+  continueLabel?: string;
+  restartLabel?: string;
+  allowFontScaling?: boolean;
   onContinue: () => void;
   onRestart: () => void;
 }

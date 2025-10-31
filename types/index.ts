@@ -20,4 +20,5 @@ export type {
   TutorialStep,
   MenuAction,
   SuccessModalProps,
+  CongratsOverlayProps,
 } from './game';
