@@ -15,23 +15,21 @@ import Animated, {
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { playSound } from '@/utils/audio';
-import LandscapeLayout from '@/components/game/LandscapeLayout';
 import type { MultipleChoiceQuestion as MCQuestion } from '@/types';
 import {
   Colors,
   Typography,
   getResponsiveFontSize,
   Opacity,
-  ButtonAnimations,
 } from '@/constants/theme';
 import {
   isLandscapeMode,
   QuestionBoard,
   ButtonSizes,
   Spacing,
-  getEdgeMargin,
-  LayoutRatios,
   TouchTargets,
+  EdgeMargins,
+  getQuestionOffsets,
 } from '@/constants/layout';
 import { useGameContext } from '@/contexts/GameContext';
 
@@ -41,9 +39,9 @@ interface Props {
 }
 
 /**
- * Multiple Choice Question - Landscape Optimized (Figma Screens 6, 8)
- * Left: Question board (45% width)
- * Right: 4 JAWAPAN buttons in 2x2 grid (50% width)
+ * Multiple Choice Question - Single Board Layout
+ * Question at top of board
+ * 4 JAWAPAN buttons in 2x2 grid at bottom of board
  */
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -51,41 +49,40 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const { gameState } = useGameContext();
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showNext, setShowNext] = useState(false);
-  const [measuredRightWidth, setMeasuredRightWidth] = useState(0);
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
   const allowScaling = gameState.allowFontScaling;
-  const questionBoardSize = isLandscape
-    ? QuestionBoard.standard.landscape
-    : QuestionBoard.standard.portrait;
-  const buttonSize = isLandscape
-    ? ButtonSizes.answerOption.landscape
-    : ButtonSizes.answerOption.portrait;
+  const offsets = getQuestionOffsets('multipleChoiceSingle', isLandscape);
+  const baseBoardSize = isLandscape
+    ? QuestionBoard.singleBoardMC.landscape
+    : QuestionBoard.singleBoardMC.portrait;
+
+  // Responsive board sizing - 80% width, 82% height max
+  const maxBoardWidth = width * 0.80;
+  const maxBoardHeight = height * 0.82;
+  const aspectRatio = baseBoardSize.width / baseBoardSize.height;
+
+  let boardWidth = Math.min(baseBoardSize.width, maxBoardWidth);
+  let boardHeight = boardWidth / aspectRatio;
+
+  // Check if height exceeds limit, recalculate if needed
+  if (boardHeight > maxBoardHeight) {
+    boardHeight = maxBoardHeight;
+    boardWidth = boardHeight * aspectRatio;
+  }
   const nextButtonSize = isLandscape ? ButtonSizes.next.landscape : ButtonSizes.next.portrait;
 
-  // Callback to measure actual right section width
-  const handleRightSectionLayout = (event: any) => {
-    const { width: layoutWidth } = event.nativeEvent.layout;
-    setMeasuredRightWidth(layoutWidth);
-  };
+  // Calculate button dimensions based on board width
+  const buttonAreaWidth = boardWidth - (offsets.boardPaddingHorizontal * 2);
+  const horizontalGap = offsets.optionRow.gap;
+  const buttonWidth = (buttonAreaWidth - horizontalGap) / 2;
 
-  // Compute responsive button width from measured px (not theoretical %)
-  const horizontalGap = Spacing.lg; // gap between two buttons in a row
-  const computedButtonWidth = measuredRightWidth > 0
-    ? Math.floor((measuredRightWidth - horizontalGap) / 2)
-    : buttonSize.width; // fallback to constant if not measured yet
+  // Clamp button width with min/max bounds
+  const clampedButtonWidth = Math.max(140, Math.min(buttonWidth, 280));
 
-  // Clamp width with min/max bounds for ergonomics
-  const minButtonWidth = buttonSize.width * 0.8;
-  const maxButtonWidth = buttonSize.width * 1.2;
-  const clampedButtonWidth = Math.max(
-    minButtonWidth,
-    Math.min(computedButtonWidth, maxButtonWidth)
-  );
-
-  // Preserve aspect ratio for height
-  const buttonHeightRatio = buttonSize.height / buttonSize.width;
-  const computedButtonHeight = Math.round(clampedButtonWidth * buttonHeightRatio);
+  // Maintain button aspect ratio
+  const buttonAspectRatio = 184 / 626; // jawapan-button.png aspect ratio
+  const clampedButtonHeight = clampedButtonWidth * buttonAspectRatio;
 
   // Animation values for each button
   const buttonScales = [
@@ -124,174 +121,181 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
     }
   };
 
-  // Left Section: Question Board
-  const leftSection = (
-    <View style={styles.questionSection}>
-      <ImageBackground
-        source={require('@/assets/images/game/backgrounds/soalan-board.png')}
-        style={[
-          styles.questionBoard,
-          {
-            width: questionBoardSize.width,
-            height: questionBoardSize.height,
-          },
-        ]}
-        resizeMode="contain">
-        <View style={styles.questionContent}>
-          <Text
-            style={[
-              styles.questionText,
-              { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
-            ]}
-            numberOfLines={3}
-            adjustsFontSizeToFit
-            minimumFontScale={0.85}
-            allowFontScaling={allowScaling}>
-            {question.question}
-          </Text>
-        </View>
-      </ImageBackground>
-    </View>
-  );
-
-  // Right Section: Answer Options
-  const rightSection = (
-    <View style={styles.answersSection}>
-      <View style={styles.optionsContainer}>
-        <View style={styles.optionRow}>
-          {question.options.slice(0, 2).map((option, btnIndex) => (
-            <AnimatedPressable
-              key={btnIndex}
-              style={[
-                styles.optionButton,
-                {
-                  width: clampedButtonWidth,
-                  height: computedButtonHeight,
-                },
-                selectedAnswer === option && styles.optionButtonSelected,
-                buttonAnimatedStyles[btnIndex],
-              ]}
-              onPress={() => handleSelect(option, btnIndex)}
-              hitSlop={TouchTargets.hitSlop}
-              pressRetentionOffset={TouchTargets.hitSlop}
-              accessibilityRole="button"
-              accessibilityLabel={`Jawapan ${btnIndex + 1}: ${option}`}
-              accessibilityState={{ selected: selectedAnswer === option }}>
-              <ImageBackground
-                source={require('@/assets/images/game/buttons/jawapan-button.png')}
-                style={styles.optionButtonBg}
-                resizeMode="stretch">
-                <Text
-                  style={[
-                    styles.optionText,
-                    { fontSize: getResponsiveFontSize(Typography.bodySmall, isLandscape) },
-                  ]}
-                  numberOfLines={2}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.85}
-                  allowFontScaling={allowScaling}>
-                  {option}
-                </Text>
-              </ImageBackground>
-            </AnimatedPressable>
-          ))}
-        </View>
-
-        <View style={styles.optionRow}>
-          {question.options.slice(2, 4).map((option, btnIndex) => {
-            const index = btnIndex + 2;
-            return (
-              <AnimatedPressable
-                key={index}
-                style={[
-                  styles.optionButton,
-                  {
-                    width: clampedButtonWidth,
-                    height: computedButtonHeight,
-                  },
-                  selectedAnswer === option && styles.optionButtonSelected,
-                  buttonAnimatedStyles[index],
-                ]}
-                onPress={() => handleSelect(option, index)}
-                hitSlop={TouchTargets.hitSlop}
-                pressRetentionOffset={TouchTargets.hitSlop}
-                accessibilityRole="button"
-                accessibilityLabel={`Jawapan ${index + 1}: ${option}`}
-                accessibilityState={{ selected: selectedAnswer === option }}>
-                <ImageBackground
-                  source={require('@/assets/images/game/buttons/jawapan-button.png')}
-                  style={styles.optionButtonBg}
-                  resizeMode="stretch">
-                  <Text
-                    style={[
-                      styles.optionText,
-                      { fontSize: getResponsiveFontSize(Typography.bodySmall, isLandscape) },
-                    ]}
-                    numberOfLines={2}
-                    adjustsFontSizeToFit
-                    minimumFontScale={0.85}
-                    allowFontScaling={allowScaling}>
-                    {option}
-                  </Text>
-                </ImageBackground>
-              </AnimatedPressable>
-            );
-          })}
-        </View>
-      </View>
-    </View>
-  );
-
-  // Footer: Next Button (bottom-right)
-  const footer = showNext ? (
-    <View style={styles.footerContainer}>
-      <Pressable
-        style={[
-          styles.nextButton,
-          {
-            width: nextButtonSize.width,
-            height: nextButtonSize.height,
-          },
-        ]}
-        onPress={handleNext}
-        hitSlop={TouchTargets.hitSlop}
-        accessibilityRole="button"
-        accessibilityLabel="Teruskan ke soalan seterusnya">
-        <Image
-          source={require('@/assets/images/game/buttons/next-button.png')}
-          style={styles.nextButtonImage}
-          contentFit="contain"
-        />
-      </Pressable>
-    </View>
-  ) : null;
-
   return (
-    <LandscapeLayout
-      leftSection={leftSection}
-      rightSection={rightSection}
-      footer={footer}
-      leftWidth={40}
-      rightWidth={58}
-      onRightSectionLayout={handleRightSectionLayout}
-    />
+    <View style={styles.container}>
+      <View style={styles.boardContainer}>
+        <ImageBackground
+          source={require('@/assets/images/game/backgrounds/soalan-board.png')}
+          style={[
+            styles.board,
+            {
+              width: boardWidth,
+              height: boardHeight,
+              paddingTop: offsets.boardPaddingTop,
+              paddingBottom: offsets.boardPaddingBottom,
+              paddingHorizontal: offsets.boardPaddingHorizontal,
+            },
+          ]}
+          resizeMode="contain">
+          {/* Question Section - Top */}
+          <View style={[styles.questionSection, { height: offsets.questionAreaHeight, marginBottom: offsets.answerAreaTop }]}>
+            <Text
+              style={[
+                styles.questionText,
+                { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
+              ]}
+              numberOfLines={3}
+              adjustsFontSizeToFit
+              minimumFontScale={0.85}
+              allowFontScaling={allowScaling}>
+              {question.question}
+            </Text>
+          </View>
+
+          {/* Answers Section - Bottom */}
+          <View style={styles.answersSection}>
+            <View style={[styles.optionsContainer, { gap: offsets.optionsContainer.gap }]}>
+              <View style={[styles.optionRow, { gap: offsets.optionRow.gap }]}>
+                {question.options.slice(0, 2).map((option, btnIndex) => (
+                  <AnimatedPressable
+                    key={btnIndex}
+                    style={[
+                      styles.optionButton,
+                      {
+                        width: clampedButtonWidth,
+                        height: clampedButtonHeight,
+                      },
+                      selectedAnswer === option && styles.optionButtonSelected,
+                      buttonAnimatedStyles[btnIndex],
+                    ]}
+                    onPress={() => handleSelect(option, btnIndex)}
+                    hitSlop={TouchTargets.hitSlop}
+                    pressRetentionOffset={TouchTargets.hitSlop}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Jawapan ${btnIndex + 1}: ${option}`}
+                    accessibilityState={{ selected: selectedAnswer === option }}>
+                    <ImageBackground
+                      source={require('@/assets/images/game/buttons/jawapan-button.png')}
+                      style={styles.optionButtonBg}
+                      resizeMode="stretch">
+                      <Text
+                        style={[
+                          styles.optionText,
+                          { fontSize: getResponsiveFontSize(Typography.bodySmall, isLandscape) },
+                        ]}
+                        numberOfLines={2}
+                        adjustsFontSizeToFit
+                        minimumFontScale={0.85}
+                        allowFontScaling={allowScaling}>
+                        {option}
+                      </Text>
+                    </ImageBackground>
+                  </AnimatedPressable>
+                ))}
+              </View>
+
+              <View style={[styles.optionRow, { gap: offsets.optionRow.gap }]}>
+                {question.options.slice(2, 4).map((option, btnIndex) => {
+                  const index = btnIndex + 2;
+                  return (
+                    <AnimatedPressable
+                      key={index}
+                      style={[
+                        styles.optionButton,
+                        {
+                          width: clampedButtonWidth,
+                          height: clampedButtonHeight,
+                        },
+                        selectedAnswer === option && styles.optionButtonSelected,
+                        buttonAnimatedStyles[index],
+                      ]}
+                      onPress={() => handleSelect(option, index)}
+                      hitSlop={TouchTargets.hitSlop}
+                      pressRetentionOffset={TouchTargets.hitSlop}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Jawapan ${index + 1}: ${option}`}
+                      accessibilityState={{ selected: selectedAnswer === option }}>
+                      <ImageBackground
+                        source={require('@/assets/images/game/buttons/jawapan-button.png')}
+                        style={styles.optionButtonBg}
+                        resizeMode="stretch">
+                        <Text
+                          style={[
+                            styles.optionText,
+                            { fontSize: getResponsiveFontSize(Typography.bodySmall, isLandscape) },
+                          ]}
+                          numberOfLines={2}
+                          adjustsFontSizeToFit
+                          minimumFontScale={0.85}
+                          allowFontScaling={allowScaling}>
+                          {option}
+                        </Text>
+                      </ImageBackground>
+                    </AnimatedPressable>
+                  );
+                })}
+              </View>
+            </View>
+          </View>
+        </ImageBackground>
+      </View>
+
+      {/* Next Button - Outside board, bottom-right */}
+      {showNext && (
+        <View style={[
+          styles.footer,
+          {
+            bottom: offsets.footerContainer.marginBottom,
+            right: offsets.footerContainer.marginRight,
+          },
+        ]}>
+          <Pressable
+            style={[
+              styles.nextButton,
+              {
+                width: nextButtonSize.width,
+                height: nextButtonSize.height,
+              },
+            ]}
+            onPress={handleNext}
+            hitSlop={TouchTargets.hitSlop}
+            accessibilityRole="button"
+            accessibilityLabel="Teruskan ke soalan seterusnya">
+            <Image
+              source={require('@/assets/images/game/buttons/next-button.png')}
+              style={styles.nextButtonImage}
+              contentFit="contain"
+            />
+          </Pressable>
+        </View>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  // Left Section: Question
-  questionSection: {
+  // Container
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: EdgeMargins.landscape,
+  },
+  boardContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  questionBoard: {
-    justifyContent: 'center',
+  board: {
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
-  questionContent: {
-    width: '85%', // Increased from 75% for better readability
-    paddingVertical: 35,
+
+  // Question Section (Top of board)
+  questionSection: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   questionText: {
     fontFamily: Typography.fontFamily,
@@ -300,20 +304,19 @@ const styles = StyleSheet.create({
     lineHeight: Typography.lineHeight.relaxed,
   },
 
-  // Right Section: Answers
+  // Answers Section (Bottom of board)
   answersSection: {
+    width: '100%',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   optionsContainer: {
-    width: '100%', // Constrain to container width
-    alignItems: 'center', // Center the grid horizontally
-    gap: Spacing.xxxl, // 32px - Increased vertical spacing
+    width: '100%',
+    alignItems: 'center',
   },
   optionRow: {
     flexDirection: 'row',
-    gap: Spacing.lg, // 18px - Horizontal spacing
   },
   optionButton: {
     position: 'relative',
@@ -336,11 +339,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
 
-  // Footer: Next Button
-  footerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+  // Footer: Next Button (Outside board)
+  footer: {
+    position: 'absolute',
+    zIndex: 20,
   },
   nextButton: {
     // Size set dynamically

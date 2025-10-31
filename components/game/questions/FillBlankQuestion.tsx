@@ -33,9 +33,15 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const isLandscape = isLandscapeMode(width); // Use consistent landscape detection
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
-  const questionBoardSize = isLandscape
+  const baseBoardSize = isLandscape
     ? QuestionBoard.standard.landscape
     : QuestionBoard.standard.portrait;
+  const boardScale = 1.87;
+  const scaledBoardWidth = baseBoardSize.width * boardScale;
+  const scaledBoardHeight = baseBoardSize.height * boardScale;
+  const maxBoardWidth = width * (isLandscape ? 0.504 : 1.056); // Increased by 20%
+  const boardWidth = Math.min(scaledBoardWidth, maxBoardWidth);
+  const boardHeight = (scaledBoardHeight / scaledBoardWidth) * boardWidth;
 
   const handleSubmit = async () => {
     if (answer.trim()) {
@@ -53,8 +59,8 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
         style={[
           styles.questionBoard,
           {
-            width: questionBoardSize.width,
-            height: questionBoardSize.height,
+            width: boardWidth,
+            height: boardHeight,
           },
         ]}
         resizeMode="contain">
@@ -157,8 +163,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   questionContent: {
-    width: '85%', // Increased from 75% for better readability
-    paddingVertical: 35,
+    width: '82%',
+    paddingVertical: 32,
+    alignItems: 'center',
+    gap: 16,
   },
   questionText: {
     fontFamily: Typography.fontFamily,

@@ -23,9 +23,8 @@ import {
   getResponsiveFontSize,
   getTextShadowStyle,
   Shadows,
-  ButtonAnimations,
 } from '@/constants/theme';
-import { isLandscapeMode, QuestionBoard, ButtonSizes, TouchTargets } from '@/constants/layout';
+import { isLandscapeMode, QuestionBoard, ButtonSizes, TouchTargets, getQuestionOffsets } from '@/constants/layout';
 import { useGameContext } from '@/contexts/GameContext';
 
 interface Props {
@@ -45,9 +44,16 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   const { width } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
   const allowScaling = gameState.allowFontScaling;
-  const questionBoardSize = isLandscape
+  const offsets = getQuestionOffsets('trueFalse', isLandscape);
+  const baseBoardSize = isLandscape
     ? QuestionBoard.standard.landscape
     : QuestionBoard.standard.portrait;
+  const boardScale = 1.87;
+  const scaledBoardWidth = baseBoardSize.width * boardScale;
+  const scaledBoardHeight = baseBoardSize.height * boardScale;
+  const maxBoardWidth = width * (isLandscape ? 0.504 : 1.056); // Increased by 20%
+  const boardWidth = Math.min(scaledBoardWidth, maxBoardWidth);
+  const boardHeight = (scaledBoardHeight / scaledBoardWidth) * boardWidth;
   const buttonSize = isLandscape ? ButtonSizes.answer.landscape : ButtonSizes.answer.portrait;
 
   // Animation values for buttons
@@ -80,18 +86,26 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
 
   // Left Section: Question Board
   const leftSection = (
-    <View style={styles.questionSection}>
+    <View style={[styles.questionSection, { marginTop: offsets.questionSection.marginTop, marginLeft: offsets.questionSection.marginLeft }]}>
       <ImageBackground
         source={require('@/assets/images/game/backgrounds/soalan-board.png')}
         style={[
           styles.questionBoard,
           {
-            width: questionBoardSize.width,
-            height: questionBoardSize.height,
+            width: boardWidth,
+            height: boardHeight,
           },
         ]}
         resizeMode="contain">
-        <View style={styles.questionContent}>
+        <View style={[
+          styles.questionContent,
+          {
+            width: offsets.questionContent.width,
+            paddingVertical: offsets.questionContent.paddingVertical,
+            paddingHorizontal: offsets.questionContent.paddingHorizontal,
+            gap: offsets.questionContent.gap,
+          },
+        ]}>
           <Text
             style={[
               styles.questionText,
@@ -110,7 +124,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
 
   // Right Section: BETUL/SALAH Buttons with Animations
   const rightSection = (
-    <View style={styles.buttonsSection}>
+    <View style={[styles.buttonsSection, { marginTop: offsets.buttonsSection.marginTop, marginRight: offsets.buttonsSection.marginRight }]}>
       {/* BETUL Button */}
       <AnimatedPressable
         style={[
@@ -151,7 +165,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
           {
             width: buttonSize.width,
             height: buttonSize.height,
-            marginTop: isLandscape ? 30 : 24,
+            marginTop: offsets.buttonGap,
           },
           salahAnimatedStyle,
         ]}
@@ -202,8 +216,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   questionContent: {
-    width: '85%', // Increased from 75% for better readability
-    paddingVertical: 35,
+    width: '82%',
+    paddingVertical: 32,
+    alignItems: 'center',
+    gap: 16,
   },
   questionText: {
     fontFamily: Typography.fontFamily,

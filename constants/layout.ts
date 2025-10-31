@@ -34,10 +34,10 @@ export const Spacing = {
 
 // Component Sizes - Question Boards
 export const QuestionBoard = {
-  // Standard Question Board (Multiple Choice, True/False, Fill Blank)
+  // Standard Question Board (Multiple Choice, True/False, Fill Blank) - Increased by 20%
   standard: {
-    landscape: { width: 340, height: 220 },
-    portrait: { width: 280, height: 260 },
+    landscape: { width: 408, height: 264 },
+    portrait: { width: 336, height: 312 },
   },
   // Compact Board (Matching, smaller content)
   compact: {
@@ -58,6 +58,11 @@ export const QuestionBoard = {
   clue: {
     landscape: { width: 180, height: 240 },
     portrait: { width: 150, height: 200 },
+  },
+  // Single Board (Multiple Choice - question + answers on same board)
+  singleBoardMC: {
+    landscape: { width: 700, height: 350 },
+    portrait: { width: 500, height: 400 },
   },
 } as const;
 
@@ -208,6 +213,112 @@ export const LayoutRatios = {
   },
 } as const;
 
+// Question Element Positioning - Easily adjustable offsets for quiz layout
+export const QuestionOffsets = {
+  multipleChoice: {
+    landscape: {
+      questionSection: { marginTop: 0, marginLeft: 0 },
+      questionContent: { width: '82%', paddingVertical: 32, paddingHorizontal: 0, gap: 16 },
+      answersSection: { marginTop: 0, marginRight: 0 },
+      optionsContainer: { marginTop: 0, gap: 32 }, // vertical gap between rows
+      optionRow: { gap: 18 }, // horizontal gap between buttons
+      footerContainer: { marginBottom: 0, marginRight: 0 },
+    },
+    portrait: {
+      questionSection: { marginTop: 0, marginLeft: 0 },
+      questionContent: { width: '82%', paddingVertical: 32, paddingHorizontal: 0, gap: 16 },
+      answersSection: { marginTop: 0, marginRight: 0 },
+      optionsContainer: { marginTop: 0, gap: 28 },
+      optionRow: { gap: 16 },
+      footerContainer: { marginBottom: 0, marginRight: 0 },
+    },
+  },
+  trueFalse: {
+    landscape: {
+      questionSection: { marginTop: 0, marginLeft: 0 },
+      questionContent: { width: '82%', paddingVertical: 32, paddingHorizontal: 0, gap: 16 },
+      buttonsSection: { marginTop: 0, marginRight: 0 },
+      buttonGap: 30, // gap between BETUL and SALAH buttons
+    },
+    portrait: {
+      questionSection: { marginTop: 0, marginLeft: 0 },
+      questionContent: { width: '82%', paddingVertical: 32, paddingHorizontal: 0, gap: 16 },
+      buttonsSection: { marginTop: 0, marginRight: 0 },
+      buttonGap: 24,
+    },
+  },
+  fillBlank: {
+    landscape: {
+      questionSection: { marginTop: 0, marginLeft: 0 },
+      questionContent: { width: '82%', paddingVertical: 32, paddingHorizontal: 0, gap: 16 },
+      inputSection: { marginTop: 0, marginRight: 0 },
+      inputContainer: { marginTop: 0, paddingHorizontal: 24 },
+      okButton: { marginTop: 28 }, // gap between input and OK button
+    },
+    portrait: {
+      questionSection: { marginTop: 0, marginLeft: 0 },
+      questionContent: { width: '82%', paddingVertical: 32, paddingHorizontal: 0, gap: 16 },
+      inputSection: { marginTop: 0, marginRight: 0 },
+      inputContainer: { marginTop: 0, paddingHorizontal: 20 },
+      okButton: { marginTop: 24 },
+    },
+  },
+  matching: {
+    landscape: {
+      questionSection: { marginTop: 0, marginLeft: 0 },
+      questionContent: { width: '82%', paddingVertical: 32, paddingHorizontal: 0, gap: 12 },
+      gridSection: { marginTop: 0, marginRight: 0 },
+      gridContainer: { marginTop: 0, gap: 12 }, // gap between rows
+      gridRow: { gap: 12 }, // gap between cells
+      footerContainer: { marginBottom: 0, marginRight: 0 },
+    },
+    portrait: {
+      questionSection: { marginTop: 0, marginLeft: 0 },
+      questionContent: { width: '82%', paddingVertical: 32, paddingHorizontal: 0, gap: 12 },
+      gridSection: { marginTop: 0, marginRight: 0 },
+      gridContainer: { marginTop: 0, gap: 12 },
+      gridRow: { gap: 12 },
+      footerContainer: { marginBottom: 0, marginRight: 0 },
+    },
+  },
+  crossword: {
+    landscape: {
+      containerPadding: { paddingTop: 40, paddingBottom: 20 },
+      columnGap: 18,
+      gridContainer: { marginTop: 14 },
+      clueContent: { width: '90%', paddingVertical: 16 },
+    },
+    portrait: {
+      containerPadding: { paddingTop: 40, paddingBottom: 20 },
+      columnGap: 16,
+      gridContainer: { marginTop: 12 },
+      clueContent: { width: '90%', paddingVertical: 14 },
+    },
+  },
+  multipleChoiceSingle: {
+    landscape: {
+      boardPaddingTop: 30,
+      boardPaddingBottom: 20,
+      boardPaddingHorizontal: 40,
+      questionAreaHeight: 100,
+      answerAreaTop: 20,
+      optionsContainer: { gap: 24 },
+      optionRow: { gap: 18 },
+      footerContainer: { marginBottom: 20, marginRight: 40 },
+    },
+    portrait: {
+      boardPaddingTop: 25,
+      boardPaddingBottom: 15,
+      boardPaddingHorizontal: 30,
+      questionAreaHeight: 90,
+      answerAreaTop: 15,
+      optionsContainer: { gap: 20 },
+      optionRow: { gap: 16 },
+      footerContainer: { marginBottom: 15, marginRight: 30 },
+    },
+  },
+} as const;
+
 // Helper Functions
 export const getEdgeMargin = (isLandscape: boolean): number => {
   return isLandscape ? EdgeMargins.landscape : EdgeMargins.portrait;
@@ -226,4 +337,13 @@ export const getResponsiveSize = <T extends { landscape: any; portrait: any }>(
   isLandscape: boolean
 ): T['landscape'] | T['portrait'] => {
   return isLandscape ? sizeConfig.landscape : sizeConfig.portrait;
+};
+
+export const getQuestionOffsets = (
+  questionType: keyof typeof QuestionOffsets,
+  isLandscape: boolean
+) => {
+  return isLandscape
+    ? QuestionOffsets[questionType].landscape
+    : QuestionOffsets[questionType].portrait;
 };

@@ -7,7 +7,6 @@ import {
   ImageBackground,
   useWindowDimensions,
 } from 'react-native';
-import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import { playSound } from '@/utils/audio';
 import LandscapeLayout from '@/components/game/LandscapeLayout';
@@ -33,9 +32,15 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const [showNext, setShowNext] = useState(false);
   const { width } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width); // Use consistent landscape detection
-  const questionBoardSize = isLandscape
+  const baseBoardSize = isLandscape
     ? QuestionBoard.standard.landscape
     : QuestionBoard.standard.portrait;
+  const boardScale = 1.87;
+  const scaledBoardWidth = baseBoardSize.width * boardScale;
+  const scaledBoardHeight = baseBoardSize.height * boardScale;
+  const maxBoardWidth = width * (isLandscape ? 0.504 : 1.056); // Increased by 20%
+  const boardWidth = Math.min(scaledBoardWidth, maxBoardWidth);
+  const boardHeight = (scaledBoardHeight / scaledBoardWidth) * boardWidth;
 
   const handleToggleOption = async (option: string) => {
     playSound('click');
@@ -83,8 +88,8 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
         style={[
           styles.questionBoard,
           {
-            width: questionBoardSize.width,
-            height: questionBoardSize.height,
+            width: boardWidth,
+            height: boardHeight,
           },
         ]}
         resizeMode="contain">
@@ -208,8 +213,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   questionContent: {
-    width: '85%', // Increased from 80% for better readability
-    paddingVertical: 25,
+    width: '82%',
+    paddingVertical: 32,
+    alignItems: 'center',
+    gap: 12,
   },
   titleText: {
     fontFamily: Typography.fontFamily,
