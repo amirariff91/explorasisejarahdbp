@@ -26,14 +26,23 @@ import { isLandscapeMode, ButtonSizes } from '@/constants/layout';
  * Opens overlay with: Resume, Restart, Quit, Settings
  * Figma: MENU-BUTTON 1
  */
-export default function MenuButton() {
+interface MenuButtonProps {
+  size?: 'default' | 'small';
+}
+
+export default function MenuButton({ size = 'default' }: MenuButtonProps) {
   const [showMenu, setShowMenu] = useState(false);
   const router = useRouter();
   const { resetGame, gameState, setAllowFontScaling } = useGameContext();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const isLandscape = isLandscapeMode(width);
-  const menuButtonSize = isLandscape ? ButtonSizes.menu.landscape : ButtonSizes.menu.portrait;
+  const baseSize = isLandscape ? ButtonSizes.menu.landscape : ButtonSizes.menu.portrait;
+  const sizeModifier = size === 'small' ? 0.7 : 1;
+  const menuButtonSize = {
+    width: baseSize.width * sizeModifier,
+    height: baseSize.height * sizeModifier,
+  };
 
   const handleOpenMenu = () => {
     playSound('click');

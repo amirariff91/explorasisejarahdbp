@@ -24,6 +24,12 @@ export default function GameLayout() {
             gestureEnabled: false, // Prevent back gestures during quiz
           }}>
           <Stack.Screen name="index" />
+          <Stack.Screen
+            name="map"
+            options={{
+              animation: 'fade',
+            }}
+          />
           <Stack.Screen name="tutorial" />
           <Stack.Screen
             name="quiz/[state]"

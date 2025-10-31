@@ -92,6 +92,13 @@ export type Question =
   | MatchingQuestion
   | CrosswordQuestion;
 
+// Answer value types for different question types
+export type AnswerValue =
+  | string    // For multipleChoice and fillBlank
+  | boolean   // For trueFalse
+  | string[]  // For matching
+  | Record<number, string>;  // For crossword (clue number -> answer)
+
 // Game State
 export interface GameState {
   money: number; // Starts at 100, -2 per wrong answer
@@ -99,7 +106,7 @@ export interface GameState {
   currentState: MalaysianState | null;
   completedStates: MalaysianState[];
   currentQuestionIndex: number;
-  answers: Record<string, any>; // questionId -> answer
+  answers: Record<string, AnswerValue>; // questionId -> answer
   showSuccessModal: boolean;
   hasSeenTutorial: boolean;
   // UI settings

@@ -47,7 +47,7 @@ export async function initializeAudio() {
       playsInSilentMode: true, // Play even when device is on silent
     });
   } catch (error) {
-    console.warn('Failed to initialize audio:', error);
+    // Fail silently - audio initialization errors should not crash the app
   }
 }
 
@@ -83,7 +83,6 @@ export async function playSound(
     player.seekTo(0);
     player.play();
   } catch (error) {
-    console.warn(`Failed to play sound "${soundName}":`, error);
     // Fail silently - don't crash the app if audio doesn't work
   }
 }
@@ -97,7 +96,7 @@ export async function stopAllSounds(): Promise<void> {
       player.pause();
     });
   } catch (error) {
-    console.warn('Failed to stop sounds:', error);
+    // Fail silently
   }
 }
 
@@ -112,7 +111,7 @@ export async function unloadAllSounds(): Promise<void> {
     });
     soundCache.clear();
   } catch (error) {
-    console.warn('Failed to unload sounds:', error);
+    // Fail silently
   }
 }
 

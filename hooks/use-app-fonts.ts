@@ -1,11 +1,10 @@
 import { useFonts } from 'expo-font';
+import { Galindo_400Regular } from '@expo-google-fonts/galindo';
 
-// Graceful font loader: currently loads no custom fonts to avoid bundling errors
-// when the font asset is not present. To enable Galindo, place the font file at
-// assets/fonts/Galindo-Regular.ttf and add it to the map below.
+// Font loader with Galindo from Google Fonts
 export function useAppFonts() {
   const [loaded] = useFonts({
-    // 'Galindo': require('@/assets/fonts/Galindo-Regular.ttf'),
+    'Galindo': Galindo_400Regular,
   });
   return loaded;
 }

@@ -1,14 +1,24 @@
-import React, { useMemo, useState } from 'react';
-import { View, StyleSheet, useWindowDimensions, Text, Pressable, Modal, ScrollView } from 'react-native';
-import { Image } from 'expo-image';
-import Svg, { Path, G } from 'react-native-svg';
-import * as Haptics from 'expo-haptics';
-import { useGameContext } from '@/contexts/GameContext';
-import { playSound } from '@/utils/audio';
-import type { MalaysianState } from '@/types';
-import { StateVisuals } from '@/constants/theme';
-import { stateDisplayNames } from '@/constants/mapLayout';
-import { statePaths } from '@/constants/mapPaths';
+import React, { useMemo, useState, useCallback } from "react";
+import {
+  View,
+  StyleSheet,
+  useWindowDimensions,
+  Text,
+  Pressable,
+  Modal,
+  ScrollView,
+  type LayoutChangeEvent,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Image } from "expo-image";
+import Svg, { Path, G } from "react-native-svg";
+import * as Haptics from "expo-haptics";
+import { useGameContext } from "@/contexts/GameContext";
+import { playSound } from "@/utils/audio";
+import type { MalaysianState } from "@/types";
+import { StateVisuals } from "@/constants/theme";
+import { stateDisplayNames } from "@/constants/mapLayout";
+import { statePaths } from "@/constants/mapPaths";
 
 interface MalaysiaMapSVGProps {
   onStateSelect: (state: MalaysianState) => void;
@@ -20,50 +30,98 @@ interface MalaysiaMapSVGProps {
  * Similar to mypeta.ai layout
  */
 export default function MalaysiaMapSVG({ onStateSelect }: MalaysiaMapSVGProps) {
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const { gameState } = useGameContext();
+  const insets = useSafeAreaInsets();
   const isLandscape = width >= 800;
   const [pressedState, setPressedState] = useState<MalaysianState | null>(null);
-  const [selectedState, setSelectedState] = useState<MalaysianState | null>(null);
+  const [selectedState, setSelectedState] = useState<MalaysianState | null>(
+    null,
+  );
   const [showDropdown, setShowDropdown] = useState(false);
+
+  // Measure element heights for accurate space calculation
+  const [dropdownHeight, setDropdownHeight] = useState(54);
+  const [buttonHeight, setButtonHeight] = useState(90);
+
+  // Handle layout measurements
+  const handleDropdownLayout = useCallback((event: LayoutChangeEvent) => {
+    const { height } = event.nativeEvent.layout;
+    setDropdownHeight(height);
+  }, []);
+
+  const handleButtonLayout = useCallback((event: LayoutChangeEvent) => {
+    const { height } = event.nativeEvent.layout;
+    setButtonHeight(height);
+  }, []);
 
   // All Malaysian states for dropdown
   const allStates: MalaysianState[] = [
-    'perlis', 'kedah', 'pulau-pinang', 'perak', 'selangor', 'kuala-lumpur',
-    'negeri-sembilan', 'melaka', 'johor', 'pahang', 'kelantan', 'terengganu',
-    'sabah', 'sarawak'
+    "perlis",
+    "kedah",
+    "pulau-pinang",
+    "perak",
+    "selangor",
+    "kuala-lumpur",
+    "negeri-sembilan",
+    "melaka",
+    "johor",
+    "pahang",
+    "kelantan",
+    "terengganu",
+    "sabah",
+    "sarawak",
   ];
 
-  // Calculate responsive map dimensions (15% smaller for better spacing)
-  const mapWidth = useMemo(() => {
-    return Math.min(width * 0.9, isLandscape ? 700 : 450) * 0.85;
-  }, [width, isLandscape]);
+  // Calculate responsive map dimensions based on available space
+  const { mapWidth, mapHeight } = useMemo(() => {
+    const DESIRED_WIDTH_RATIO = isLandscape ? 0.88 : 0.94;
+    const MIN_WIDTH_RATIO = isLandscape ? 0.68 : 0.75;
+    const MAX_HEIGHT_RATIO = isLandscape ? 0.95 : 0.78; // allow map to dominate vertical space
 
-  const mapHeight = useMemo(() => {
-    return mapWidth * 0.667; // 3:2 aspect ratio (matches viewBox 1200x800)
-  }, [mapWidth]);
+    const desiredWidth = width * DESIRED_WIDTH_RATIO;
+    const minWidth = width * MIN_WIDTH_RATIO;
+    const maxMapHeight = height * MAX_HEIGHT_RATIO;
+
+    let mapHeight = Math.min(desiredWidth * 0.667, maxMapHeight);
+    let mapWidth = mapHeight / 0.667;
+
+    if (mapWidth < minWidth) {
+      mapWidth = minWidth;
+      mapHeight = Math.min(mapWidth * 0.667, maxMapHeight);
+    }
+
+    return { mapWidth, mapHeight };
+  }, [width, height, isLandscape]);
+
+  const mapVerticalOffset = useMemo(
+    () => -Math.max(mapHeight * 0.2, 30),
+    [mapHeight],
+  );
+
+  const borneoOffsetX = useMemo(() => -40, []); // Pull East Malaysia closer to peninsula with scaling
 
   const handleStatePress = async (state: MalaysianState) => {
-    playSound('click');
+    playSound("click");
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onStateSelect(state);
   };
 
   const handleDropdownSelect = async (state: MalaysianState) => {
-    playSound('click');
+    playSound("click");
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setSelectedState(state);
     setShowDropdown(false);
   };
 
   const handleDropdownOpen = () => {
-    playSound('click');
+    playSound("click");
     setShowDropdown(true);
   };
 
   const handleNextPress = async () => {
     if (!selectedState) return;
-    playSound('click');
+    playSound("click");
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onStateSelect(selectedState);
   };
@@ -71,23 +129,32 @@ export default function MalaysiaMapSVG({ onStateSelect }: MalaysiaMapSVGProps) {
   const getStateColor = (state: MalaysianState): string => {
     // Highlight selected state from dropdown
     if (selectedState === state) {
-      return '#4A90E2'; // Blue highlight for selected
+      return "#4A90E2"; // Blue highlight for selected
     }
     const isCompleted = gameState.completedStates.includes(state);
     if (isCompleted) {
-      return '#4CAF50'; // Green for completed
+      return "#4CAF50"; // Green for completed
     }
     // Use existing StateVisuals colors
-    return StateVisuals[state]?.color || '#FFD700';
+    return StateVisuals[state]?.color || "#FFD700";
   };
-
 
   // Separate peninsula and Borneo states for different scaling
   const peninsulaStates: MalaysianState[] = [
-    'perlis', 'kedah', 'pulau-pinang', 'perak', 'selangor', 'kuala-lumpur',
-    'negeri-sembilan', 'melaka', 'johor', 'pahang', 'kelantan', 'terengganu'
+    "perlis",
+    "kedah",
+    "pulau-pinang",
+    "perak",
+    "selangor",
+    "kuala-lumpur",
+    "negeri-sembilan",
+    "melaka",
+    "johor",
+    "pahang",
+    "kelantan",
+    "terengganu",
   ];
-  const borneoStates: MalaysianState[] = ['sabah', 'sarawak'];
+  const borneoStates: MalaysianState[] = ["sabah", "sarawak"];
 
   const renderStatePath = (state: MalaysianState, pathData: string) => {
     const isPressed = pressedState === state;
@@ -108,43 +175,79 @@ export default function MalaysiaMapSVG({ onStateSelect }: MalaysiaMapSVGProps) {
 
   return (
     <View style={styles.container}>
-      {/* Dropdown Selector */}
-      <Pressable style={styles.dropdown} onPress={handleDropdownOpen}>
-        <Text style={styles.dropdownText}>
-          {selectedState ? stateDisplayNames[selectedState] : 'Pilih Negeri'}
-        </Text>
-        <Text style={styles.dropdownArrow}>▼</Text>
-      </Pressable>
+      {/* Top Section: Dropdown + Map */}
+      <View style={styles.topSection}>
+        {/* Dropdown Selector */}
+        <Pressable
+          style={[styles.dropdown, { marginTop: insets.top }]}
+          onPress={handleDropdownOpen}
+          onLayout={handleDropdownLayout}
+        >
+          <Text style={styles.dropdownText}>
+            {selectedState ? stateDisplayNames[selectedState] : "Pilih Negeri"}
+          </Text>
+          <Text style={styles.dropdownArrow}>▼</Text>
+        </Pressable>
 
-      {/* Malaysia Map */}
-      <Svg width={mapWidth} height={mapHeight} viewBox="0 0 1200 800">
-        {/* Peninsular Malaysia - Scaled 20% larger */}
-        <G origin="250, 400" scale="1.2">
-          {peninsulaStates.map((state) => renderStatePath(state, statePaths[state]))}
-        </G>
+        {/* Malaysia Map */}
+        <View style={[styles.mapWrapper, { marginTop: mapVerticalOffset }]}>
+          <Svg
+            width={mapWidth}
+            height={mapHeight}
+            viewBox="-200 -150 1650 1100"
+          >
+            {/* Peninsular Malaysia - Scaled up to fill more canvas */}
+            <G origin="250, 400" scale="1.55">
+              {peninsulaStates.map((state) =>
+                renderStatePath(state, statePaths[state]),
+              )}
+            </G>
 
-        {/* East Malaysia (Borneo) - No scaling */}
-        <G>
-          {borneoStates.map((state) => renderStatePath(state, statePaths[state]))}
-        </G>
-      </Svg>
-
-      {/* Next Button - Appears when state is selected from dropdown */}
-      {selectedState && (
-        <View style={styles.nextButtonContainer}>
-          <Pressable
-            style={styles.nextButton}
-            onPress={handleNextPress}
-            accessibilityRole="button"
-            accessibilityLabel="Mula Kuiz">
-            <Image
-              source={require('@/assets/images/game/buttons/next-button.png')}
-              style={styles.nextButtonImage}
-              contentFit="contain"
-            />
-          </Pressable>
+            {/* East Malaysia (Borneo) - Shifted and enlarged */}
+            <G transform={`translate(${borneoOffsetX} 0)`} scale="1.35">
+              {borneoStates.map((state) =>
+                renderStatePath(state, statePaths[state]),
+              )}
+            </G>
+          </Svg>
         </View>
-      )}
+      </View>
+
+      {/* Spacer to force container to full height */}
+      <View style={styles.spacer} />
+
+      {/* Next Button - Always visible, disabled until state is selected */}
+      <View
+        style={[
+          styles.nextButtonContainer,
+          {
+            bottom: insets.bottom + 10,
+            right: insets.right + 10,
+            opacity: selectedState ? 1 : 0.5,
+          },
+        ]}
+        onLayout={handleButtonLayout}
+      >
+        <Pressable
+          style={[
+            styles.nextButton,
+            {
+              width: isLandscape ? 113 : 73,
+              height: isLandscape ? 86 : 55,
+            },
+          ]}
+          onPress={handleNextPress}
+          disabled={!selectedState}
+          accessibilityRole="button"
+          accessibilityLabel="Mula Kuiz"
+        >
+          <Image
+            source={require("@/assets/images/game/buttons/next-button.png")}
+            style={styles.nextButtonImage}
+            contentFit="contain"
+          />
+        </Pressable>
+      </View>
 
       {/* Dropdown Modal */}
       <Modal
@@ -152,29 +255,43 @@ export default function MalaysiaMapSVG({ onStateSelect }: MalaysiaMapSVGProps) {
         transparent
         animationType="fade"
         presentationStyle="overFullScreen"
-        supportedOrientations={['portrait', 'landscape']}
-        onRequestClose={() => setShowDropdown(false)}>
+        supportedOrientations={["portrait", "landscape"]}
+        onRequestClose={() => setShowDropdown(false)}
+      >
         <Pressable
           style={styles.modalOverlay}
-          onPress={() => setShowDropdown(false)}>
+          onPress={() => setShowDropdown(false)}
+        >
           <Pressable onPress={(e) => e.stopPropagation()}>
             <View style={styles.dropdownModal}>
               <Text style={styles.modalTitle}>Pilih Negeri</Text>
               <ScrollView
-                style={styles.stateList}
-                showsVerticalScrollIndicator={true}>
+                style={[
+                  styles.stateList,
+                  {
+                    maxHeight: Math.min(
+                      (height - insets.top - insets.bottom) * 0.5,
+                      400,
+                    ),
+                  },
+                ]}
+                showsVerticalScrollIndicator={true}
+              >
                 {allStates.map((state) => (
                   <Pressable
                     key={state}
                     style={[
                       styles.stateItem,
-                      selectedState === state && styles.stateItemSelected
+                      selectedState === state && styles.stateItemSelected,
                     ]}
-                    onPress={() => handleDropdownSelect(state)}>
-                    <Text style={[
-                      styles.stateItemText,
-                      selectedState === state && styles.stateItemTextSelected
-                    ]}>
+                    onPress={() => handleDropdownSelect(state)}
+                  >
+                    <Text
+                      style={[
+                        styles.stateItemText,
+                        selectedState === state && styles.stateItemTextSelected,
+                      ]}
+                    >
                       {stateDisplayNames[state]}
                     </Text>
                     {gameState.completedStates.includes(state) && (
@@ -192,30 +309,42 @@ export default function MalaysiaMapSVG({ onStateSelect }: MalaysiaMapSVGProps) {
 }
 
 const styles = StyleSheet.create({
+  // Map SVG Wrapper with flex layout
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 10,
+    flex: 1,
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 8.5,
     paddingTop: 0,
-    marginTop: -80,
-    width: '100%',
+    alignSelf: "stretch",
   },
-  // Dropdown Selector
+  // Top Section: Groups dropdown + map together
+  topSection: {
+    alignItems: "center",
+    gap: 8,
+  },
+  mapWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  // Spacer to force container height
+  spacer: {
+    flex: 1,
+    minHeight: 1,
+  },
+  // Dropdown Container with safe area aware positioning
   dropdown: {
-    position: 'absolute',
-    top: '30%',
-    left: '50%',
-    transform: [{ translateX: -119 }], // Half of maxWidth (238/2)
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#2c3e50',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#2c3e50",
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    borderRadius: 12,
-    width: '53.5%',
-    maxWidth: 238,
-    shadowColor: '#000',
+    paddingVertical: 10,
+    borderRadius: 10,
+    width: 160,
+    alignSelf: "center",
+    marginBottom: 4,
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -223,44 +352,44 @@ const styles = StyleSheet.create({
     zIndex: 10,
   },
   dropdownText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#fff",
   },
   dropdownArrow: {
     fontSize: 14,
-    color: '#fff',
+    color: "#fff",
   },
-  // Next Button
+  // Next Button Container with absolute positioning for better control
   nextButtonContainer: {
-    position: 'absolute',
-    bottom: 20,
-    right: 20,
+    position: "absolute",
     zIndex: 20,
   },
   nextButton: {
     width: 120,
     height: 90,
+    left: "80%",
+    top: "50%",
   },
   nextButtonImage: {
-    width: '100%',
-    height: '100%',
+    width: "80%",
+    height: "80%",
   },
   // Modal Styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   dropdownModal: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 16,
-    padding: 20,
-    width: '85%',
+    padding: 15,
+    width: "75%",
     maxWidth: 400,
     maxHeight: 500,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -268,36 +397,36 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+    fontWeight: "bold",
+    color: "#2c3e50",
     marginBottom: 15,
-    textAlign: 'center',
+    textAlign: "center",
   },
   stateList: {
-    maxHeight: 180,
+    // maxHeight set dynamically in JSX based on screen height
   },
   stateItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingVertical: 14,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
+    borderBottomColor: "#e0e0e0",
   },
   stateItemSelected: {
-    backgroundColor: '#e3f2fd',
+    backgroundColor: "#e3f2fd",
   },
   stateItemText: {
-    fontSize: 16,
-    color: '#2c3e50',
+    fontSize: 14,
+    color: "#2c3e50",
   },
   stateItemTextSelected: {
-    fontWeight: 'bold',
-    color: '#4A90E2',
+    fontWeight: "bold",
+    color: "#4A90E2",
   },
   completedBadge: {
-    fontSize: 18,
-    color: '#4CAF50',
+    fontSize: 16,
+    color: "#4CAF50",
   },
 });

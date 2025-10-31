@@ -3,6 +3,8 @@
  * All visual design tokens in one place for consistency
  */
 
+import { Platform } from 'react-native';
+
 // Color Palette
 export const Colors = {
   // Primary Colors
@@ -27,11 +29,37 @@ export const Colors = {
 
   // Shadow Colors
   shadowDark: '#000',
+
+  // Theme-specific colors for light/dark modes
+  light: {
+    text: '#000',
+    background: '#fff',
+    tint: '#2196F3',
+    icon: '#687076',
+    tabIconDefault: '#687076',
+    tabIconSelected: '#2196F3',
+  },
+  dark: {
+    text: '#ECEDEE',
+    background: '#151718',
+    tint: '#fff',
+    icon: '#9BA1A6',
+    tabIconDefault: '#9BA1A6',
+    tabIconSelected: '#fff',
+  },
+} as const;
+
+// Font Families
+export const Fonts = {
+  rounded: 'Galindo', // Main game font
+  mono: Platform.select({
+    ios: 'Courier',
+    android: 'monospace',
+    default: 'monospace'
+  }),
 } as const;
 
 // Typography Scale
-import { Platform } from 'react-native';
-
 export const Typography = {
   // Font Family (fallback to system; replace with 'Galindo' when font asset is added)
   fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' })!,

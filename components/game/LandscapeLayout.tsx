@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
   header: {
     paddingVertical: 12,
     zIndex: 10,
+    alignItems: 'center',
   },
   mainContent: {
     flex: 1,

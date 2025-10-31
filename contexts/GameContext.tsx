@@ -15,13 +15,14 @@ import type {
   MalaysianState,
   Question,
   AnswerResult,
+  AnswerValue,
 } from '@/types';
 
 interface GameContextType {
   gameState: GameState;
   hasSeenTutorial: boolean;
   showSuccessModal: boolean;
-  answerQuestion: (questionId: string, answer: any, question: Question) => AnswerResult;
+  answerQuestion: (questionId: string, answer: AnswerValue, question: Question) => AnswerResult;
   completeState: (state: MalaysianState) => void;
   clearStateAnswers: (state: MalaysianState) => void;
   markTutorialComplete: () => void;
@@ -125,7 +126,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       // Retry logic: attempt up to 2 retries with exponential backoff
       if (retryCount < 2) {
         const retryDelay = Math.pow(2, retryCount) * 1000; // 1s, 2s
-        console.log(`Retrying save in ${retryDelay}ms...`);
         setSaveError(`Menyimpan kemajuan... cuba lagi (${retryCount + 1}/2)`);
 
         setTimeout(() => {
@@ -137,13 +137,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const checkAnswer = (question: Question, answer: any): boolean => {
+  const checkAnswer = (question: Question, answer: AnswerValue): boolean => {
     switch (question.type) {
       case 'multipleChoice':
         return answer === question.correctAnswer;
       case 'trueFalse':
         return answer === question.correctAnswer;
       case 'fillBlank':
+        if (typeof answer !== 'string') return false;
         const normalizedAnswer = question.caseSensitive
           ? answer.trim()
           : answer.trim().toLowerCase();
@@ -188,7 +189,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const answerQuestion = (
     questionId: string,
-    answer: any,
+    answer: AnswerValue,
     question: Question
   ): AnswerResult => {
     const isCorrect = checkAnswer(question, answer);

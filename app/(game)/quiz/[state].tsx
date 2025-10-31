@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ImageBackground, useWindowDimensions, Pressable } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, Pressable } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useGameContext } from '@/contexts/GameContext';
 import { getQuestionsForState } from '@/data/questions';
-import type { MalaysianState, Question } from '@/types';
+import type { MalaysianState, Question, AnswerValue } from '@/types';
 
 // Question Components
 import MultipleChoiceQuestion from '@/components/game/questions/MultipleChoiceQuestion';
@@ -17,7 +17,6 @@ import StatusBar from '@/components/game/StatusBar';
 import MenuButton from '@/components/game/MenuButton';
 import SuccessModal from '@/components/game/SuccessModal';
 import FeedbackOverlay from '@/components/game/FeedbackOverlay';
-import ProgressBar from '@/components/game/ProgressBar';
 
 /**
  * Quiz Screen - Dynamic Route
@@ -27,7 +26,6 @@ import ProgressBar from '@/components/game/ProgressBar';
 export default function QuizScreen() {
   const router = useRouter();
   const { state } = useLocalSearchParams<{ state: MalaysianState }>();
-  const { width } = useWindowDimensions();
   const {
     gameState,
     answerQuestion,
@@ -116,7 +114,7 @@ export default function QuizScreen() {
     );
   }
 
-  const handleAnswer = (answer: any) => {
+  const handleAnswer = (answer: AnswerValue) => {
     // Prevent double-submit or submission on unmounted component
     if (isAnswering || !isMountedRef.current) return;
 
@@ -186,15 +184,40 @@ export default function QuizScreen() {
   const renderQuestion = () => {
     switch (currentQuestion.type) {
       case 'multipleChoice':
-        return <MultipleChoiceQuestion question={currentQuestion} onAnswer={handleAnswer} />;
+        return (
+          <MultipleChoiceQuestion
+            question={currentQuestion}
+            onAnswer={handleAnswer}
+          />
+        );
       case 'trueFalse':
-        return <TrueFalseQuestion question={currentQuestion} onAnswer={handleAnswer} />;
+        return (
+          <TrueFalseQuestion
+            question={currentQuestion}
+            onAnswer={handleAnswer}
+          />
+        );
       case 'fillBlank':
-        return <FillBlankQuestion question={currentQuestion} onAnswer={handleAnswer} />;
+        return (
+          <FillBlankQuestion
+            question={currentQuestion}
+            onAnswer={handleAnswer}
+          />
+        );
       case 'matching':
-        return <MatchingQuestion question={currentQuestion} onAnswer={handleAnswer} />;
+        return (
+          <MatchingQuestion
+            question={currentQuestion}
+            onAnswer={handleAnswer}
+          />
+        );
       case 'crossword':
-        return <CrosswordQuestion question={currentQuestion} onAnswer={handleAnswer} />;
+        return (
+          <CrosswordQuestion
+            question={currentQuestion}
+            onAnswer={handleAnswer}
+          />
+        );
       default:
         return <Text>Unknown question type</Text>;
     }
@@ -207,13 +230,7 @@ export default function QuizScreen() {
       resizeMode="cover">
       <StatusBar state={state} />
 
-      {/* Progress Bar */}
-      <ProgressBar
-        currentQuestion={currentQuestionIndex + 1}
-        totalQuestions={questions.length}
-      />
-
-      <MenuButton />
+      <MenuButton size="small" />
 
       <View style={styles.content}>{renderQuestion()}</View>
 

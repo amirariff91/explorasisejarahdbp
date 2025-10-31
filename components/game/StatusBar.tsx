@@ -48,6 +48,15 @@ export default function StatusBar({ state }: StatusBarProps) {
     sarawak: 'SARAWAK',
   };
 
+  const baseStateIndicatorSize = isLandscape
+    ? statusBarSizes.stateIndicator.landscape
+    : statusBarSizes.stateIndicator.portrait;
+  const stateIndicatorScale = 1.3;
+  const scaledStateIndicator = {
+    width: baseStateIndicatorSize.width * stateIndicatorScale,
+    height: baseStateIndicatorSize.height * stateIndicatorScale,
+  };
+
   return (
     <View style={[styles.container, { paddingHorizontal: edgeMargin, paddingTop: insets.top + 8 }]}>
       {/* Health Bar - Left */}
@@ -85,12 +94,8 @@ export default function StatusBar({ state }: StatusBarProps) {
           style={[
             styles.stateImage,
             {
-              width: isLandscape
-                ? statusBarSizes.stateIndicator.landscape.width
-                : statusBarSizes.stateIndicator.portrait.width,
-              height: isLandscape
-                ? statusBarSizes.stateIndicator.landscape.height
-                : statusBarSizes.stateIndicator.portrait.height,
+              width: scaledStateIndicator.width,
+              height: scaledStateIndicator.height,
             },
           ]}
           contentFit="contain"

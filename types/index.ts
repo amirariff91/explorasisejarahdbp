@@ -12,6 +12,7 @@ export type {
   CrosswordQuestion,
   CrosswordClue,
   Question,
+  AnswerValue,
   GameState,
   StateInfo,
   AnswerResult,

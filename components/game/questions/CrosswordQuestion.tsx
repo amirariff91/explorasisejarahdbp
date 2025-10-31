@@ -1,6 +1,5 @@
 import { View, Text, StyleSheet, ImageBackground, useWindowDimensions } from 'react-native';
 import { Typography } from '@/constants/theme';
-import LandscapeLayout from '@/components/game/LandscapeLayout';
 import type { CrosswordQuestion as CWQuestion } from '@/types';
 import { useGameContext } from '@/contexts/GameContext';
 
@@ -28,6 +27,16 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
 
   const edgeMargin = isLandscape ? 40 : 30; // Reduced margins for wider content area
   const columnGap = isLandscape ? 18 : 16;
+  const baseClueBoardSize = {
+    width: isLandscape ? 180 : 150,
+    height: isLandscape ? 240 : 200,
+  };
+  const boardScale = 1.87;
+  const scaledClueWidth = baseClueBoardSize.width * boardScale;
+  const scaledClueHeight = baseClueBoardSize.height * boardScale;
+  const maxClueWidth = width * (isLandscape ? 0.26 : 0.8);
+  const clueBoardWidth = Math.min(scaledClueWidth, maxClueWidth);
+  const clueBoardHeight = (scaledClueHeight / scaledClueWidth) * clueBoardWidth;
 
   return (
     <View style={styles.container}>
@@ -41,8 +50,8 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
             style={[
               styles.clueBoard,
               {
-                width: isLandscape ? 180 : 150,
-                height: isLandscape ? 240 : 200,
+                width: clueBoardWidth,
+                height: clueBoardHeight,
               },
             ]}
             resizeMode="contain">
@@ -116,8 +125,8 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
             style={[
               styles.clueBoard,
               {
-                width: isLandscape ? 180 : 150,
-                height: isLandscape ? 240 : 200,
+                width: clueBoardWidth,
+                height: clueBoardHeight,
               },
             ]}
             resizeMode="contain">
