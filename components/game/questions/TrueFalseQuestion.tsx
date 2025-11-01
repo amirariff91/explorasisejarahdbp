@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -44,7 +44,12 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   const { width } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
   const allowScaling = gameState.allowFontScaling;
-  const offsets = getQuestionOffsets('trueFalse', isLandscape);
+  const offsets = getQuestionOffsets('trueFalse', isLandscape) as {
+    questionSection: { marginTop: number; marginLeft: number };
+    questionContent: { width: string; paddingVertical: number; paddingHorizontal: number; gap: number };
+    buttonsSection: { marginTop: number; marginRight: number };
+    buttonGap: number;
+  };
   const baseBoardSize = isLandscape
     ? QuestionBoard.standard.landscape
     : QuestionBoard.standard.portrait;
@@ -100,7 +105,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
         <View style={[
           styles.questionContent,
           {
-            width: offsets.questionContent.width,
+            width: offsets.questionContent.width as any,
             paddingVertical: offsets.questionContent.paddingVertical,
             paddingHorizontal: offsets.questionContent.paddingHorizontal,
             gap: offsets.questionContent.gap,

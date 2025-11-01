@@ -13,7 +13,6 @@ import { playFeedback } from '@/utils/audio';
 import {
   Colors,
   Typography,
-  getResponsiveFontSize,
   getTextShadowStyle,
   Shadows,
 } from '@/constants/theme';
@@ -98,6 +97,7 @@ export default function FeedbackOverlay({
       translateX.value = 0;
       explainOpacity.value = 0;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, isCorrect]);
 
   // Animated styles

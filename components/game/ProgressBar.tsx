@@ -4,7 +4,6 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
-  withTiming,
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -46,6 +45,7 @@ export default function ProgressBar({ currentQuestion, totalQuestions }: Progres
       damping: 15,
       stiffness: 100,
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentQuestion, totalQuestions]);
 
   // Animated style for progress fill

@@ -7,6 +7,7 @@ import {
   ImageBackground,
   useWindowDimensions,
 } from 'react-native';
+import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import { playSound } from '@/utils/audio';
 import LandscapeLayout from '@/components/game/LandscapeLayout';

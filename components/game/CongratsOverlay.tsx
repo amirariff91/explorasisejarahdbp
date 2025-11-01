@@ -128,7 +128,7 @@ export default function CongratsOverlay({
 
   const sparkleSpots = useMemo(
     () =>
-      (isLandscape
+      isLandscape
         ? [
             { top: '18%', left: '18%', size: 10 },
             { top: '24%', right: '14%', size: 12 },
@@ -144,7 +144,7 @@ export default function CongratsOverlay({
             { bottom: '20%', right: '22%', size: 8 },
             { top: '34%', left: '50%', size: 11 },
             { bottom: '14%', left: '48%', size: 10 },
-          ]) as const,
+          ],
     [isLandscape]
   );
 
@@ -185,15 +185,22 @@ export default function CongratsOverlay({
       {sparkleSpots.map((spot, index) => {
         const { size, ...position } = spot;
         return (
-          <Animated.View
+          <View
             key={`sparkle-${index}`}
             style={[
               styles.sparkle,
-              position,
+              position as any,
               { width: size, height: size, borderRadius: size / 2 },
-              sparkleStyles[index],
             ]}
-          />
+          >
+            <Animated.View
+              style={[
+                StyleSheet.absoluteFillObject,
+                { backgroundColor: 'rgba(255, 255, 255, 0.85)' },
+                sparkleStyles[index],
+              ]}
+            />
+          </View>
         );
       })}
 
@@ -412,10 +419,6 @@ const styles = StyleSheet.create({
   },
   sparkle: {
     position: 'absolute',
-    width: 12,
-    height: 12,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
     shadowColor: Colors.gold,
     shadowOpacity: 0.5,
     shadowRadius: 4,

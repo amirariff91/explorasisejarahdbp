@@ -37,6 +37,7 @@ import { useGameContext } from '@/contexts/GameContext';
 import type {
   CrosswordPuzzleClue,
   CrosswordPuzzleDefinition,
+  CrosswordPuzzleWord,
 } from '@/types';
 
 type CrosswordCell = {
@@ -69,14 +70,14 @@ export default function JohorCrossword() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const wordMap = useMemo(() => {
-    const entries = PUZZLE.words.map((word) => [word.id, word] as const);
+    const entries = PUZZLE.words.map((word: CrosswordPuzzleWord) => [word.id, word] as const);
     return new Map(entries);
   }, []);
 
   const clueMap = useMemo(() => {
-    const entries: Array<[string, CrosswordPuzzleClue]> = [];
-    PUZZLE.clues.across.forEach((clue) => entries.push([clue.id, clue]));
-    PUZZLE.clues.down.forEach((clue) => entries.push([clue.id, clue]));
+    const entries: [string, CrosswordPuzzleClue][] = [];
+    PUZZLE.clues.across.forEach((clue: CrosswordPuzzleClue) => entries.push([clue.id, clue]));
+    PUZZLE.clues.down.forEach((clue: CrosswordPuzzleClue) => entries.push([clue.id, clue]));
     return new Map(entries);
   }, []);
 
@@ -94,10 +95,10 @@ export default function JohorCrossword() {
       }))
     );
 
-    PUZZLE.words.forEach((word) => {
+    PUZZLE.words.forEach((word: CrosswordPuzzleWord) => {
       const letters = word.answer.toUpperCase().split('');
 
-      letters.forEach((letter, index) => {
+      letters.forEach((letter: string, index: number) => {
         const row = word.startRow + (word.direction === 'down' ? index : 0);
         const col = word.startCol + (word.direction === 'across' ? index : 0);
 
@@ -106,8 +107,12 @@ export default function JohorCrossword() {
           return;
         }
 
-        cell.letter = letter;
-        cell.wordIds = [...cell.wordIds, word.id];
+        // Create new cell object instead of mutating readonly properties
+        matrix[row]![col] = {
+          ...cell,
+          letter: letter,
+          wordIds: [...cell.wordIds, word.id],
+        };
       });
     });
 
@@ -124,8 +129,9 @@ export default function JohorCrossword() {
     return list;
   }, [gridCells]);
 
-  const activeWordId = activeClueId ? clueMap.get(activeClueId)?.wordId ?? null : null;
-  const activeWord = activeWordId ? wordMap.get(activeWordId) ?? null : null;
+  const activeClue = activeClueId ? clueMap.get(activeClueId) : undefined;
+  const activeWordId = activeClue?.wordId ?? null;
+  const activeWord = activeWordId ? wordMap.get(activeWordId) : undefined;
 
   const highlightedCellKeys = useMemo(() => {
     if (!activeWord) {
@@ -175,7 +181,12 @@ export default function JohorCrossword() {
 
   const gridWidth = tileSize * PUZZLE.gridSize.cols;
   const gridHeight = tileSize * PUZZLE.gridSize.rows;
-  const crosswordOffsets = getQuestionOffsets('crossword', isLandscape);
+  const crosswordOffsets = getQuestionOffsets('crossword', isLandscape) as {
+    containerPadding: { paddingTop: number; paddingBottom: number };
+    columnGap: number;
+    gridContainer: { marginTop: number };
+    clueContent: { width: string; paddingVertical: number };
+  };
   const columnGap = crosswordOffsets.columnGap;
 
   const handleSelectWord = (wordId?: string) => {
