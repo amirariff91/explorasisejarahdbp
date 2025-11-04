@@ -1,36 +1,36 @@
-import { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ImageBackground,
-  useWindowDimensions,
-} from 'react-native';
-import { Image } from 'expo-image';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
-import { playSound } from '@/utils/audio';
-import type { MultipleChoiceQuestion as MCQuestion } from '@/types';
-import {
-  Colors,
-  Typography,
-  getResponsiveFontSize,
-  Opacity,
-} from '@/constants/theme';
-import {
-  isLandscapeMode,
-  QuestionBoard,
   ButtonSizes,
-  TouchTargets,
   EdgeMargins,
   getQuestionOffsets,
+  isLandscapeMode,
+  QuestionBoard,
+  TouchTargets,
 } from '@/constants/layout';
+import {
+  Colors,
+  getResponsiveFontSize,
+  Opacity,
+  Typography,
+} from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
+import type { MultipleChoiceQuestion as MCQuestion } from '@/types';
+import { playSound } from '@/utils/audio';
+import * as Haptics from 'expo-haptics';
+import { Image } from 'expo-image';
+import { useState } from 'react';
+import {
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 
 interface Props {
   question: MCQuestion;
@@ -65,9 +65,9 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
     ? QuestionBoard.singleBoardMC.landscape
     : QuestionBoard.singleBoardMC.portrait;
 
-  // Responsive board sizing - 80% width, 82% height max
-  const maxBoardWidth = width * 0.80;
-  const maxBoardHeight = height * 0.82;
+  // Responsive board sizing - Allow board to reach its base dimensions
+  const maxBoardWidth = width * 0.90;  // Increased to allow base size (350px)
+  const maxBoardHeight = height * 0.80; // Allow adequate height
   const aspectRatio = baseBoardSize.width / baseBoardSize.height;
 
   let boardWidth = Math.min(baseBoardSize.width, maxBoardWidth);
@@ -86,7 +86,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const buttonWidth = (buttonAreaWidth - horizontalGap) / 2;
 
   // Clamp button width with min/max bounds
-  const clampedButtonWidth = Math.max(140, Math.min(buttonWidth, 280));
+  const clampedButtonWidth = Math.max(140, Math.min(buttonWidth, 260)); // Optimized for 680×380 board
 
   // Maintain button aspect ratio
   const buttonAspectRatio = 184 / 626; // jawapan-button.png aspect ratio
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: Typography.lineHeight.relaxed,
+    lineHeight: Typography.lineHeight.normal * 20, // 1.4 * 20 = 28
   },
 
   // Answers Section (Bottom of board)

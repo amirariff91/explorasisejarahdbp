@@ -59,12 +59,12 @@ export const Fonts = {
   }),
 } as const;
 
-// Typography Scale
+// Typography Scale (Refined for Figma alignment)
 export const Typography = {
   // Font Family (fallback to system; replace with 'Galindo' when font asset is added)
   fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' })!,
 
-  // Font Sizes (Landscape / Portrait)
+  // Font Sizes (Landscape / Portrait) - Refined to match Figma
   title: {
     landscape: 28,
     portrait: 24,
@@ -102,11 +102,20 @@ export const Typography = {
     portrait: 15,
   },
 
-  // Line Heights
+  // Line Heights (Refined for better readability)
   lineHeight: {
-    tight: 20,
-    normal: 26,
-    relaxed: 28,
+    tight: 1.2,
+    normal: 1.4,
+    relaxed: 1.5,
+  },
+
+  // Letter Spacing (Added for Figma compliance)
+  letterSpacing: {
+    tight: -0.5,
+    normal: 0,
+    wide: 0.5,
+    wider: 1,
+    widest: 1.5,
   },
 
   // Font Weights
@@ -117,23 +126,29 @@ export const Typography = {
   },
 } as const;
 
-// Text Shadow Presets
+// Text Shadow Presets (Refined to match Figma - visible but subtle)
 export const Shadows = {
   text: {
     strong: {
-      color: '#fff',
-      offset: { width: 2, height: 2 },
-      radius: 4,
+      color: 'rgba(0, 0, 0, 0.6)',
+      offset: { width: 1, height: 2 },
+      radius: 3,
     },
     medium: {
-      color: '#000',
+      color: 'rgba(0, 0, 0, 0.4)',
       offset: { width: 1, height: 1 },
       radius: 2,
     },
     subtle: {
-      color: '#000',
-      offset: { width: 1, height: 1 },
-      radius: 3,
+      color: 'rgba(0, 0, 0, 0.25)',
+      offset: { width: 0, height: 1 },
+      radius: 2,
+    },
+    // For homepage title with thick outline
+    titleStroke: {
+      color: '#1565C0', // Dark blue for stroke
+      offset: { width: 0, height: 0 },
+      radius: 6,
     },
   },
 

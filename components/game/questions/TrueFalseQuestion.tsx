@@ -1,29 +1,29 @@
-import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  ImageBackground,
-  useWindowDimensions,
-} from 'react-native';
-import { Image } from 'expo-image';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-} from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
-import { playSound } from '@/utils/audio';
-import type { TrueFalseQuestion as TFQuestion } from '@/types';
+import { ButtonSizes, EdgeMargins, isLandscapeMode, QuestionBoard, TouchTargets } from '@/constants/layout';
 import {
   Colors,
-  Typography,
   getResponsiveFontSize,
   getTextShadowStyle,
   Shadows,
+  Typography,
 } from '@/constants/theme';
-import { isLandscapeMode, QuestionBoard, ButtonSizes, TouchTargets, EdgeMargins, getQuestionOffsets } from '@/constants/layout';
 import { useGameContext } from '@/contexts/GameContext';
+import type { TrueFalseQuestion as TFQuestion } from '@/types';
+import { playSound } from '@/utils/audio';
+import * as Haptics from 'expo-haptics';
+import { Image } from 'expo-image';
+import {
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from 'react-native-reanimated';
 
 interface Props {
   question: TFQuestion;
@@ -42,21 +42,23 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   const { width, height } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
   const allowScaling = gameState.allowFontScaling;
-  const offsets = getQuestionOffsets('trueFalseSingle', isLandscape) as {
-    boardPaddingTop: number;
-    boardPaddingBottom: number;
-    boardPaddingHorizontal: number;
-    questionAreaHeight: number;
-    buttonsAreaTop: number;
-    buttonGap: number;
+  // Simple responsive offsets for True/False questions
+  const offsets = {
+    boardPaddingTop: 25,
+    boardPaddingBottom: 15,
+    boardPaddingHorizontal: 30,
+    questionAreaHeight: 90,
+    buttonsAreaTop: 15,
+    buttonGap: 30,
   };
+  
   const baseBoardSize = isLandscape
-    ? QuestionBoard.singleBoardTrueFalse.landscape
-    : QuestionBoard.singleBoardTrueFalse.portrait;
+    ? QuestionBoard.standard.landscape
+    : QuestionBoard.standard.portrait;
 
-  // Responsive board sizing - 80% width, 88% height max
-  const maxBoardWidth = width * 0.80;
-  const maxBoardHeight = height * 0.88;
+  // Responsive board sizing - Allow board to reach its base dimensions (408×264)
+  const maxBoardWidth = width * 0.90;  // Increased to allow full board size
+  const maxBoardHeight = height * 0.85; // Allow adequate height
   const aspectRatio = baseBoardSize.width / baseBoardSize.height;
 
   let boardWidth = Math.min(baseBoardSize.width, maxBoardWidth);
@@ -233,7 +235,7 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: Typography.lineHeight.relaxed,
+    lineHeight: Typography.lineHeight.normal * 20, // 1.4 * 20 = 28
   },
 
   // Buttons Section (Bottom of board - Vertical per Figma)

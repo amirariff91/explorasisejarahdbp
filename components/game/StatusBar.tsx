@@ -10,7 +10,7 @@ import {
   getTextShadowStyle,
   Shadows,
 } from '@/constants/theme';
-import { isLandscapeMode, getEdgeMargin, UIElements } from '@/constants/layout';
+import { isLandscapeMode, getEdgeMargin, UIElements, Spacing } from '@/constants/layout';
 import { ASSETS } from '@/constants/assets';
 
 interface StatusBarProps {
@@ -59,7 +59,7 @@ export default function StatusBar({ state }: StatusBarProps) {
   };
 
   return (
-    <View style={[styles.container, { paddingHorizontal: edgeMargin, paddingTop: insets.top + 8 }]}>
+    <View style={[styles.container, { paddingHorizontal: edgeMargin, paddingTop: insets.top + Spacing.sm }]}>
       {/* Health Bar - Left */}
       <View style={styles.statusItem}>
         <Image
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     // paddingTop set dynamically with safe area insets
-    paddingBottom: 8,
+    paddingBottom: Spacing.sm,
     // paddingHorizontal set dynamically for dead zones
   },
   statusItem: {

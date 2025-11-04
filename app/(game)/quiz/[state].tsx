@@ -1,22 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ImageBackground, Pressable } from 'react-native';
-import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useGameContext } from '@/contexts/GameContext';
 import { getQuestionsForState } from '@/data/questions';
-import type { MalaysianState, Question, AnswerValue } from '@/types';
+import type { AnswerValue, MalaysianState, Question } from '@/types';
+import { playAmbient, playMusic, stopAllAmbient, stopMusic } from '@/utils/audio';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useRef, useState } from 'react';
+import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
 
 // Question Components
-import MultipleChoiceQuestion from '@/components/game/questions/MultipleChoiceQuestion';
-import TrueFalseQuestion from '@/components/game/questions/TrueFalseQuestion';
+import CrosswordQuestion from '@/components/game/questions/CrosswordQuestion';
 import FillBlankQuestion from '@/components/game/questions/FillBlankQuestion';
 import MatchingQuestion from '@/components/game/questions/MatchingQuestion';
-import CrosswordQuestion from '@/components/game/questions/CrosswordQuestion';
+import MultipleChoiceQuestion from '@/components/game/questions/MultipleChoiceQuestion';
+import TrueFalseQuestion from '@/components/game/questions/TrueFalseQuestion';
 
 // UI Components
-import StatusBar from '@/components/game/StatusBar';
-import MenuButton from '@/components/game/MenuButton';
-import SuccessModal from '@/components/game/SuccessModal';
 import FeedbackOverlay from '@/components/game/FeedbackOverlay';
+import MenuButton from '@/components/game/MenuButton';
+import StatusBar from '@/components/game/StatusBar';
+import SuccessModal from '@/components/game/SuccessModal';
 
 /**
  * Quiz Screen - Dynamic Route
@@ -50,6 +51,7 @@ export default function QuizScreen() {
   // Track component mount state to prevent setState on unmounted component
   const isMountedRef = useRef(true);
   const answerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hasCompletedRef = useRef(false); // Track if we've already completed this state
 
   // Track mounted state and cleanup on unmount
   useEffect(() => {
@@ -75,9 +77,47 @@ export default function QuizScreen() {
         setQuestions(stateQuestions);
         setCurrentQuestionIndex(0); // Reset index when state changes
         setError(null);
+        hasCompletedRef.current = false; // Reset completion flag for new state
       }
     }
   }, [state]);
+
+  // Handle state completion when all questions are answered
+  // Note: completeState is intentionally omitted from deps to prevent infinite loop
+  // We use hasCompletedRef flag instead to track completion
+  useEffect(() => {
+    if (
+      state &&
+      currentQuestionIndex >= questions.length - 1 &&
+      questions.length > 0 &&
+      !isAnswering &&
+      !hasCompletedRef.current &&
+      isMountedRef.current
+    ) {
+      hasCompletedRef.current = true; // Mark as completed to prevent re-calling
+      completeState(state);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentQuestionIndex, questions.length, isAnswering, state]);
+
+  // Play quiz background music on mount
+  useEffect(() => {
+    playMusic('bgm-quiz', true, 2000); // Fade in quiz theme
+    playAmbient('ambient-quiz-soft', 0.15); // Very subtle concentration ambience
+
+    return () => {
+      stopMusic(1000); // Fade out when leaving quiz
+      stopAllAmbient();
+    };
+  }, []);
+
+  // Switch to success music when modal shows
+  useEffect(() => {
+    if (showSuccessModal) {
+      stopMusic(500); // Quick fade out quiz music
+      playMusic('bgm-success', false, 1000); // Fade in success theme (no loop)
+    }
+  }, [showSuccessModal]);
 
   // Show error if questions failed to load
   if (error) {
@@ -150,10 +190,8 @@ export default function QuizScreen() {
           setIsAnswering(false);
           return nextIndex;
         } else {
-          // All questions completed
-          if (state && isMountedRef.current) {
-            completeState(state);
-          }
+          // All questions completed - don't call setState here
+          setIsAnswering(false);
           return prevIndex;
         }
       });

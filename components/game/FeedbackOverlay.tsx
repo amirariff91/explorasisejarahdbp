@@ -1,21 +1,22 @@
-import { useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withSequence,
-  withTiming,
-  Easing,
-} from 'react-native-reanimated';
-import * as Haptics from 'expo-haptics';
-import { playFeedback } from '@/utils/audio';
 import {
-  Colors,
-  Typography,
-  getTextShadowStyle,
-  Shadows,
+    BorderRadius,
+    Colors,
+    getTextShadowStyle,
+    Shadows,
+    Typography,
 } from '@/constants/theme';
+import { playRandomFeedback } from '@/utils/audio';
+import * as Haptics from 'expo-haptics';
+import { useEffect } from 'react';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import Animated, {
+    Easing,
+    useAnimatedStyle,
+    useSharedValue,
+    withSequence,
+    withSpring,
+    withTiming,
+} from 'react-native-reanimated';
 
 interface FeedbackOverlayProps {
   visible: boolean;
@@ -57,8 +58,8 @@ export default function FeedbackOverlay({
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       }
 
-      // Audio feedback (voice)
-      playFeedback(isCorrect);
+      // Audio feedback (voice) - randomized for variety
+      playRandomFeedback(isCorrect, true); // true = include encouragement on wrong answers
 
       // Fade in background
       opacity.value = withTiming(1, { duration: 200 });
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
   },
   explanationContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
-    borderRadius: 12,
+    borderRadius: BorderRadius.small,
     padding: 16,
     maxWidth: '100%',
     maxHeight: 200, // Prevent overflow, allow scrolling

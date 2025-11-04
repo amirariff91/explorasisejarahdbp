@@ -11,7 +11,7 @@ import Animated, {
 import * as Haptics from 'expo-haptics';
 import { playSound } from '@/utils/audio';
 import type { MalaysianState } from '@/types';
-import { Typography, Colors, getTextShadowStyle, Shadows, StateVisuals } from '@/constants/theme';
+import { Typography, Colors, getTextShadowStyle, Shadows, StateVisuals, BorderRadius } from '@/constants/theme';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   card: {
     width: 100,
     height: 90,
-    borderRadius: 16,
+    borderRadius: BorderRadius.medium,
     borderWidth: 4,
     padding: 8,
     alignItems: 'center',
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     top: 4,
     right: 4,
     backgroundColor: 'rgba(255,255,255,0.3)',
-    borderRadius: 10,
+    borderRadius: BorderRadius.small,
     width: 20,
     height: 20,
     alignItems: 'center',
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     top: -8,
     right: -8,
     backgroundColor: '#2196F3',
-    borderRadius: 8,
+    borderRadius: BorderRadius.small,
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderWidth: 2,

@@ -1,21 +1,21 @@
+import LandscapeLayout from '@/components/game/LandscapeLayout';
+import { isLandscapeMode, QuestionBoard } from '@/constants/layout';
+import { Colors, getResponsiveFontSize, Typography } from '@/constants/theme';
+import { useGameContext } from '@/contexts/GameContext';
+import type { FillBlankQuestion as FBQuestion } from '@/types';
+import { playSound } from '@/utils/audio';
+import * as Haptics from 'expo-haptics';
+import { Image } from 'expo-image';
 import { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
   ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
   TextInput,
   useWindowDimensions,
+  View,
 } from 'react-native';
-import { Image } from 'expo-image';
-import * as Haptics from 'expo-haptics';
-import { playSound } from '@/utils/audio';
-import LandscapeLayout from '@/components/game/LandscapeLayout';
-import { Typography, Colors, getResponsiveFontSize } from '@/constants/theme';
-import type { FillBlankQuestion as FBQuestion } from '@/types';
-import { isLandscapeMode, QuestionBoard } from '@/constants/layout';
-import { useGameContext } from '@/contexts/GameContext';
 
 interface Props {
   question: FBQuestion;
@@ -36,10 +36,10 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const baseBoardSize = isLandscape
     ? QuestionBoard.standard.landscape
     : QuestionBoard.standard.portrait;
-  const boardScale = 1.87;
+  const boardScale = 1.25;  // Optimized for 480px base board
   const scaledBoardWidth = baseBoardSize.width * boardScale;
   const scaledBoardHeight = baseBoardSize.height * boardScale;
-  const maxBoardWidth = width * (isLandscape ? 0.504 : 1.056); // Increased by 20%
+  const maxBoardWidth = width * (isLandscape ? 0.85 : 0.92); // Allow adequate board size
   const boardWidth = Math.min(scaledBoardWidth, maxBoardWidth);
   const boardHeight = (scaledBoardHeight / scaledBoardWidth) * boardWidth;
 
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: Typography.lineHeight.relaxed,
+    lineHeight: Typography.lineHeight.normal * 20, // 1.4 * 20 = 28
   },
 
   // Right Section: Input + OK Button

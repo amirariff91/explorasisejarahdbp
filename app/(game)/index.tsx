@@ -11,6 +11,7 @@ import { Image } from "expo-image";
 import { playSound } from "@/utils/audio";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGameContext } from "@/contexts/GameContext";
+import { Colors } from "@/constants/theme";
 
 /**
  * Homepage / Splash Screen
@@ -163,11 +164,12 @@ const styles = StyleSheet.create({
     fontFamily: "Galindo",
     fontSize: 111,
     fontWeight: "bold",
-    color: "#FFD700",
+    color: Colors.gold,
     textAlign: "center",
-    textShadowColor: "#000",
-    textShadowOffset: { width: 4, height: 4 },
-    textShadowRadius: 7,
+    // Thick blue stroke outline (Figma-matched)
+    textShadowColor: "#1565C0",
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 6,
     letterSpacing: 0,
     width: "100%",
     top: "18%",

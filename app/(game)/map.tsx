@@ -1,22 +1,21 @@
-import { useMemo, useCallback, useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ImageBackground,
-  Pressable,
-  useWindowDimensions,
-  ActivityIndicator,
-  type LayoutChangeEvent,
-} from "react-native";
-import { useRouter } from "expo-router";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Image } from "expo-image";
-import { Typography } from "@/constants/theme";
-import { useGameContext } from "@/contexts/GameContext";
-import { playSound } from "@/utils/audio";
 import MalaysiaMapSVG from "@/components/game/MalaysiaMapSVG";
+import { BorderRadius, Colors, Shadows, Typography, getComponentShadowStyle } from "@/constants/theme";
+import { useGameContext } from "@/contexts/GameContext";
 import type { MalaysianState } from "@/types";
+import { playAmbient, playMusic, playSound, stopAllAmbient, stopMusic } from "@/utils/audio";
+import { useRouter } from "expo-router";
+import { useCallback, useEffect, useState } from "react";
+import {
+    ActivityIndicator,
+    ImageBackground,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
+    useWindowDimensions,
+    type LayoutChangeEvent,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Local layout configuration
 const LAYOUT_CONFIG = {
@@ -48,6 +47,17 @@ export default function StateSelectionScreen() {
     }
   }, [gameState.playerProfile, isLoading, router]);
 
+  // Play background music and ambient sounds on mount
+  useEffect(() => {
+    playMusic('bgm-map', true, 2000); // Fade in map theme
+    playAmbient('ambient-map', 0.2); // Subtle tropical ambience
+
+    return () => {
+      stopMusic(1000); // Fade out when leaving map
+      stopAllAmbient();
+    };
+  }, []);
+
   // Measure actual rendered heights for accurate spacing
   const [topBarHeight, setTopBarHeight] = useState(
     LAYOUT_CONFIG.minTopBarHeight,
@@ -56,6 +66,8 @@ export default function StateSelectionScreen() {
   // Memoize callback to prevent recreating function on every render
   const handleStateSelect = useCallback(
     (state: MalaysianState) => {
+      playSound('click'); // Soft, pleasant feedback for state selection
+      
       if (state === 'johor') {
         router.push(`/crossword/${state}`);
         return;
@@ -123,12 +135,8 @@ export default function StateSelectionScreen() {
           </Pressable>
         </View>
 
-        {/* Middle Section - Title */}
-        <View style={styles.topBarCenter}>
-          <Text style={styles.mapTitle} allowFontScaling={allowScaling}>
-            Peta Malaysia
-          </Text>
-        </View>
+        {/* Center Spacer */}
+        <View style={styles.topBarCenter} />
 
         {/* Right Section - Stats */}
         <View
@@ -193,9 +201,31 @@ export default function StateSelectionScreen() {
           </View>
         )}
 
-        {/* Map View Container */}
-        <View style={styles.mapViewContainer}>
-          <MalaysiaMapSVG onStateSelect={handleStateSelect} />
+        {/* Map Board Container */}
+        <View style={styles.mapBoardContainer}>
+          <ImageBackground
+            source={require("@/assets/images/game/backgrounds/board-bg.png")}
+            style={[
+              styles.mapBoard,
+              {
+                width: isLandscape ? 700 : Math.min(width * 0.9, 533),
+                height: isLandscape ? 450 : Math.min(width * 0.9 * 0.75, 397),
+              },
+            ]}
+            resizeMode="contain"
+          >
+            {/* Map Title Header */}
+            <View style={styles.mapTitleContainer}>
+              <Text style={styles.mapTitleText} allowFontScaling={allowScaling}>
+                PETA MALAYSIA
+              </Text>
+            </View>
+
+            {/* Map View Container */}
+            <View style={styles.mapViewContainer}>
+              <MalaysiaMapSVG onStateSelect={handleStateSelect} />
+            </View>
+          </ImageBackground>
         </View>
       </View>
     </ImageBackground>
@@ -214,12 +244,43 @@ const styles = StyleSheet.create({
     bottom: 0,
     paddingHorizontal: 24,
     paddingBottom: 16,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  // Map Board Container
+  mapBoardContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  mapBoard: {
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  // Map Title Container
+  mapTitleContainer: {
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: BorderRadius.medium,
+    marginTop: 12,
+    marginBottom: 8,
+    ...getComponentShadowStyle(Shadows.component.medium),
+  },
+  mapTitleText: {
+    fontFamily: Typography.fontFamily,
+    fontSize: 18,
+    fontWeight: Typography.fontWeight.bold,
+    color: Colors.textLight,
+    textAlign: "center",
+    letterSpacing: 1,
   },
   // Map View Container - stretches to full height
   mapViewContainer: {
     flex: 1,
     alignItems: "center",
-    justifyContent: "flex-start",
+    justifyContent: "center",
+    width: "100%",
   },
 
   // Loading State
@@ -232,7 +293,7 @@ const styles = StyleSheet.create({
   loadingText: {
     fontFamily: Typography.fontFamily,
     fontSize: 16,
-    color: "#333",
+    color: Colors.textSecondary,
     textAlign: "center",
   },
 
@@ -243,9 +304,10 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(244, 67, 54, 0.9)",
     paddingHorizontal: 16,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: BorderRadius.medium,
     marginBottom: 12,
     gap: 8,
+    ...getComponentShadowStyle(Shadows.component.medium),
   },
   errorIcon: {
     fontSize: 20,
@@ -254,7 +316,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontFamily: Typography.fontFamily,
     fontSize: 13,
-    color: "#fff",
+    color: Colors.textLight,
   },
 
   // Top Bar with minimum height (will expand with font scaling)
@@ -290,38 +352,30 @@ const styles = StyleSheet.create({
     gap: 4, // Reduce gap on small screens
   },
   tutorialButtonCompact: {
-    backgroundColor: "#2196F3",
+    backgroundColor: Colors.secondary,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    borderRadius: 18,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
+    borderRadius: BorderRadius.medium,
+    ...getComponentShadowStyle(Shadows.component.small),
   },
   tutorialButtonText: {
     fontFamily: Typography.fontFamily,
     fontSize: 13,
-    color: "#fff",
-    fontWeight: "bold",
+    color: Colors.textLight,
+    fontWeight: Typography.fontWeight.bold,
   },
   statItemCompact: {
-    backgroundColor: "rgba(255, 255, 255, 0.85)",
+    backgroundColor: Colors.semiTransparentCard,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    borderRadius: 15,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    borderRadius: BorderRadius.medium,
+    ...getComponentShadowStyle(Shadows.component.small),
   },
   statTextCompact: {
     fontFamily: Typography.fontFamily,
     fontSize: 12,
-    fontWeight: "600",
-    color: "#000",
+    fontWeight: Typography.fontWeight.semiBold,
+    color: Colors.textPrimary,
     textAlign: "center",
   },
   statItemTiny: {
@@ -330,55 +384,5 @@ const styles = StyleSheet.create({
   },
   statTextTiny: {
     fontSize: 10,
-  },
-  mapTitle: {
-    fontFamily: Typography.fontFamily,
-    fontSize: 14,
-    fontWeight: "bold",
-    color: "#000",
-    textAlign: "center",
-  },
-
-  // Map Container
-  mapContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-start",
-    gap: 24,
-    marginBottom: 12,
-  },
-
-  // Peninsula Region (Left)
-  peninsulaRegion: {
-    flex: 2,
-  },
-  regionTitle: {
-    fontFamily: Typography.fontFamily,
-    fontWeight: "bold",
-    color: "#000",
-    textAlign: "center",
-    marginBottom: 12,
-    textShadowColor: "#fff",
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
-  row: {
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 8,
-    justifyContent: "flex-start",
-  },
-  cardSpacer: {
-    width: 100,
-    height: 90,
-  },
-
-  // Borneo Region (Right)
-  borneoRegion: {
-    flex: 1,
-    alignItems: "center",
-  },
-  borneoCards: {
-    gap: 8,
   },
 });

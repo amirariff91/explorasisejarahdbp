@@ -1,16 +1,18 @@
-import { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  ImageBackground,
-  Pressable,
-  useWindowDimensions,
-} from "react-native";
-import { useRouter } from "expo-router";
-import { Image } from "expo-image";
-import { Typography } from "@/constants/theme";
+import { Spacing } from "@/constants/layout";
+import { Colors } from "@/constants/theme";
 import { useGameContext } from "@/contexts/GameContext";
+import { playMusic, playSound, playTutorialNarration, stopMusic } from "@/utils/audio";
+import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import { useEffect, useState } from "react";
+import {
+    ImageBackground,
+    Pressable,
+    StyleSheet,
+    Text,
+    useWindowDimensions,
+    View,
+} from "react-native";
 
 /**
  * Tutorial Screens - Centered Single-Column Layout
@@ -40,7 +42,23 @@ export default function TutorialScreen() {
 
   const currentTutorial = tutorialSteps[currentStep];
 
+  // Play tutorial background music on mount
+  useEffect(() => {
+    playMusic('bgm-tutorial', true, 2000); // Fade in over 2 seconds
+
+    return () => {
+      stopMusic(1000); // Fade out when leaving tutorial
+    };
+  }, []);
+
+  // Play voice narration when step changes
+  useEffect(() => {
+    playTutorialNarration(currentStep);
+  }, [currentStep]);
+
   const handleNext = () => {
+    playSound('click'); // UI feedback
+    
     if (currentStep < tutorialSteps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -69,8 +87,8 @@ export default function TutorialScreen() {
             style={[
               styles.descriptionBoard,
               {
-                width: isLandscape ? 762 : 549,
-                height: isLandscape ? 381 : 335,
+                width: isLandscape ? 600 : 460,
+                height: isLandscape ? 300 : 280,
               },
             ]}
             resizeMode="contain"
@@ -121,52 +139,49 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // Single-Column Layout
+  // Single-Column Flex Layout (Replaced absolute positioning)
   contentContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    top: "20%",
-    paddingBottom: 40,
+    paddingTop: Spacing.xxxl,
+    paddingBottom: Spacing.xxxl,
+    paddingHorizontal: Spacing.lg,
   },
 
   // Board Container
   boardContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 10,
+    marginBottom: Spacing.xl,
   },
   descriptionBoard: {
     alignItems: "center",
     justifyContent: "center",
   },
   boardContent: {
-    width: "50%",
+    width: "70%",  // More text space with smaller board
     paddingTop: 46,
     paddingBottom: 46,
-    paddingLeft: 27,
-    paddingRight: 27,
+    paddingHorizontal: 27,
     alignItems: "center",
   },
   description: {
     fontFamily: "Galindo",
     fontSize: 8,
-    color: "#000",
+    color: Colors.textPrimary,
     textAlign: "center",
     lineHeight: 30,
     maxWidth: "100%",
   },
 
-  // Button Container
+  // Button Container (Flex-based positioning)
   buttonContainer: {
     alignItems: "center",
     justifyContent: "center",
-    marginTop: 10,
-    left: "25%",
-    top: "-45%",
+    marginTop: Spacing.xl,
   },
   nextButton: {
-    position: "relative",
     alignItems: "center",
     justifyContent: "center",
   },

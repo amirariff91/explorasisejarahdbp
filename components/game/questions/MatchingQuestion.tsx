@@ -1,19 +1,19 @@
+import { ButtonSizes, EdgeMargins, isLandscapeMode, QuestionBoard, TouchTargets } from '@/constants/layout';
+import { Colors, getResponsiveFontSize, Opacity, Typography } from '@/constants/theme';
+import { useGameContext } from '@/contexts/GameContext';
+import type { MatchingQuestion as MQQuestion } from '@/types';
+import { playSound } from '@/utils/audio';
+import * as Haptics from 'expo-haptics';
+import { Image } from 'expo-image';
 import { useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
   ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
   useWindowDimensions,
+  View,
 } from 'react-native';
-import { Image } from 'expo-image';
-import * as Haptics from 'expo-haptics';
-import { playSound } from '@/utils/audio';
-import { Typography, Colors, getResponsiveFontSize, Opacity } from '@/constants/theme';
-import type { MatchingQuestion as MQQuestion } from '@/types';
-import { isLandscapeMode, QuestionBoard, ButtonSizes, TouchTargets, EdgeMargins, getQuestionOffsets } from '@/constants/layout';
-import { useGameContext } from '@/contexts/GameContext';
 
 interface Props {
   question: MQQuestion;
@@ -32,23 +32,25 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const [showNext, setShowNext] = useState(false);
   const { width, height } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
-  const offsets = getQuestionOffsets('matchingSingle', isLandscape) as {
-    boardPaddingTop: number;
-    boardPaddingBottom: number;
-    boardPaddingHorizontal: number;
-    questionAreaHeight: number;
-    gridAreaTop: number;
-    gridContainer: { gap: number };
-    gridRow: { gap: number };
-    footerContainer: { marginBottom: number; marginRight: number };
+  // Simple responsive offsets for Matching questions
+  const offsets = {
+    boardPaddingTop: 25,
+    boardPaddingBottom: 15,
+    boardPaddingHorizontal: 30,
+    questionAreaHeight: 90,
+    gridAreaTop: 15,
+    gridContainer: { gap: 20 },
+    gridRow: { gap: 16 },
+    footerContainer: { marginBottom: 30, marginRight: 30 },
   };
+  
   const baseBoardSize = isLandscape
-    ? QuestionBoard.singleBoardMatching.landscape
-    : QuestionBoard.singleBoardMatching.portrait;
+    ? QuestionBoard.compact.landscape
+    : QuestionBoard.compact.portrait;
 
-  // Responsive board sizing - 80% width, 85% height max
-  const maxBoardWidth = width * 0.80;
-  const maxBoardHeight = height * 0.85;
+  // Responsive board sizing - Allow board to reach its base dimensions (290×200)
+  const maxBoardWidth = width * 0.80;  // Adequate for compact board
+  const maxBoardHeight = height * 0.80; // Allow adequate height
   const aspectRatio = baseBoardSize.width / baseBoardSize.height;
 
   let boardWidth = Math.min(baseBoardSize.width, maxBoardWidth);
@@ -263,7 +265,7 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: Typography.lineHeight.normal,
+    lineHeight: Typography.lineHeight.tight * 16, // 1.2 * 16 = 19.2
   },
 
   // Grid Section (Bottom of board)

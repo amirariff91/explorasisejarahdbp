@@ -34,15 +34,15 @@ export const Spacing = {
 
 // Component Sizes - Question Boards
 export const QuestionBoard = {
-  // Standard Question Board (Multiple Choice, True/False, Fill Blank) - Increased by 20%
+  // Standard Question Board (True/False, Fill Blank)
   standard: {
-    landscape: { width: 408, height: 264 },
-    portrait: { width: 336, height: 312 },
+    landscape: { width: 480, height: 300 },  // Increased from 408×264
+    portrait: { width: 380, height: 340 },   // Increased from 336×312
   },
   // Compact Board (Matching, smaller content)
   compact: {
-    landscape: { width: 290, height: 200 },
-    portrait: { width: 240, height: 180 },
+    landscape: { width: 420, height: 280 },  // +24% larger for 3×3 grid readability
+    portrait: { width: 340, height: 260 },   // Increased for better spacing
   },
   // Large Board (Tutorial, State Selection)
   large: {
@@ -61,8 +61,8 @@ export const QuestionBoard = {
   },
   // Single Board (Multiple Choice - question + answers on same board)
   singleBoardMC: {
-    landscape: { width: 700, height: 350 },
-    portrait: { width: 500, height: 400 },
+    landscape: { width: 680, height: 380 },  // ~1.79:1 ratio - Comfortable fit for content
+    portrait: { width: 460, height: 380 },   // Increased for better phone portrait fit
   },
 } as const;
 
@@ -297,24 +297,24 @@ export const QuestionOffsets = {
   },
   multipleChoiceSingle: {
     landscape: {
-      boardPaddingTop: 30,
-      boardPaddingBottom: 20,
-      boardPaddingHorizontal: 40,
-      questionAreaHeight: 100,
-      answerAreaTop: 20,
-      optionsContainer: { gap: 24 },
-      optionRow: { gap: 18 },
-      footerContainer: { marginBottom: 20, marginRight: 40 },
+      boardPaddingTop: 28,              // Optimized for 380px height
+      boardPaddingBottom: 18,           // Balanced padding
+      boardPaddingHorizontal: 40,       // Wide padding for content breathing room
+      questionAreaHeight: 90,           // Adequate space for question text
+      answerAreaTop: 18,                // Gap between question and answers
+      optionsContainer: { gap: 24 },    // Vertical gap between button rows
+      optionRow: { gap: 20 },           // Horizontal gap between buttons
+      footerContainer: { marginBottom: 22, marginRight: 40 },
     },
     portrait: {
-      boardPaddingTop: 25,
-      boardPaddingBottom: 15,
-      boardPaddingHorizontal: 30,
+      boardPaddingTop: 28,
+      boardPaddingBottom: 20,
+      boardPaddingHorizontal: 32,
       questionAreaHeight: 90,
-      answerAreaTop: 15,
-      optionsContainer: { gap: 20 },
+      answerAreaTop: 20,
+      optionsContainer: { gap: 22 },
       optionRow: { gap: 16 },
-      footerContainer: { marginBottom: 15, marginRight: 30 },
+      footerContainer: { marginBottom: 20, marginRight: 32 },
     },
   },
 } as const;

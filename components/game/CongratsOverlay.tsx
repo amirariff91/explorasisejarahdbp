@@ -11,7 +11,7 @@ import Animated, {
   withSequence,
 } from 'react-native-reanimated';
 import { Colors, Typography, getResponsiveFontSize, getTextShadowStyle, Shadows, getComponentShadowStyle } from '@/constants/theme';
-import { ButtonSizes, TouchTargets, UIElements, isLandscapeMode } from '@/constants/layout';
+import { ButtonSizes, TouchTargets, UIElements, isLandscapeMode, Spacing } from '@/constants/layout';
 import type { CongratsOverlayProps } from '@/types';
 
 function useSparkleAnimation(visible: boolean, delay: number) {
@@ -20,12 +20,13 @@ function useSparkleAnimation(visible: boolean, delay: number) {
 
   useEffect(() => {
     if (visible) {
+      // Refined sparkle timing: faster, subtler pulsing
       opacity.value = withDelay(
         delay,
         withRepeat(
           withSequence(
-            withTiming(1, { duration: 600 }),
-            withTiming(0.3, { duration: 700 })
+            withTiming(1, { duration: 500 }), // Slightly faster fade in
+            withTiming(0.4, { duration: 600 }) // Higher minimum opacity
           ),
           -1,
           true
@@ -36,8 +37,8 @@ function useSparkleAnimation(visible: boolean, delay: number) {
         delay,
         withRepeat(
           withSequence(
-            withTiming(1.1, { duration: 600 }),
-            withTiming(0.9, { duration: 700 })
+            withTiming(1.08, { duration: 500 }), // Less extreme scaling
+            withTiming(0.95, { duration: 600 }) // Subtle pulse
           ),
           -1,
           true
@@ -81,14 +82,18 @@ export default function CongratsOverlay({
 
   useEffect(() => {
     if (visible) {
+      // Star entrance: Quick bounce with refined timing
       starScale.value = withSequence(
-        withSpring(1.15, { damping: 8, stiffness: 120 }),
-        withSpring(1, { damping: 10, stiffness: 160 })
+        withSpring(1.2, { damping: 10, stiffness: 150 }), // Slightly more bounce
+        withSpring(1, { damping: 12, stiffness: 180 }) // Smoother settle
       );
 
-      contentOpacity.value = withTiming(1, { duration: 450 });
-      contentTranslateY.value = withSpring(0, { damping: 12, stiffness: 140 });
-      flareScale.value = withTiming(1, { duration: 700 });
+      // Content fade & slide: Smooth entrance
+      contentOpacity.value = withTiming(1, { duration: 400 }); // Slightly faster
+      contentTranslateY.value = withSpring(0, { damping: 14, stiffness: 150 }); // Tighter spring
+      
+      // Flare: Delayed entrance for depth
+      flareScale.value = withDelay(100, withTiming(1, { duration: 600 })); // Subtle delay
     } else {
       starScale.value = 0;
       contentOpacity.value = 0;
@@ -196,7 +201,7 @@ export default function CongratsOverlay({
             <Animated.View
               style={[
                 StyleSheet.absoluteFillObject,
-                { backgroundColor: 'rgba(255, 255, 255, 0.85)' },
+                { backgroundColor: Colors.textLight, opacity: 0.85 },
                 sparkleStyles[index],
               ]}
             />
@@ -204,7 +209,7 @@ export default function CongratsOverlay({
         );
       })}
 
-      <Animated.View style={[styles.panelWrapper, contentAnimatedStyle]}>
+      <Animated.View style={[styles.panelWrapper, { paddingTop: isLandscape ? 80 : 100 }, contentAnimatedStyle]}>
         <Image
           source={PANEL_ASSET}
           style={[
@@ -239,7 +244,7 @@ export default function CongratsOverlay({
               {
                 width: starDimensions.width,
                 height: starDimensions.height,
-                marginHorizontal: 12,
+                marginHorizontal: Spacing.md,
               },
             ]}
             contentFit="contain"
@@ -330,7 +335,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    backgroundColor: Colors.backgroundOverlay,
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 9999,
@@ -338,9 +343,9 @@ const styles = StyleSheet.create({
   panelWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 120,
-    paddingBottom: 48,
-    paddingHorizontal: 32,
+    // paddingTop set dynamically in JSX (80 landscape / 100 portrait)
+    paddingBottom: Spacing.xxxl * 1.5, // 48px
+    paddingHorizontal: Spacing.xxxl,
   },
   panelImage: {
     position: 'absolute',
@@ -348,7 +353,7 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: 'center',
-    gap: 16,
+    gap: Spacing.lg,
     zIndex: 2,
   },
   title: {
@@ -372,8 +377,8 @@ const styles = StyleSheet.create({
   buttons: {
     width: '100%',
     alignItems: 'center',
-    gap: 16,
-    marginTop: 12,
+    gap: Spacing.lg,
+    marginTop: Spacing.md,
   },
   button: {
     position: 'relative',
@@ -398,7 +403,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   secondaryButtonText: {
-    color: '#E2ECFF',
+    color: Colors.textLight,
+    opacity: 0.95,
   },
   starGroup: {
     position: 'absolute',

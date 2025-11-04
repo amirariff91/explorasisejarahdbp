@@ -67,8 +67,8 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
               {acrossClues.map((clue) => (
                 <Text
                   key={clue.number}
-                  style={[styles.clueText, { fontSize: isLandscape ? 11 : 10 }]}
-                  numberOfLines={2}
+                  style={[styles.clueText, { fontSize: isLandscape ? 14 : 12 }]}
+                  numberOfLines={3}
                   adjustsFontSizeToFit
                   minimumFontScale={0.8}
                   allowFontScaling={allowScaling}>
@@ -142,8 +142,8 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
               {downClues.map((clue) => (
                 <Text
                   key={clue.number}
-                  style={[styles.clueText, { fontSize: isLandscape ? 11 : 10 }]}
-                  numberOfLines={2}
+                  style={[styles.clueText, { fontSize: isLandscape ? 14 : 12 }]}
+                  numberOfLines={3}
                   adjustsFontSizeToFit
                   minimumFontScale={0.8}
                   allowFontScaling={allowScaling}>
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   clueBoardContent: {
     width: '80%',
-    paddingVertical: 20,
+    paddingVertical: 16,
   },
   clueTitle: {
     fontFamily: Typography.fontFamily,
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     fontSize: 10,
     color: '#000',
-    lineHeight: 16,
+    lineHeight: Typography.lineHeight.normal * 14, // 1.4 * 14 = 19.6
     marginBottom: 4,
   },
 
