@@ -55,5 +55,5 @@
     "typescript": "~5.9.2"
   },
   "private": true,
-  "packageManager": "yarn@4.10.2+sha512.0b0e54ad5381f0a35184957bd3ea44e37f5a4fb1960b903b0fb9a3c7c2c009190455c41ef2a1977b1dbd3b72c5f152da696e9c52e2bc78a011b6adea8ee73ba3"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

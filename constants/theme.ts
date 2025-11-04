@@ -220,13 +220,17 @@ export const getResponsiveFontSize = (
   return isLandscape ? fontSizeConfig.landscape : fontSizeConfig.portrait;
 };
 
-export const getTextShadowStyle = (shadowPreset: typeof Shadows.text.medium) => ({
+export const getTextShadowStyle = (
+  shadowPreset: typeof Shadows.text.medium | typeof Shadows.text.strong | typeof Shadows.text.subtle
+) => ({
   textShadowColor: shadowPreset.color,
   textShadowOffset: shadowPreset.offset,
   textShadowRadius: shadowPreset.radius,
 });
 
-export const getComponentShadowStyle = (shadowPreset: typeof Shadows.component.medium) => ({
+export const getComponentShadowStyle = (
+  shadowPreset: typeof Shadows.component.small | typeof Shadows.component.medium | typeof Shadows.component.large
+) => ({
   elevation: shadowPreset.elevation,
   shadowColor: shadowPreset.shadowColor,
   shadowOffset: shadowPreset.shadowOffset,

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import {
   View,
   Text,
@@ -43,7 +42,14 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   const { width, height } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
   const allowScaling = gameState.allowFontScaling;
-  const offsets = getQuestionOffsets('trueFalseSingle', isLandscape);
+  const offsets = getQuestionOffsets('trueFalseSingle', isLandscape) as {
+    boardPaddingTop: number;
+    boardPaddingBottom: number;
+    boardPaddingHorizontal: number;
+    questionAreaHeight: number;
+    buttonsAreaTop: number;
+    buttonGap: number;
+  };
   const baseBoardSize = isLandscape
     ? QuestionBoard.singleBoardTrueFalse.landscape
     : QuestionBoard.singleBoardTrueFalse.portrait;
@@ -123,75 +129,74 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
             </Text>
           </View>
 
-          {/* Buttons Section - Bottom (Horizontal Side-by-Side) */}
+          {/* Buttons Section - Bottom (Vertical Stacking per Figma) */}
           <View style={styles.buttonsSection}>
-            <View style={[styles.buttonsRow, { gap: offsets.buttonGap }]}>
-              {/* BETUL Button */}
-              <AnimatedPressable
+            {/* BETUL Button - Top */}
+            <AnimatedPressable
+              style={[
+                styles.button,
+                {
+                  width: buttonSize.width,
+                  height: buttonSize.height,
+                },
+                betulAnimatedStyle,
+              ]}
+              onPress={() => handleAnswer(true)}
+              hitSlop={TouchTargets.hitSlop}
+              accessibilityRole="button"
+              accessibilityLabel="Jawapan: Betul">
+              <Image
+                source={require('@/assets/images/game/buttons/betul-button.png')}
+                style={[styles.buttonImage, { width: buttonSize.width, height: buttonSize.height }]}
+                contentFit="fill"
+              />
+              <Text
                 style={[
-                  styles.button,
-                  {
-                    width: buttonSize.width,
-                    height: buttonSize.height,
-                  },
-                  betulAnimatedStyle,
+                  styles.buttonText,
+                  { fontSize: getResponsiveFontSize(Typography.button, isLandscape) + 6 },
                 ]}
-                onPress={() => handleAnswer(true)}
-                hitSlop={TouchTargets.hitSlop}
-                accessibilityRole="button"
-                accessibilityLabel="Jawapan: Betul">
-                <Image
-                  source={require('@/assets/images/game/buttons/betul-button.png')}
-                  style={[styles.buttonImage, { width: buttonSize.width, height: buttonSize.height }]}
-                  contentFit="fill"
-                />
-                <Text
-                  style={[
-                    styles.buttonText,
-                    { fontSize: getResponsiveFontSize(Typography.button, isLandscape) + 6 },
-                  ]}
-                  allowFontScaling={allowScaling}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit={true}
-                  minimumFontScale={0.75}
-                  ellipsizeMode="tail">
-                  BETUL
-                </Text>
-              </AnimatedPressable>
+                allowFontScaling={allowScaling}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.75}
+                ellipsizeMode="tail">
+                BETUL
+              </Text>
+            </AnimatedPressable>
 
-              {/* SALAH Button */}
-              <AnimatedPressable
+            {/* SALAH Button - Bottom */}
+            <AnimatedPressable
+              style={[
+                styles.button,
+                {
+                  width: buttonSize.width,
+                  height: buttonSize.height,
+                  marginTop: offsets.buttonGap,
+                },
+                salahAnimatedStyle,
+              ]}
+              onPress={() => handleAnswer(false)}
+              hitSlop={TouchTargets.hitSlop}
+              accessibilityRole="button"
+              accessibilityLabel="Jawapan: Salah">
+              <Image
+                source={require('@/assets/images/game/buttons/salah-button.png')}
+                style={[styles.buttonImage, { width: buttonSize.width, height: buttonSize.height }]}
+                contentFit="fill"
+              />
+              <Text
                 style={[
-                  styles.button,
-                  {
-                    width: buttonSize.width,
-                    height: buttonSize.height,
-                  },
-                  salahAnimatedStyle,
+                  styles.buttonText,
+                  { fontSize: getResponsiveFontSize(Typography.button, isLandscape) + 6 },
                 ]}
-                onPress={() => handleAnswer(false)}
-                hitSlop={TouchTargets.hitSlop}
-                accessibilityRole="button"
-                accessibilityLabel="Jawapan: Salah">
-                <Image
-                  source={require('@/assets/images/game/buttons/salah-button.png')}
-                  style={[styles.buttonImage, { width: buttonSize.width, height: buttonSize.height }]}
-                  contentFit="fill"
-                />
-                <Text
-                  style={[
-                    styles.buttonText,
-                    { fontSize: getResponsiveFontSize(Typography.button, isLandscape) + 6 },
-                  ]}
-                  allowFontScaling={allowScaling}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit={true}
-                  minimumFontScale={0.75}
-                  ellipsizeMode="tail">
-                  SALAH
-                </Text>
-              </AnimatedPressable>
-            </View>
+                allowFontScaling={allowScaling}
+                numberOfLines={1}
+                adjustsFontSizeToFit={true}
+                minimumFontScale={0.75}
+                ellipsizeMode="tail">
+                SALAH
+              </Text>
+            </AnimatedPressable>
           </View>
         </ImageBackground>
       </View>
@@ -231,15 +236,11 @@ const styles = StyleSheet.create({
     lineHeight: Typography.lineHeight.relaxed,
   },
 
-  // Buttons Section (Bottom of board - Horizontal)
+  // Buttons Section (Bottom of board - Vertical per Figma)
   buttonsSection: {
     width: '100%',
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonsRow: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
   },

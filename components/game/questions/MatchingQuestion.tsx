@@ -32,7 +32,16 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const [showNext, setShowNext] = useState(false);
   const { width, height } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
-  const offsets = getQuestionOffsets('matchingSingle', isLandscape);
+  const offsets = getQuestionOffsets('matchingSingle', isLandscape) as {
+    boardPaddingTop: number;
+    boardPaddingBottom: number;
+    boardPaddingHorizontal: number;
+    questionAreaHeight: number;
+    gridAreaTop: number;
+    gridContainer: { gap: number };
+    gridRow: { gap: number };
+    footerContainer: { marginBottom: number; marginRight: number };
+  };
   const baseBoardSize = isLandscape
     ? QuestionBoard.singleBoardMatching.landscape
     : QuestionBoard.singleBoardMatching.portrait;

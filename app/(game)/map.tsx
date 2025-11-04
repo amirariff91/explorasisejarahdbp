@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useState } from "react";
+import { useMemo, useCallback, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -41,6 +41,13 @@ export default function StateSelectionScreen() {
   const isLandscape = width >= 800;
   const allowScaling = gameState.allowFontScaling;
 
+  // Route guard: Check if player profile exists
+  useEffect(() => {
+    if (!isLoading && !gameState.playerProfile) {
+      router.replace('/log-masuk');
+    }
+  }, [gameState.playerProfile, isLoading, router]);
+
   // Measure actual rendered heights for accurate spacing
   const [topBarHeight, setTopBarHeight] = useState(
     LAYOUT_CONFIG.minTopBarHeight,
@@ -49,6 +56,10 @@ export default function StateSelectionScreen() {
   // Memoize callback to prevent recreating function on every render
   const handleStateSelect = useCallback(
     (state: MalaysianState) => {
+      if (state === 'johor') {
+        router.push(`/crossword/${state}`);
+        return;
+      }
       router.push(`/quiz/${state}`);
     },
     [router],

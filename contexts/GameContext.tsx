@@ -29,6 +29,7 @@ interface GameContextType {
   resetGame: () => void;
   setShowSuccessModal: (show: boolean) => void;
   setAllowFontScaling: (allow: boolean) => void;
+  setPlayerProfile: (name: string, age: number) => void;
   saveError: string | null;
   isLoading: boolean;
 }
@@ -50,6 +51,7 @@ const initialGameState: GameState = {
   answers: {},
   showSuccessModal: false,
   hasSeenTutorial: false,
+  playerProfile: null,
   allowFontScaling: false,
 };
 
@@ -93,6 +95,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           completedStates: progress.completedStates,
           hasSeenTutorial: progress.hasSeenTutorial,
           currentState: progress.lastPlayedState,
+          playerProfile: progress.playerProfile ?? null,
           allowFontScaling: progress.allowFontScaling ?? false,
         }));
       }
@@ -115,6 +118,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         hasSeenTutorial: gameState.hasSeenTutorial,
         lastPlayedState: gameState.currentState,
         timestamp: Date.now(),
+        playerProfile: gameState.playerProfile,
         allowFontScaling: gameState.allowFontScaling,
       };
 
@@ -261,6 +265,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGameState((prev) => ({ ...prev, allowFontScaling: allow }));
   };
 
+  const setPlayerProfile = (name: string, age: number) => {
+    setGameState((prev) => ({
+      ...prev,
+      playerProfile: { name, age },
+    }));
+  };
+
   const value: GameContextType = useMemo(
     () => ({
       gameState,
@@ -273,6 +284,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       resetGame,
       setShowSuccessModal,
       setAllowFontScaling,
+      setPlayerProfile,
       saveError,
       isLoading,
     }),

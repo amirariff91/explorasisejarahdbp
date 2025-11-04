@@ -11,6 +11,9 @@ export type {
   MatchingQuestion,
   CrosswordQuestion,
   CrosswordClue,
+  CrosswordPuzzleWord,
+  CrosswordPuzzleClue,
+  CrosswordPuzzleDefinition,
   Question,
   AnswerValue,
   GameState,
@@ -20,4 +23,5 @@ export type {
   TutorialStep,
   MenuAction,
   SuccessModalProps,
+  CongratsOverlayProps,
 } from './game';

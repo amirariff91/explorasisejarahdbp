@@ -26,7 +26,6 @@ import {
   isLandscapeMode,
   QuestionBoard,
   ButtonSizes,
-  Spacing,
   TouchTargets,
   EdgeMargins,
   getQuestionOffsets,
@@ -52,7 +51,16 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const { width, height } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
   const allowScaling = gameState.allowFontScaling;
-  const offsets = getQuestionOffsets('multipleChoiceSingle', isLandscape);
+  const offsets = getQuestionOffsets('multipleChoiceSingle', isLandscape) as {
+    boardPaddingTop: number;
+    boardPaddingBottom: number;
+    boardPaddingHorizontal: number;
+    questionAreaHeight: number;
+    answerAreaTop: number;
+    optionsContainer: { gap: number };
+    optionRow: { gap: number };
+    footerContainer: { marginBottom: number; marginRight: number };
+  };
   const baseBoardSize = isLandscape
     ? QuestionBoard.singleBoardMC.landscape
     : QuestionBoard.singleBoardMC.portrait;
