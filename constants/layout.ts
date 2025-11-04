@@ -308,20 +308,20 @@ export const QuestionOffsets = {
   multipleChoiceSingle: {
     landscape: {
       boardPaddingTop: 30,
-      boardPaddingBottom: 20,
+      boardPaddingBottom: 15,      // Reduced by 5px to compensate for taller question area
       boardPaddingHorizontal: 40,
-      questionAreaHeight: 100,
-      answerAreaTop: 20,
+      questionAreaHeight: 140,      // Increased from 100 to accommodate long questions (e.g. Kedah)
+      answerAreaTop: 15,            // Reduced by 5px to compensate
       optionsContainer: { gap: 24 },
       optionRow: { gap: 11 }, // Reduced by another 20% (was 14)
       footerContainer: { marginBottom: 20, marginRight: 40 },
     },
     portrait: {
       boardPaddingTop: 25,
-      boardPaddingBottom: 15,
+      boardPaddingBottom: 10,      // Reduced by 5px to compensate for taller question area
       boardPaddingHorizontal: 30,
-      questionAreaHeight: 90,
-      answerAreaTop: 15,
+      questionAreaHeight: 130,      // Increased from 90 to accommodate long questions
+      answerAreaTop: 12,            // Reduced to compensate
       optionsContainer: { gap: 20 },
       optionRow: { gap: 10 }, // Reduced by another 20% (was 13)
       footerContainer: { marginBottom: 15, marginRight: 30 },

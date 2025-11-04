@@ -152,9 +152,9 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                 styles.questionText,
                 { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
               ]}
-              numberOfLines={5}
+              numberOfLines={7}
               adjustsFontSizeToFit
-              minimumFontScale={0.85}
+              minimumFontScale={0.8}
               allowFontScaling={allowScaling}>
               {question.question}
             </Text>
