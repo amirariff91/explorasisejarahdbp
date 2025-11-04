@@ -10,10 +10,9 @@ import {
 import { Image } from 'expo-image';
 import * as Haptics from 'expo-haptics';
 import { playSound } from '@/utils/audio';
-import LandscapeLayout from '@/components/game/LandscapeLayout';
-import { Typography, Colors, getResponsiveFontSize } from '@/constants/theme';
+import { Typography, Colors, getResponsiveFontSize, Opacity } from '@/constants/theme';
 import type { MatchingQuestion as MQQuestion } from '@/types';
-import { getEdgeMargin, LayoutRatios, isLandscapeMode, QuestionBoard, ButtonSizes } from '@/constants/layout';
+import { isLandscapeMode, QuestionBoard, ButtonSizes, TouchTargets, EdgeMargins, getQuestionOffsets } from '@/constants/layout';
 import { useGameContext } from '@/contexts/GameContext';
 
 interface Props {
@@ -22,26 +21,46 @@ interface Props {
 }
 
 /**
- * Matching Question - Landscape Optimized (Figma Screen 11)
- * Left: Title and instructions (40% width)
- * Right: 3x3 grid of JAWAPAN boxes (55% width)
+ * Matching Question - Single Board Layout
+ * Question title/instructions at top of board
+ * 3x3 grid of JAWAPAN boxes at bottom of board (9 options)
  */
 export default function MatchingQuestion({ question, onAnswer }: Props) {
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [showNext, setShowNext] = useState(false);
-  const { width } = useWindowDimensions();
-  const isLandscape = isLandscapeMode(width); // Use consistent landscape detection
+  const { width, height } = useWindowDimensions();
+  const isLandscape = isLandscapeMode(width);
+  const offsets = getQuestionOffsets('matchingSingle', isLandscape) as {
+    boardPaddingTop: number;
+    boardPaddingBottom: number;
+    boardPaddingHorizontal: number;
+    questionAreaHeight: number;
+    gridAreaTop: number;
+    gridContainer: { gap: number };
+    gridRow: { gap: number };
+    footerContainer: { marginBottom: number; marginRight: number };
+  };
   const baseBoardSize = isLandscape
-    ? QuestionBoard.standard.landscape
-    : QuestionBoard.standard.portrait;
-  const boardScale = 1.87;
-  const scaledBoardWidth = baseBoardSize.width * boardScale;
-  const scaledBoardHeight = baseBoardSize.height * boardScale;
-  const maxBoardWidth = width * (isLandscape ? 0.504 : 1.056); // Increased by 20%
-  const boardWidth = Math.min(scaledBoardWidth, maxBoardWidth);
-  const boardHeight = (scaledBoardHeight / scaledBoardWidth) * boardWidth;
+    ? QuestionBoard.singleBoardMatching.landscape
+    : QuestionBoard.singleBoardMatching.portrait;
+
+  // Responsive board sizing - 80% width, 85% height max
+  const maxBoardWidth = width * 0.80;
+  const maxBoardHeight = height * 0.85;
+  const aspectRatio = baseBoardSize.width / baseBoardSize.height;
+
+  let boardWidth = Math.min(baseBoardSize.width, maxBoardWidth);
+  let boardHeight = boardWidth / aspectRatio;
+
+  // Check if height exceeds limit, recalculate if needed
+  if (boardHeight > maxBoardHeight) {
+    boardHeight = maxBoardHeight;
+    boardWidth = boardHeight * aspectRatio;
+  }
+
+  const nextButtonSize = isLandscape ? ButtonSizes.next.landscape : ButtonSizes.next.portrait;
 
   const handleToggleOption = async (option: string) => {
     playSound('click');
@@ -68,163 +87,177 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     onAnswer(selectedOptions);
   };
 
-  // Compute responsive grid cell width so 3 columns always fit the right column
-  const edgeMargin = getEdgeMargin(isLandscape);
-  const contentWidth = width - edgeMargin * 2;
-  const rightPercent = LayoutRatios.twoColumn.matching.right; // 58 (updated for consistency)
-  const rightSectionWidth = (contentWidth * rightPercent) / 100;
-  const cellGap = 12; // matches styles.gridRow gap
-  const gridCellWidth = Math.floor((rightSectionWidth - cellGap * 2) / 3);
+  // Calculate button dimensions based on board width (with 10% size increase)
+  const buttonAreaWidth = boardWidth - (offsets.boardPaddingHorizontal * 2);
+  const horizontalGap = offsets.gridRow.gap;
+  const baseButtonWidth = (buttonAreaWidth - horizontalGap * 2) / 3;
 
-  // Calculate height based on jawapan-button aspect ratio (uses same button as MultipleChoice)
-  const buttonAspectRatio = ButtonSizes.answerOption.landscape.height / ButtonSizes.answerOption.landscape.width; // 70/190 = 0.368
-  const gridCellHeight = Math.round(gridCellWidth * buttonAspectRatio);
-  const fontSize = Math.max(10, Math.floor(gridCellWidth / 14)); // Increased min from 9 to 10
+  // Increase button size by 10%
+  const buttonWidth = baseButtonWidth * 1.1;
 
-  // Left Section: Question Board with Title
-  const leftSection = (
-    <View style={styles.questionSection}>
-      <ImageBackground
-        source={require('@/assets/images/game/backgrounds/soalan-board.png')}
-        style={[
-          styles.questionBoard,
-          {
-            width: boardWidth,
-            height: boardHeight,
-          },
-        ]}
-        resizeMode="contain">
-        <View style={styles.questionContent}>
-          <Text
-            style={[
-              styles.titleText,
-              { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
-            ]}
-            numberOfLines={2}
-            adjustsFontSizeToFit
-            minimumFontScale={0.85}
-            allowFontScaling={allowScaling}>
-            {question.title}
-          </Text>
-          <Text
-            style={[
-              styles.questionText,
-              { fontSize: getResponsiveFontSize(Typography.body, isLandscape) },
-            ]}
-            numberOfLines={2}
-            adjustsFontSizeToFit
-            minimumFontScale={0.85}
-            allowFontScaling={allowScaling}>
-            {question.question}
-          </Text>
-        </View>
-      </ImageBackground>
-    </View>
-  );
+  // Clamp button width with min/max bounds
+  const clampedButtonWidth = Math.max(120, Math.min(buttonWidth, 240));
 
-  // Right Section: 3x3 Grid of Options
-  const rightSection = (
-    <View style={styles.gridSection}>
-      <View style={styles.grid}>
-        {[0, 1, 2].map((row) => (
-          <View key={row} style={styles.gridRow}>
-            {question.options.slice(row * 3, row * 3 + 3).map((option, col) => {
-              const isSelected = selectedOptions.includes(option);
-              return (
-                <Pressable
-                  key={col}
-                  style={[
-                    styles.gridCell,
-                    {
-                      width: gridCellWidth,
-                      height: gridCellHeight,
-                    },
-                    isSelected && styles.gridCellSelected,
-                  ]}
-                  onPress={() => handleToggleOption(option)}
-                  accessibilityRole="button"
-                  accessibilityLabel={`Pilihan ${row * 3 + col + 1}: ${option}`}
-                  accessibilityState={{ selected: isSelected }}>
-                  <ImageBackground
-                    source={require('@/assets/images/game/buttons/jawapan-button.png')}
-                    style={styles.gridCellBg}
-                    resizeMode="stretch">
-                    <Text
-                      style={[styles.gridCellText, { fontSize }]}
-                      numberOfLines={2}
-                      adjustsFontSizeToFit
-                      minimumFontScale={0.85}
-                      allowFontScaling={allowScaling}>
-                      {isSelected && '✓ '}
-                      {option}
-                    </Text>
-                  </ImageBackground>
-                </Pressable>
-              );
-            })}
-          </View>
-        ))}
-      </View>
-    </View>
-  );
+  // Calculate height based on jawapan-button aspect ratio
+  const buttonAspectRatio = 184 / 626; // jawapan-button.png aspect ratio
+  const clampedButtonHeight = clampedButtonWidth * buttonAspectRatio;
 
-  // Footer: Next Button (bottom-right)
-  const footer = showNext ? (
-    <View style={styles.footerContainer}>
-      <Pressable
-        style={[
-          styles.nextButton,
-          {
-            width: isLandscape ? 120 : 100,
-            height: isLandscape ? 90 : 75,
-          },
-        ]}
-        onPress={handleSubmit}
-        accessibilityRole="button"
-        accessibilityLabel="Teruskan">
-        <Image
-          source={require('@/assets/images/game/buttons/next-button.png')}
-          style={styles.nextButtonImage}
-          contentFit="contain"
-        />
-      </Pressable>
-    </View>
-  ) : null;
+  // Font size scales with button size
+  const fontSize = Math.max(10, Math.floor(clampedButtonWidth / 14));
 
   return (
-    <LandscapeLayout
-      leftSection={leftSection}
-      rightSection={rightSection}
-      footer={footer}
-      leftWidth={40}
-      rightWidth={58}
-    />
+    <View style={styles.container}>
+      <View style={styles.boardContainer}>
+        <ImageBackground
+          source={require('@/assets/images/game/backgrounds/soalan-board.png')}
+          style={[
+            styles.board,
+            {
+              width: boardWidth,
+              height: boardHeight,
+              paddingTop: offsets.boardPaddingTop,
+              paddingBottom: offsets.boardPaddingBottom,
+              paddingHorizontal: offsets.boardPaddingHorizontal,
+            },
+          ]}
+          resizeMode="contain">
+          {/* Question Section - Top */}
+          <View style={[styles.questionSection, { height: offsets.questionAreaHeight, marginBottom: offsets.gridAreaTop }]}>
+            <Text
+              style={[
+                styles.titleText,
+                { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
+              ]}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.85}
+              allowFontScaling={allowScaling}>
+              {question.title}
+            </Text>
+            <Text
+              style={[
+                styles.questionText,
+                { fontSize: getResponsiveFontSize(Typography.bodySmall, isLandscape) },
+              ]}
+              numberOfLines={2}
+              adjustsFontSizeToFit
+              minimumFontScale={0.85}
+              allowFontScaling={allowScaling}>
+              {question.question}
+            </Text>
+          </View>
+
+          {/* Grid Section - Bottom */}
+          <View style={styles.gridSection}>
+            <View style={[styles.grid, { gap: offsets.gridContainer.gap }]}>
+              {[0, 1, 2].map((row) => (
+                <View key={row} style={[styles.gridRow, { gap: offsets.gridRow.gap }]}>
+                  {question.options.slice(row * 3, row * 3 + 3).map((option, col) => {
+                    const isSelected = selectedOptions.includes(option);
+                    return (
+                      <Pressable
+                        key={col}
+                        style={[
+                          styles.gridCell,
+                          {
+                            width: clampedButtonWidth,
+                            height: clampedButtonHeight,
+                          },
+                          isSelected && styles.gridCellSelected,
+                        ]}
+                        onPress={() => handleToggleOption(option)}
+                        hitSlop={TouchTargets.hitSlop}
+                        pressRetentionOffset={TouchTargets.hitSlop}
+                        accessibilityRole="button"
+                        accessibilityLabel={`Pilihan ${row * 3 + col + 1}: ${option}`}
+                        accessibilityState={{ selected: isSelected }}>
+                        <ImageBackground
+                          source={require('@/assets/images/game/buttons/jawapan-button.png')}
+                          style={styles.gridCellBg}
+                          resizeMode="stretch">
+                          <Text
+                            style={[styles.gridCellText, { fontSize }]}
+                            numberOfLines={2}
+                            adjustsFontSizeToFit
+                            minimumFontScale={0.85}
+                            allowFontScaling={allowScaling}>
+                            {isSelected && '✓ '}
+                            {option}
+                          </Text>
+                        </ImageBackground>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              ))}
+            </View>
+          </View>
+        </ImageBackground>
+      </View>
+
+      {/* Next Button - Outside board, bottom-right */}
+      {showNext && (
+        <View style={[
+          styles.footer,
+          {
+            bottom: offsets.footerContainer.marginBottom,
+            right: offsets.footerContainer.marginRight,
+          },
+        ]}>
+          <Pressable
+            style={[
+              styles.nextButton,
+              {
+                width: nextButtonSize.width,
+                height: nextButtonSize.height,
+              },
+            ]}
+            onPress={handleSubmit}
+            hitSlop={TouchTargets.hitSlop}
+            accessibilityRole="button"
+            accessibilityLabel="Teruskan ke soalan seterusnya">
+            <Image
+              source={require('@/assets/images/game/buttons/next-button.png')}
+              style={styles.nextButtonImage}
+              contentFit="contain"
+            />
+          </Pressable>
+        </View>
+      )}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  // Left Section: Question
-  questionSection: {
+  // Container
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: EdgeMargins.landscape,
+  },
+  boardContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  questionBoard: {
-    justifyContent: 'center',
+  board: {
+    justifyContent: 'flex-start',
     alignItems: 'center',
   },
-  questionContent: {
-    width: '82%',
-    paddingVertical: 32,
+
+  // Question Section (Top of board)
+  questionSection: {
+    width: '100%',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
+    gap: 8,
   },
   titleText: {
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
     fontWeight: Typography.fontWeight.bold,
-    marginBottom: 10,
   },
   questionText: {
     fontFamily: Typography.fontFamily,
@@ -233,24 +266,24 @@ const styles = StyleSheet.create({
     lineHeight: Typography.lineHeight.normal,
   },
 
-  // Right Section: Grid
+  // Grid Section (Bottom of board)
   gridSection: {
+    width: '100%',
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
   grid: {
-    gap: 12,
+    alignItems: 'center',
   },
   gridRow: {
     flexDirection: 'row',
-    gap: 12,
   },
   gridCell: {
     position: 'relative',
   },
   gridCellSelected: {
-    opacity: 0.8,
+    opacity: Opacity.selected,
     transform: [{ scale: 0.95 }],
   },
   gridCellBg: {
@@ -267,11 +300,10 @@ const styles = StyleSheet.create({
     fontWeight: Typography.fontWeight.semiBold,
   },
 
-  // Footer: Next Button
-  footerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
+  // Footer: Next Button (Outside board)
+  footer: {
+    position: 'absolute',
+    zIndex: 20,
   },
   nextButton: {
     // Size set dynamically
