@@ -34,6 +34,7 @@ import MenuButton from '@/components/game/MenuButton';
 import FeedbackOverlay from '@/components/game/FeedbackOverlay';
 import SuccessModal from '@/components/game/SuccessModal';
 import { useGameContext } from '@/contexts/GameContext';
+import { ASSETS } from '@/constants/assets';
 import type {
   CrosswordPuzzleClue,
   CrosswordPuzzleDefinition,
@@ -55,7 +56,7 @@ export default function JohorCrossword() {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const isLandscape = isLandscapeMode(width);
-  const { gameState } = useGameContext();
+  const { gameState, completeState, setShowSuccessModal: setGlobalSuccessModal } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
 
   const [activeClueId, setActiveClueId] = useState<string | null>(INITIAL_ACTIVE_CLUE_ID);
@@ -228,6 +229,9 @@ export default function JohorCrossword() {
 
     // All clues visited - play success sound
     playSound('star'); // Celebration sound for completion
+    // Mark state as completed in global game state but avoid showing the global modal here
+    completeState('johor');
+    setGlobalSuccessModal(false);
     setShowSuccessModal(true);
   };
 
@@ -270,7 +274,7 @@ export default function JohorCrossword() {
 
   return (
     <ImageBackground
-      source={require('@/assets/images/game/backgrounds/bg-main.png')}
+      source={ASSETS.shared.backgrounds.main}
       style={styles.background}
       resizeMode="cover">
       <StatusBar state="johor" />
@@ -358,7 +362,7 @@ export default function JohorCrossword() {
                           accessibilityLabel={`Petak huruf ${cell.letter}`}
                           hitSlop={4}>
                           <ImageBackground
-                            source={require('@/assets/images/game/buttons/crossword-box.png')}
+                            source={ASSETS.games.dbpSejarah.crosswordBox}
                             style={styles.tileBackground}
                             resizeMode="cover">
                             <View
@@ -417,7 +421,7 @@ export default function JohorCrossword() {
         accessibilityLabel="Semak jawapan"
         onPress={handleCheck}>
         <Image
-          source={require('@/assets/images/game/buttons/next-button.png')}
+          source={ASSETS.shared.buttons.next.default}
           style={styles.nextButtonImage}
           contentFit="contain"
         />
@@ -462,7 +466,7 @@ function ClueBoard({
 }: ClueBoardProps) {
   return (
     <ImageBackground
-      source={require('@/assets/images/game/backgrounds/soalan-board.png')}
+      source={ASSETS.games.dbpSejarah.soalanBoard}
       style={[
         styles.clueBoard,
         {
@@ -656,5 +660,3 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 });
-
-

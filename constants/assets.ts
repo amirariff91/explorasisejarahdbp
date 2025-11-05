@@ -161,21 +161,13 @@ export const ASSETS: AssetManifest = {
   // BRANDING & PLATFORM ASSETS
   // ============================================================================
   branding: {
-    // DBP logo PNG (Figma Frame 1:15)
-    logoDbp: require('@/assets/images/game/LOGO DBP/logo-dbp.png'),
-    
-    // DBP logo SVG for scalability
-    logoDbpSvg: require('@/assets/images/game/LOGO DBP/LOGO DBP.svg'),
-    
-    // "Eksplorasi Sejarah" title masthead (Figma Frame 1:13)
-    titleMasthead: require('@/assets/images/game/MASTHEAD/TITLE.svg'),
-    
-    // TODO: Add splash screen variants when generated
-    splashScreenSafe: require('@/assets/images/splash-icon.png'), // Placeholder
-    splashScreenFull: require('@/assets/images/splash-icon.png'), // Placeholder
-    
-    // iOS app icon master (1024x1024)
-    appIconIos: require('@/assets/images/icon.png'), // Using existing icon as placeholder
+    // Using safe PNG fallbacks until real assets are exported
+    logoDbp: require('@/assets/images/icon.png'),
+    logoDbpSvg: require('@/assets/images/icon.png'),
+    titleMasthead: require('@/assets/images/splash-icon.png'),
+    splashScreenSafe: require('@/assets/images/splash-icon.png'),
+    splashScreenFull: require('@/assets/images/splash-icon.png'),
+    appIconIos: require('@/assets/images/icon.png'),
   },
 };
 
@@ -261,4 +253,3 @@ export function getAsset(...path: string[]): any {
   }
   return current;
 }
-

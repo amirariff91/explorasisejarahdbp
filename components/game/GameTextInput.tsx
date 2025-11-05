@@ -4,10 +4,9 @@ import {
   Text,
   TextInput,
   StyleSheet,
-  TextInputProps,
   KeyboardTypeOptions,
 } from 'react-native';
-import { Colors, Typography, BorderRadius, Shadows } from '@/constants/theme';
+import { Colors, BorderRadius, Shadows } from '@/constants/theme';
 
 interface GameTextInputProps {
   label: string;
@@ -53,7 +52,14 @@ export function GameTextInput({
             placeholderTextColor={Colors.textPlaceholder}
             keyboardType={keyboardType}
             maxLength={maxLength}
-            autoCapitalize={keyboardType === 'numeric' ? 'none' : 'words'}
+            autoCapitalize={
+              keyboardType === 'numeric' ||
+              keyboardType === 'number-pad' ||
+              keyboardType === 'decimal-pad' ||
+              keyboardType === 'phone-pad'
+                ? 'none'
+                : 'words'
+            }
             autoCorrect={false}
             returnKeyType="done"
             onFocus={() => setIsFocused(true)}
@@ -124,4 +130,3 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
 });
-

@@ -12,6 +12,7 @@ import {
   Opacity,
   Typography,
 } from '@/constants/theme';
+import { ASSETS } from '@/constants/assets';
 import { useGameContext } from '@/contexts/GameContext';
 import type { MultipleChoiceQuestion as MCQuestion } from '@/types';
 import { playSound } from '@/utils/audio';
@@ -133,7 +134,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
     <View style={styles.container}>
       <View style={styles.boardContainer}>
         <ImageBackground
-          source={require('@/assets/images/game/backgrounds/soalan-board.png')}
+          source={ASSETS.games.dbpSejarah.soalanBoard}
           style={[
             styles.board,
             {
@@ -183,7 +184,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                     accessibilityLabel={`Jawapan ${btnIndex + 1}: ${option}`}
                     accessibilityState={{ selected: selectedAnswer === option }}>
                     <ImageBackground
-                      source={require('@/assets/images/game/buttons/jawapan-button.png')}
+                      source={ASSETS.games.dbpSejarah.jawapanButton.default}
                       style={styles.optionButtonBg}
                       resizeMode="stretch">
                       <Text
@@ -224,7 +225,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                       accessibilityLabel={`Jawapan ${index + 1}: ${option}`}
                       accessibilityState={{ selected: selectedAnswer === option }}>
                       <ImageBackground
-                        source={require('@/assets/images/game/buttons/jawapan-button.png')}
+                        source={ASSETS.games.dbpSejarah.jawapanButton.default}
                         style={styles.optionButtonBg}
                         resizeMode="stretch">
                         <Text
@@ -270,7 +271,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
             accessibilityRole="button"
             accessibilityLabel="Teruskan ke soalan seterusnya">
             <Image
-              source={require('@/assets/images/game/buttons/next-button.png')}
+              source={ASSETS.shared.buttons.next.default}
               style={styles.nextButtonImage}
               contentFit="contain"
             />

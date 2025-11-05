@@ -1,6 +1,6 @@
 import { useGameContext } from '@/contexts/GameContext';
 import type { SuccessModalProps } from '@/types';
-import { playAmbient, playCelebration, playSound, playStateCompletionVoice } from '@/utils/audio';
+import { playAmbient, playCelebration, playSound, playStateCompletionVoice, stopAmbient } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
 import { useEffect } from 'react';
 import CongratsOverlay from './CongratsOverlay';
@@ -30,11 +30,15 @@ export default function SuccessModal({ visible, onContinue, onRestart }: Success
 
   const handleContinue = () => {
     playSound('click');
+    // Stop celebration ambience when closing modal
+    stopAmbient('ambient-celebration');
     onContinue();
   };
 
   const handleRestart = () => {
     playSound('click');
+    // Stop celebration ambience when closing modal
+    stopAmbient('ambient-celebration');
     onRestart();
   };
 

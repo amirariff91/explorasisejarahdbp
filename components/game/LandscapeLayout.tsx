@@ -1,4 +1,4 @@
-import { View, StyleSheet, useWindowDimensions, type ViewStyle } from 'react-native';
+import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import type { ReactNode } from 'react';
 import { isLandscapeMode, getEdgeMargin, getColumnGap } from '@/constants/layout';
 

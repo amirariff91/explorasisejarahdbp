@@ -14,6 +14,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import { ASSETS } from '@/constants/assets';
 
 interface Props {
   question: MQQuestion;
@@ -111,7 +112,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     <View style={styles.container}>
       <View style={styles.boardContainer}>
         <ImageBackground
-          source={require('@/assets/images/game/backgrounds/soalan-board.png')}
+          source={ASSETS.games.dbpSejarah.soalanBoard}
           style={[
             styles.board,
             {
@@ -174,7 +175,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
                         accessibilityLabel={`Pilihan ${row * 3 + col + 1}: ${option}`}
                         accessibilityState={{ selected: isSelected }}>
                         <ImageBackground
-                          source={require('@/assets/images/game/buttons/jawapan-button.png')}
+                          source={ASSETS.games.dbpSejarah.jawapanButton.default}
                           style={styles.gridCellBg}
                           resizeMode="stretch">
                           <Text
@@ -219,7 +220,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
             accessibilityRole="button"
             accessibilityLabel="Teruskan ke soalan seterusnya">
             <Image
-              source={require('@/assets/images/game/buttons/next-button.png')}
+              source={ASSETS.shared.buttons.next.default}
               style={styles.nextButtonImage}
               contentFit="contain"
             />

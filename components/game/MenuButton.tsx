@@ -67,7 +67,8 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
     // Clear all answers for the current state
     if (state && state !== '' && state !== 'quiz' && state !== 'crossword') {
       clearStateAnswers(state as any); // Clear answers to restart
-      router.replace(pathname as any); // Reload current route to reset question index
+      const restartHref = `${pathname}?restart=${Date.now()}`;
+      router.replace(restartHref as any); // Force remount by changing href
     }
   };
 

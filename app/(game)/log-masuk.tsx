@@ -17,7 +17,7 @@ import { GameTextInput } from '@/components/game/GameTextInput';
 import { useGameContext } from '@/contexts/GameContext';
 import { playSound } from '@/utils/audio';
 import { Colors, BorderRadius, Shadows, Fonts } from '@/constants/theme';
-import { isLandscapeMode } from '@/constants/layout';
+import { ASSETS } from '@/constants/assets';
 
 /**
  * Log Masuk Screen
@@ -25,7 +25,7 @@ import { isLandscapeMode } from '@/constants/layout';
  */
 export default function LogMasukScreen() {
   const router = useRouter();
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const { setPlayerProfile } = useGameContext();
 
@@ -33,7 +33,7 @@ export default function LogMasukScreen() {
   const [age, setAge] = useState('');
   const [errors, setErrors] = useState<{ name?: string; age?: string }>({});
 
-  const isLandscape = isLandscapeMode(width); // Standardized landscape detection (800px breakpoint)
+  // Landscape not used on this screen currently; keep width-based sizing
 
   // Responsive sizing
   const panelWidth = Math.min(width * 0.85, 420);
@@ -102,7 +102,7 @@ export default function LogMasukScreen() {
 
   return (
     <ImageBackground
-      source={require('@/assets/images/game/backgrounds/bg-main.png')}
+      source={ASSETS.shared.backgrounds.main}
       style={styles.container}
       resizeMode="cover">
       <KeyboardAvoidingView
@@ -168,7 +168,7 @@ export default function LogMasukScreen() {
                 accessibilityLabel="Mula bermain"
                 accessibilityState={{ disabled: !isFormValid() }}>
                 <Image
-                  source={require('@/assets/images/game/buttons/next-button.png')}
+                  source={ASSETS.shared.buttons.next.default}
                   style={[
                     styles.buttonImage,
                     { width: buttonWidth, height: buttonHeight },
@@ -254,4 +254,3 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
 });
-

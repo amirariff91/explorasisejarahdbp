@@ -5,6 +5,7 @@ import { playAmbient, playMusic, playSound, stopAllAmbient, stopMusic } from '@/
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
+import { ASSETS } from '@/constants/assets';
 
 // Question Components
 import CrosswordQuestion from '@/components/game/questions/CrosswordQuestion';
@@ -34,6 +35,8 @@ export default function QuizScreen() {
     clearStateAnswers,
     showSuccessModal,
     setShowSuccessModal,
+    setCurrentState,
+    setQuestionIndexForState,
   } = useGameContext();
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -67,6 +70,12 @@ export default function QuizScreen() {
     };
   }, []);
 
+  // Track current playing state in global context for persistence and voice playback
+  useEffect(() => {
+    if (state) setCurrentState(state);
+    return () => setCurrentState(null);
+  }, [state, setCurrentState]);
+
   // Load questions for the current state
   useEffect(() => {
     if (state && isMountedRef.current) {
@@ -75,30 +84,28 @@ export default function QuizScreen() {
         setError(`No questions found for ${state}. Please try another state.`);
       } else {
         setQuestions(stateQuestions);
-        setCurrentQuestionIndex(0); // Reset index when state changes
+        const savedIndex = gameState.questionIndexByState?.[state] ?? 0;
+        const clampedIndex = Math.max(0, Math.min(savedIndex, stateQuestions.length - 1));
+        setCurrentQuestionIndex(clampedIndex);
         setError(null);
         hasCompletedRef.current = false; // Reset completion flag for new state
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   // Handle state completion when all questions are answered
-  // Note: completeState is intentionally omitted from deps to prevent infinite loop
-  // We use hasCompletedRef flag instead to track completion
+  // Guard by verifying every question has a recorded answer
   useEffect(() => {
-    if (
-      state &&
-      currentQuestionIndex >= questions.length - 1 &&
-      questions.length > 0 &&
-      !isAnswering &&
-      !hasCompletedRef.current &&
-      isMountedRef.current
-    ) {
-      hasCompletedRef.current = true; // Mark as completed to prevent re-calling
+    if (!state || questions.length === 0 || !isMountedRef.current) return;
+    // All questions must have an answer recorded in GameContext
+    const allAnswered = questions.every((q) => gameState.answers[q.id] !== undefined);
+    if (allAnswered && !hasCompletedRef.current) {
+      hasCompletedRef.current = true;
       completeState(state);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentQuestionIndex, questions.length, isAnswering, state]);
+  }, [questions, gameState.answers, state]);
 
   // Play quiz background music on mount
   useEffect(() => {
@@ -189,6 +196,7 @@ export default function QuizScreen() {
           // More questions remaining - play transition sound
           playSound('transition', { volume: 0.5 }); // Soft transition between questions
           setIsAnswering(false);
+          if (state) setQuestionIndexForState(state, nextIndex);
           return nextIndex;
         } else {
           // All questions completed - don't call setState here
@@ -217,7 +225,9 @@ export default function QuizScreen() {
     setShowSuccessModal(false);
     clearStateAnswers(state); // Clear previous answers for fresh start
     setCurrentQuestionIndex(0);
+    setQuestionIndexForState(state, 0);
     setIsAnswering(false); // Reset answer lock on restart
+    hasCompletedRef.current = false; // Allow completion detection again after restart
   };
 
   const renderQuestion = () => {
@@ -264,7 +274,7 @@ export default function QuizScreen() {
 
   return (
     <ImageBackground
-      source={require('@/assets/images/game/backgrounds/bg-main.png')}
+      source={ASSETS.shared.backgrounds.main}
       style={styles.container}
       resizeMode="cover">
       <StatusBar state={state} />

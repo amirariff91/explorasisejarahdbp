@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet, ImageBackground, useWindowDimensions } from 'react-native';
 import { Typography } from '@/constants/theme';
+import { ASSETS } from '@/constants/assets';
 import type { CrosswordQuestion as CWQuestion } from '@/types';
 import { useGameContext } from '@/contexts/GameContext';
 
@@ -46,7 +47,7 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
         {/* Left Column: MENDATAR (Across) Clues */}
         <View style={styles.clueColumn}>
           <ImageBackground
-            source={require('@/assets/images/game/backgrounds/soalan-board.png')}
+            source={ASSETS.games.dbpSejarah.soalanBoard}
             style={[
               styles.clueBoard,
               {
@@ -100,10 +101,10 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
                 marginTop: isLandscape ? 14 : 12,
               },
             ]}>
-            <ImageBackground
-              source={require('@/assets/images/game/buttons/crossword-box.png')}
-              style={styles.gridBackground}
-              resizeMode="contain">
+          <ImageBackground
+            source={ASSETS.games.dbpSejarah.crosswordBox}
+            style={styles.gridBackground}
+            resizeMode="contain">
               <Text
                 style={[styles.placeholderText, { fontSize: isLandscape ? 15 : 13 }]}
                 allowFontScaling={allowScaling}>
@@ -121,7 +122,7 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
         {/* Right Column: MENEGAK (Down) Clues */}
         <View style={styles.clueColumn}>
           <ImageBackground
-            source={require('@/assets/images/game/backgrounds/soalan-board.png')}
+            source={ASSETS.games.dbpSejarah.soalanBoard}
             style={[
               styles.clueBoard,
               {

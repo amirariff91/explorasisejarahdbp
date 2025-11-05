@@ -160,6 +160,8 @@ export interface GameState {
   completedStates: MalaysianState[];
   currentQuestionIndex: number;
   answers: Record<string, AnswerValue>; // questionId -> answer
+  // Per-state current question index for resuming quizzes
+  questionIndexByState?: Partial<Record<MalaysianState, number>>;
   showSuccessModal: boolean;
   hasSeenTutorial: boolean;
   playerProfile: PlayerProfile | null;
@@ -195,6 +197,9 @@ export interface GameProgress {
   playerProfile?: PlayerProfile | null;
   // Optional UI settings for persistence
   allowFontScaling?: boolean;
+  // Persist quiz progress across sessions
+  answers?: Record<string, AnswerValue>;
+  questionIndexByState?: Partial<Record<MalaysianState, number>>;
 }
 
 // Tutorial Step

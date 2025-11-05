@@ -15,6 +15,10 @@ import {
     useWindowDimensions,
     type LayoutChangeEvent,
 } from "react-native";
+import { Alert } from "react-native";
+import { ASSETS, ASSET_PRELOAD_CONFIG } from "@/constants/assets";
+import { preloadAssets } from "@/utils/preload-assets";
+import { getQuestionsForState } from "@/data/questions";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Local layout configuration
@@ -34,8 +38,8 @@ const LAYOUT_CONFIG = {
  */
 export default function StateSelectionScreen() {
   const router = useRouter();
-  const { width, height } = useWindowDimensions();
-  const { gameState, isLoading, saveError } = useGameContext();
+  const { width } = useWindowDimensions();
+  const { gameState, isLoading, saveError, setCurrentState } = useGameContext();
   const insets = useSafeAreaInsets();
   const isLandscape = width >= 800;
   const allowScaling = gameState.allowFontScaling;
@@ -46,6 +50,8 @@ export default function StateSelectionScreen() {
       router.replace('/log-masuk');
     }
   }, [gameState.playerProfile, isLoading, router]);
+
+  const [isPreloading, setIsPreloading] = useState(false);
 
   // Play background music and ambient sounds on mount
   useEffect(() => {
@@ -58,6 +64,14 @@ export default function StateSelectionScreen() {
     };
   }, []);
 
+  // Preload lazy game assets while on map for smoother transitions
+  useEffect(() => {
+    setIsPreloading(true);
+    preloadAssets(ASSET_PRELOAD_CONFIG.lazy)
+      .catch(() => {})
+      .finally(() => setIsPreloading(false));
+  }, []);
+
   // Measure actual rendered heights for accurate spacing
   const [topBarHeight, setTopBarHeight] = useState(
     LAYOUT_CONFIG.minTopBarHeight,
@@ -67,14 +81,32 @@ export default function StateSelectionScreen() {
   const handleStateSelect = useCallback(
     (state: MalaysianState) => {
       playSound('click'); // Soft, pleasant feedback for state selection
-      
-      if (state === 'johor') {
-        router.push(`/crossword/${state}`);
-        return;
+      setCurrentState(state);
+
+      const proceed = () => {
+        if (state === 'johor') {
+          router.push(`/crossword/${state}`);
+        } else {
+          router.push(`/quiz/${state}`);
+        }
+      };
+
+      const alreadyCompleted = gameState.completedStates.includes(state);
+      if (alreadyCompleted) {
+        Alert.alert(
+          'Ulang Kuiz',
+          'Anda telah melengkapkan negeri ini. Ulang kuiz?',
+          [
+            { text: 'Tidak', style: 'cancel' },
+            { text: 'Ya', onPress: proceed },
+          ],
+          { cancelable: true }
+        );
+      } else {
+        proceed();
       }
-      router.push(`/quiz/${state}`);
     },
-    [router],
+    [router, setCurrentState, gameState.completedStates],
   );
 
   const handleTutorial = useCallback(() => {
@@ -92,7 +124,7 @@ export default function StateSelectionScreen() {
   if (isLoading) {
     return (
       <ImageBackground
-        source={require("@/assets/images/game/backgrounds/bg-main.png")}
+        source={ASSETS.shared.backgrounds.main}
         style={styles.container}
         resizeMode="cover"
       >
@@ -108,7 +140,7 @@ export default function StateSelectionScreen() {
 
   return (
     <ImageBackground
-      source={require("@/assets/images/game/backgrounds/bg-main.png")}
+      source={ASSETS.shared.backgrounds.main}
       style={styles.container}
       resizeMode="cover"
     >
@@ -191,6 +223,36 @@ export default function StateSelectionScreen() {
           { top: insets.top + LAYOUT_CONFIG.topBarSpacing + topBarHeight },
         ]}
       >
+        {/* Warmup indicator (subtle) */}
+        {isPreloading && (
+          <View style={styles.warmupBadge}>
+            <ActivityIndicator size="small" color="#fff" />
+            <Text style={styles.warmupText} allowFontScaling={allowScaling}>Memuatkan aset...</Text>
+          </View>
+        )}
+        {/* Resume badge */}
+        {(() => {
+          const s = gameState.currentState as MalaysianState | null;
+          if (!s) return null;
+          if (gameState.completedStates.includes(s)) return null;
+          const savedIdx = gameState.questionIndexByState?.[s];
+          if (typeof savedIdx !== 'number') return null;
+          const total = getQuestionsForState(s).length;
+          if (total <= 0) return null;
+          const nextQ = Math.min(savedIdx + 1, total);
+          const name = s.replace('-', ' ').replace(/\b\w/g, c => c.toUpperCase());
+          const label = `Sambung ${name} • Soalan ${nextQ}/${total}`;
+          const onResume = () => {
+            playSound('click');
+            if (s === 'johor') router.push(`/crossword/${s}`);
+            else router.push(`/quiz/${s}`);
+          };
+          return (
+            <Pressable style={styles.warmupBadge} onPress={onResume} accessibilityRole="button">
+              <Text style={styles.warmupText} allowFontScaling={allowScaling}>{label}</Text>
+            </Pressable>
+          );
+        })()}
         {/* Error Banner */}
         {saveError && (
           <View style={styles.errorBanner}>
@@ -204,7 +266,7 @@ export default function StateSelectionScreen() {
         {/* Map Board Container */}
         <View style={styles.mapBoardContainer}>
           <ImageBackground
-            source={require("@/assets/images/game/backgrounds/board-bg.png")}
+            source={ASSETS.shared.backgrounds.board}
             style={[
               styles.mapBoard,
               {
@@ -317,6 +379,25 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     fontSize: 13,
     color: Colors.textLight,
+  },
+
+  warmupBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    zIndex: 10,
+  },
+  warmupText: {
+    fontFamily: Typography.fontFamily,
+    fontSize: 12,
+    color: '#fff',
   },
 
   // Top Bar with minimum height (will expand with font scaling)

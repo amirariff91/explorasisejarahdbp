@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { View, Text, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
+import { ASSETS } from '@/constants/assets';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -56,10 +57,10 @@ function useSparkleAnimation(visible: boolean, delay: number) {
   }));
 }
 
-const STAR_ASSET = require('@/assets/images/game/ui-elements/star.png');
-const PANEL_ASSET = require('@/assets/images/game/ui-elements/tahniah-bg.png');
-const BUTTON_ASSET = require('@/assets/images/game/ui-elements/button-teruskan.png');
-const FLARE_ASSET = require('@/assets/images/game/ui-elements/flare.png');
+const STAR_ASSET = ASSETS.shared.ui.star;
+const PANEL_ASSET = ASSETS.games.dbpSejarah.tahniahBg;
+const BUTTON_ASSET = ASSETS.games.dbpSejarah.buttonTeruskan.default;
+const FLARE_ASSET = ASSETS.shared.ui.flare;
 
 export default function CongratsOverlay({
   visible,
@@ -434,4 +435,3 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
 });
-

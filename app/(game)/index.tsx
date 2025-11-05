@@ -9,6 +9,7 @@ import {
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
 import { useEffect } from "react";
+import { ASSETS } from "@/constants/assets";
 import { playSound, playMusic, playAmbient, stopMusic, stopAllAmbient } from "@/utils/audio";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGameContext } from "@/contexts/GameContext";
@@ -55,7 +56,7 @@ export default function Homepage() {
 
   return (
     <ImageBackground
-      source={require("@/assets/images/game/backgrounds/bg-main.png")}
+      source={ASSETS.shared.backgrounds.main}
       style={styles.container}
       resizeMode="cover"
     >
@@ -65,7 +66,7 @@ export default function Homepage() {
       >
         <View style={styles.logoContainer}>
           <Image
-            source={require("@/assets/images/game/LOGO DBP/logo-dbp.png")}
+            source={ASSETS.branding.logoDbp}
             style={[
               styles.logo,
               { width: logoSize, height: logoSize, borderRadius: logoSize / 2 },
@@ -84,7 +85,7 @@ export default function Homepage() {
       >
         <View style={styles.titleContainer}>
           <Image
-            source={require("@/assets/images/game/MASTHEAD/TITLE.svg")}
+            source={ASSETS.branding.titleMasthead}
             style={styles.masthead}
             contentFit="contain"
           />
@@ -111,7 +112,7 @@ export default function Homepage() {
       >
         <Pressable style={styles.nextButtonContainer} onPress={handlePlay}>
           <Image
-            source={require("@/assets/images/game/buttons/next-button.png")}
+            source={ASSETS.shared.buttons.next.default}
             style={[
               styles.nextButton,
               { width: buttonWidth, height: buttonHeight },

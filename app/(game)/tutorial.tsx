@@ -1,10 +1,12 @@
 import { Spacing } from "@/constants/layout";
 import { Colors } from "@/constants/theme";
+import { ASSETS, ASSET_PRELOAD_CONFIG } from "@/constants/assets";
 import { useGameContext } from "@/contexts/GameContext";
 import { playMusic, playSound, playTutorialNarration, stopMusic } from "@/utils/audio";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
+import { preloadAssets } from "@/utils/preload-assets";
 import {
     ImageBackground,
     Pressable,
@@ -12,6 +14,7 @@ import {
     Text,
     useWindowDimensions,
     View,
+    ActivityIndicator,
 } from "react-native";
 
 /**
@@ -26,6 +29,7 @@ export default function TutorialScreen() {
   const isLandscape = width >= 800; // Landscape mode threshold (800px standardized breakpoint)
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
+  const [isPreloading, setIsPreloading] = useState(false);
 
   const tutorialSteps = [
     {
@@ -51,6 +55,14 @@ export default function TutorialScreen() {
     };
   }, []);
 
+  // Preload commonly used UI assets during tutorial
+  useEffect(() => {
+    setIsPreloading(true);
+    preloadAssets(ASSET_PRELOAD_CONFIG.preload)
+      .catch(() => {})
+      .finally(() => setIsPreloading(false));
+  }, []);
+
   // Play voice narration when step changes
   useEffect(() => {
     playTutorialNarration(currentStep);
@@ -64,7 +76,7 @@ export default function TutorialScreen() {
     } else {
       // Tutorial complete, mark as seen and navigate to map
       markTutorialComplete();
-      router.replace("/");
+      router.replace("/map");
     }
   };
 
@@ -72,10 +84,17 @@ export default function TutorialScreen() {
 
   return (
     <ImageBackground
-      source={require("@/assets/images/game/backgrounds/bg-main.png")}
+      source={ASSETS.shared.backgrounds.main}
       style={styles.container}
       resizeMode="cover"
     >
+      {/* Warmup indicator (subtle) */}
+      {isPreloading && (
+        <View style={styles.warmupBadge}>
+          <ActivityIndicator size="small" color="#fff" />
+          <Text style={styles.warmupText} allowFontScaling={allowScaling}>Memuatkan aset...</Text>
+        </View>
+      )}
       {/* Single-Column Layout: Description + Controls */}
       <View
         style={[styles.contentContainer, { paddingHorizontal: edgeMargin }]}
@@ -83,7 +102,7 @@ export default function TutorialScreen() {
         {/* Description Board Container */}
         <View style={styles.boardContainer}>
           <ImageBackground
-            source={require("@/assets/images/game/backgrounds/board-bg.png")}
+            source={ASSETS.shared.backgrounds.board}
             style={[
               styles.descriptionBoard,
               {
@@ -123,7 +142,7 @@ export default function TutorialScreen() {
             onPress={handleNext}
           >
             <Image
-              source={require("@/assets/images/game/buttons/next-button.png")}
+              source={ASSETS.shared.buttons.next.default}
               style={styles.nextButtonImage}
               contentFit="contain"
             />
@@ -188,5 +207,23 @@ const styles = StyleSheet.create({
   nextButtonImage: {
     width: "75%",
     height: "75%",
+  },
+  warmupBadge: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    zIndex: 10,
+  },
+  warmupText: {
+    fontFamily: "Galindo",
+    fontSize: 12,
+    color: '#fff',
   },
 });

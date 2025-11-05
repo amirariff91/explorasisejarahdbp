@@ -1,15 +1,24 @@
 import { View, Text, StyleSheet, ImageBackground } from 'react-native';
+import { ASSETS } from '@/constants/assets';
+import { useEffect } from 'react';
 import { useLocalSearchParams } from 'expo-router';
 import type { MalaysianState } from '@/types';
 import JohorCrossword from '@/components/game/crossword/JohorCrossword';
 import StatusBar from '@/components/game/StatusBar';
 import MenuButton from '@/components/game/MenuButton';
+import { useGameContext } from '@/contexts/GameContext';
 
 /**
  * Crossword Screen - Dynamic loader that delegates to state-specific crossword experiences.
  */
 export default function CrosswordScreen() {
   const { state } = useLocalSearchParams<{ state: MalaysianState }>();
+  const { setCurrentState } = useGameContext();
+
+  useEffect(() => {
+    if (state) setCurrentState(state);
+    return () => setCurrentState(null);
+  }, [state, setCurrentState]);
 
   if (state === 'johor') {
     return <JohorCrossword />;
@@ -17,7 +26,7 @@ export default function CrosswordScreen() {
 
   return (
     <ImageBackground
-      source={require('@/assets/images/game/backgrounds/bg-main.png')}
+      source={ASSETS.shared.backgrounds.main}
       style={styles.container}
       resizeMode="cover">
       <StatusBar state={state || 'johor'} />

@@ -5,6 +5,7 @@ import {
   useEffect,
   useMemo,
   useCallback,
+  useRef,
   type ReactNode,
 } from 'react';
 import * as SecureStore from 'expo-secure-store';
@@ -25,8 +26,10 @@ interface GameContextType {
   answerQuestion: (questionId: string, answer: AnswerValue, question: Question) => AnswerResult;
   completeState: (state: MalaysianState) => void;
   clearStateAnswers: (state: MalaysianState) => void;
+  setCurrentState: (state: MalaysianState | null) => void;
+  setQuestionIndexForState: (state: MalaysianState, index: number) => void;
   markTutorialComplete: () => void;
-  resetGame: () => void;
+  resetGame: () => Promise<void>;
   setShowSuccessModal: (show: boolean) => void;
   setAllowFontScaling: (allow: boolean) => void;
   setPlayerProfile: (name: string, age: number) => void;
@@ -39,7 +42,8 @@ const GameContext = createContext<GameContextType | undefined>(undefined);
 const STORAGE_KEY = 'dbp_sejarah_game_progress';
 const INITIAL_MONEY = 100;
 const INITIAL_HEALTH = 100;
-const MONEY_PENALTY = 1;
+// Align with tutorial copy: "Jika jawapan anda salah RM2.00 akan ditolak."
+const MONEY_PENALTY = 2;
 const HEALTH_PENALTY = 2;
 
 const initialGameState: GameState = {
@@ -49,6 +53,7 @@ const initialGameState: GameState = {
   completedStates: [],
   currentQuestionIndex: 0,
   answers: {},
+  questionIndexByState: {},
   showSuccessModal: false,
   hasSeenTutorial: false,
   playerProfile: null,
@@ -59,6 +64,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  // Keep the latest game state in a ref to avoid stale closures in debounced saves
+  const latestStateRef = useRef<GameState>(initialGameState);
+  useEffect(() => {
+    latestStateRef.current = gameState;
+  }, [gameState]);
 
   // Create debounced save function (max one save per second)
   const debouncedSaveProgress = useMemo(
@@ -97,6 +107,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
           currentState: progress.lastPlayedState,
           playerProfile: progress.playerProfile ?? null,
           allowFontScaling: progress.allowFontScaling ?? false,
+          answers: progress.answers ?? {},
+          questionIndexByState: progress.questionIndexByState ?? {},
         }));
       }
       setSaveError(null); // Clear any previous errors
@@ -111,15 +123,19 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const saveProgress = async (retryCount = 0) => {
     try {
+      // Read from ref to ensure we always save the latest state
+      const current = latestStateRef.current;
       const progress: GameProgress = {
-        money: gameState.money,
-        health: gameState.health,
-        completedStates: gameState.completedStates,
-        hasSeenTutorial: gameState.hasSeenTutorial,
-        lastPlayedState: gameState.currentState,
+        money: current.money,
+        health: current.health,
+        completedStates: current.completedStates,
+        hasSeenTutorial: current.hasSeenTutorial,
+        lastPlayedState: current.currentState,
         timestamp: Date.now(),
-        playerProfile: gameState.playerProfile,
-        allowFontScaling: gameState.allowFontScaling,
+        playerProfile: current.playerProfile,
+        allowFontScaling: current.allowFontScaling,
+        answers: current.answers,
+        questionIndexByState: current.questionIndexByState,
       };
 
       await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(progress));
@@ -149,21 +165,22 @@ export function GameProvider({ children }: { children: ReactNode }) {
         return answer === question.correctAnswer;
       case 'fillBlank':
         if (typeof answer !== 'string') return false;
+        // Normalize spacing and case for robust comparisons
         const normalizedAnswer = question.caseSensitive
           ? answer.trim()
           : answer.trim().toLowerCase();
-        const correctAnswer = question.caseSensitive
-          ? question.correctAnswer
-          : question.correctAnswer.toLowerCase();
+        const normalizedCorrect = question.caseSensitive
+          ? (question.correctAnswer ?? '').trim()
+          : (question.correctAnswer ?? '').trim().toLowerCase();
 
-        if (normalizedAnswer === correctAnswer) return true;
+        if (normalizedAnswer === normalizedCorrect) return true;
 
         // Check acceptable alternatives
         if (question.acceptableAnswers) {
           return question.acceptableAnswers.some((acceptable) => {
             const normalizedAcceptable = question.caseSensitive
-              ? acceptable
-              : acceptable.toLowerCase();
+              ? (acceptable ?? '').trim()
+              : (acceptable ?? '').trim().toLowerCase();
             return normalizedAnswer === normalizedAcceptable;
           });
         }
@@ -222,7 +239,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGameState((prev) => ({
       ...prev,
       completedStates: [...new Set([...prev.completedStates, state])],
-      currentState: null,
+      // Preserve currentState so SuccessModal can access it for voice playback
+      currentState: state,
       currentQuestionIndex: 0,
       showSuccessModal: true,
     }));
@@ -234,15 +252,33 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGameState((prev) => {
       const updatedAnswers = { ...prev.answers };
       Object.keys(updatedAnswers).forEach((questionId) => {
-        if (questionId.startsWith(`${state}-`)) {
+        // Support ids with '-' or '_' separators (e.g., 'johor-1' or 'johor_1')
+        if (questionId.startsWith(`${state}-`) || questionId.startsWith(`${state}_`)) {
           delete updatedAnswers[questionId];
         }
       });
+      const updatedIndexMap = { ...(prev.questionIndexByState ?? {}) };
+      delete updatedIndexMap[state];
       return {
         ...prev,
         answers: updatedAnswers,
+        questionIndexByState: updatedIndexMap,
       };
     });
+  };
+
+  const setQuestionIndexForState = (state: MalaysianState, index: number) => {
+    setGameState((prev) => ({
+      ...prev,
+      questionIndexByState: { ...(prev.questionIndexByState ?? {}), [state]: index },
+    }));
+  };
+
+  const setCurrentState = (state: MalaysianState | null) => {
+    setGameState((prev) => ({
+      ...prev,
+      currentState: state,
+    }));
   };
 
   const markTutorialComplete = () => {
@@ -252,9 +288,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  const resetGame = () => {
+  const resetGame = async () => {
+    try {
+      await SecureStore.deleteItemAsync(STORAGE_KEY);
+    } catch (e) {
+      // Ignore delete errors; proceed with local reset
+    }
     setGameState(initialGameState);
-    SecureStore.deleteItemAsync(STORAGE_KEY);
   };
 
   const setShowSuccessModal = (show: boolean) => {
@@ -280,6 +320,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       answerQuestion,
       completeState,
       clearStateAnswers,
+      setCurrentState,
+      setQuestionIndexForState,
       markTutorialComplete,
       resetGame,
       setShowSuccessModal,

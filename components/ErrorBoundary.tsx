@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Pressable, StyleSheet, ImageBackground } from 'react-native';
 import { Typography, Colors } from '@/constants/theme';
+import { ASSETS } from '@/constants/assets';
 
 interface ErrorBoundaryState {
   hasError: boolean;
@@ -47,7 +48,7 @@ export class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         <ImageBackground
-          source={require('@/assets/images/game/backgrounds/bg-main.png')}
+          source={ASSETS.shared.backgrounds.main}
           style={styles.container}>
           <View style={styles.errorCard}>
             <Text style={styles.errorIcon}>⚠️</Text>

@@ -24,6 +24,7 @@ import Animated, {
   useSharedValue,
   withSpring,
 } from 'react-native-reanimated';
+import { ASSETS } from '@/constants/assets';
 
 interface Props {
   question: TFQuestion;
@@ -104,7 +105,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
     <View style={styles.container}>
       <View style={styles.boardContainer}>
         <ImageBackground
-          source={require('@/assets/images/game/backgrounds/soalan-board.png')}
+          source={ASSETS.games.dbpSejarah.soalanBoard}
           style={[
             styles.board,
             {
@@ -148,7 +149,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
               accessibilityRole="button"
               accessibilityLabel="Jawapan: Betul">
               <Image
-                source={require('@/assets/images/game/buttons/betul-button.png')}
+                source={ASSETS.games.dbpSejarah.betulButton.default}
                 style={[styles.buttonImage, { width: buttonSize.width, height: buttonSize.height }]}
                 contentFit="fill"
               />
@@ -182,7 +183,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
               accessibilityRole="button"
               accessibilityLabel="Jawapan: Salah">
               <Image
-                source={require('@/assets/images/game/buttons/salah-button.png')}
+                source={ASSETS.games.dbpSejarah.salahButton.default}
                 style={[styles.buttonImage, { width: buttonSize.width, height: buttonSize.height }]}
                 contentFit="fill"
               />

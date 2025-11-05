@@ -16,6 +16,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import { ASSETS } from '@/constants/assets';
 
 interface Props {
   question: FBQuestion;
@@ -55,7 +56,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const leftSection = (
     <View style={styles.questionSection}>
       <ImageBackground
-        source={require('@/assets/images/game/backgrounds/soalan-board.png')}
+        source={ASSETS.games.dbpSejarah.soalanBoard}
         style={[
           styles.questionBoard,
           {
@@ -86,7 +87,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
     <View style={styles.inputSection}>
       {/* Input Box */}
       <ImageBackground
-        source={require('@/assets/images/game/ui-elements/isi-tempat-kosong.png')}
+        source={ASSETS.games.dbpSejarah.isiTempatKosong}
         style={[
           styles.inputContainer,
           {
@@ -133,7 +134,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
         accessibilityLabel="Hantar jawapan"
         accessibilityState={{ disabled: !answer.trim() }}>
         <Image
-          source={require('@/assets/images/game/buttons/ok-button.png')}
+          source={ASSETS.shared.buttons.ok.default}
           style={[styles.okButtonImage, !answer.trim() && styles.buttonDisabled]}
           contentFit="contain"
         />
