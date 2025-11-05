@@ -8,7 +8,7 @@ export const kedahQuestions: Question[] = [
     id: 'kedah_1',
     state: 'kedah',
     type: 'multipleChoice',
-    question: 'Siapakah Bendahara Melaka yang pertahankan serangan Siam?',
+    question: 'Bendahara Melaka pernah mempertahankan serangan Siam sebanyak 2 kali. Siapakah Bendahara Melaka?',
     options: ['Tun Teja', 'Tun Perak', 'Puteri Gunung Ledang', 'Hang Nadim'],
     correctAnswer: 'Tun Perak',
     explanation:

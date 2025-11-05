@@ -43,14 +43,14 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     gridRow: { gap: 16 },
     footerContainer: { marginBottom: 30, marginRight: 30 },
   };
-  
+
   const baseBoardSize = isLandscape
     ? QuestionBoard.compact.landscape
     : QuestionBoard.compact.portrait;
 
   // Responsive board sizing - Allow board to reach its base dimensions (290×200)
   const maxBoardWidth = width * 0.80;  // Adequate for compact board
-  const maxBoardHeight = height * 0.80; // Allow adequate height
+  const maxBoardHeight = height * 0.85; // Allow adequate height for larger screens
   const aspectRatio = baseBoardSize.width / baseBoardSize.height;
 
   let boardWidth = Math.min(baseBoardSize.width, maxBoardWidth);

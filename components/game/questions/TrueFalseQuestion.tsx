@@ -51,14 +51,14 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
     buttonsAreaTop: 15,
     buttonGap: 30,
   };
-  
+
   const baseBoardSize = isLandscape
     ? QuestionBoard.standard.landscape
     : QuestionBoard.standard.portrait;
 
   // Responsive board sizing - Allow board to reach its base dimensions (408×264)
   const maxBoardWidth = width * 0.90;  // Increased to allow full board size
-  const maxBoardHeight = height * 0.85; // Allow adequate height
+  const maxBoardHeight = height * 0.88; // Allow adequate height
   const aspectRatio = baseBoardSize.width / baseBoardSize.height;
 
   let boardWidth = Math.min(baseBoardSize.width, maxBoardWidth);

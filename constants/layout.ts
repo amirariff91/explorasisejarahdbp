@@ -298,23 +298,63 @@ export const QuestionOffsets = {
   multipleChoiceSingle: {
     landscape: {
       boardPaddingTop: 28,              // Optimized for 380px height
-      boardPaddingBottom: 18,           // Balanced padding
+      boardPaddingBottom: 15,           // Reduced to compensate for taller question area
       boardPaddingHorizontal: 40,       // Wide padding for content breathing room
-      questionAreaHeight: 90,           // Adequate space for question text
-      answerAreaTop: 18,                // Gap between question and answers
+      questionAreaHeight: 140,          // Increased from 90 to accommodate long questions (e.g. Kedah)
+      answerAreaTop: 15,                // Reduced to compensate for taller question area
       optionsContainer: { gap: 24 },    // Vertical gap between button rows
       optionRow: { gap: 20 },           // Horizontal gap between buttons
       footerContainer: { marginBottom: 22, marginRight: 40 },
     },
     portrait: {
       boardPaddingTop: 28,
-      boardPaddingBottom: 20,
+      boardPaddingBottom: 12,           // Reduced to compensate for taller question area
       boardPaddingHorizontal: 32,
-      questionAreaHeight: 90,
-      answerAreaTop: 20,
+      questionAreaHeight: 130,          // Increased from 90 to accommodate long questions
+      answerAreaTop: 15,                // Reduced to compensate
       optionsContainer: { gap: 22 },
       optionRow: { gap: 16 },
       footerContainer: { marginBottom: 20, marginRight: 32 },
+    },
+  },
+  matchingSingle: {
+    landscape: {
+      boardPaddingTop: 35,
+      boardPaddingBottom: 25,
+      boardPaddingHorizontal: 35,
+      questionAreaHeight: 110,
+      gridAreaTop: 18,
+      gridContainer: { gap: 14 },
+      gridRow: { gap: 14 },
+      footerContainer: { marginBottom: 20, marginRight: 40 },
+    },
+    portrait: {
+      boardPaddingTop: 30,
+      boardPaddingBottom: 20,
+      boardPaddingHorizontal: 28,
+      questionAreaHeight: 100,
+      gridAreaTop: 15,
+      gridContainer: { gap: 12 },
+      gridRow: { gap: 12 },
+      footerContainer: { marginBottom: 15, marginRight: 30 },
+    },
+  },
+  trueFalseSingle: {
+    landscape: {
+      boardPaddingTop: 35,
+      boardPaddingBottom: 25,
+      boardPaddingHorizontal: 40,
+      questionAreaHeight: 110,
+      buttonsAreaTop: 20,
+      buttonGap: 16, // Reduced by 20% (was 20)
+    },
+    portrait: {
+      boardPaddingTop: 30,
+      boardPaddingBottom: 20,
+      boardPaddingHorizontal: 30,
+      questionAreaHeight: 100,
+      buttonsAreaTop: 18,
+      buttonGap: 14, // Reduced by 20% (was 18)
     },
   },
 } as const;
