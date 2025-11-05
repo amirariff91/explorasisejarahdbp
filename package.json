@@ -9,7 +9,6 @@
     "ios": "npx expo start --ios",
     "web": "npx expo start --web",
     "lint": "npx expo lint",
-    "eas-build-pre-install": "corepack enable",
     "generate-map": "node scripts/convert-map.js"
   },
   "dependencies": {
