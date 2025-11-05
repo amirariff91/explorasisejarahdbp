@@ -13,7 +13,7 @@ interface Props {
  * Left: MENDATAR (Across) clues (25% width)
  * Center: Title + Crossword grid (50% width)
  * Right: MENEGAK (Down) clues (25% width)
- * TODO: Implement interactive crossword grid
+ * Note: Interactive crossword grid is implemented in JohorCrossword.tsx
  */
 export default function CrosswordQuestion({ question, onAnswer }: Props) {
   const { gameState } = useGameContext();

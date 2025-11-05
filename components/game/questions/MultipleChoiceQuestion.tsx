@@ -302,7 +302,7 @@ const styles = StyleSheet.create({
   // Question Section (Top of board)
   questionSection: {
     width: '100%',
-    maxWidth: '70%',
+    maxWidth: '85%',
     justifyContent: 'center',
     alignItems: 'center',
   },

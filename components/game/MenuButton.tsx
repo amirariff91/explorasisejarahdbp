@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, usePathname } from 'expo-router';
 import { useGameContext } from '@/contexts/GameContext';
 import { playSound } from '@/utils/audio';
 import {
@@ -34,7 +34,8 @@ interface MenuButtonProps {
 export default function MenuButton({ size = 'default' }: MenuButtonProps) {
   const [showMenu, setShowMenu] = useState(false);
   const router = useRouter();
-  const { resetGame, gameState, setAllowFontScaling } = useGameContext();
+  const pathname = usePathname();
+  const { clearStateAnswers, gameState, setAllowFontScaling } = useGameContext();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const isLandscape = isLandscapeMode(width);
@@ -58,7 +59,16 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
   const handleRestart = () => {
     playSound('click');
     setShowMenu(false);
-    // TODO: Restart current level
+
+    // Extract state from pathname (e.g., "/quiz/johor" -> "johor")
+    const pathParts = pathname.split('/');
+    const state = pathParts[pathParts.length - 1];
+
+    // Clear all answers for the current state
+    if (state && state !== '' && state !== 'quiz' && state !== 'crossword') {
+      clearStateAnswers(state as any); // Clear answers to restart
+      router.replace(pathname as any); // Reload current route to reset question index
+    }
   };
 
   const handleQuit = () => {

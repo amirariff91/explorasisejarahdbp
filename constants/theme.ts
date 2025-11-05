@@ -61,8 +61,8 @@ export const Fonts = {
 
 // Typography Scale (Refined for Figma alignment)
 export const Typography = {
-  // Font Family (fallback to system; replace with 'Galindo' when font asset is added)
-  fontFamily: Platform.select({ ios: 'System', android: 'sans-serif', default: 'System' })!,
+  // Font Family - Galindo is loaded via useAppFonts hook
+  fontFamily: 'Galindo',
 
   // Font Sizes (Landscape / Portrait) - Refined to match Figma
   title: {
