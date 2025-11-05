@@ -47,17 +47,17 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
   };
 
   const handleOpenMenu = () => {
-    playSound('click');
+    playSound('transition', { volume: 0.6 }); // Slide-in effect for menu opening
     setShowMenu(true);
   };
 
   const handleResume = () => {
-    playSound('click');
+    playSound('click', { volume: 0.8 }); // Soft close sound
     setShowMenu(false);
   };
 
   const handleRestart = () => {
-    playSound('click');
+    playSound('star'); // Celebratory sound for fresh start
     setShowMenu(false);
 
     // Extract state from pathname (e.g., "/quiz/johor" -> "johor")
@@ -72,7 +72,7 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
   };
 
   const handleQuit = () => {
-    playSound('click');
+    playSound('transition', { volume: 0.4 }); // Exit transition
     setShowMenu(false);
     router.back();
   };

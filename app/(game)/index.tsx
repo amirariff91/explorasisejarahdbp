@@ -8,10 +8,12 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
-import { playSound } from "@/utils/audio";
+import { useEffect } from "react";
+import { playSound, playMusic, playAmbient, stopMusic, stopAllAmbient } from "@/utils/audio";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGameContext } from "@/contexts/GameContext";
 import { Colors } from "@/constants/theme";
+import { isLandscapeMode } from "@/constants/layout";
 
 /**
  * Homepage / Splash Screen
@@ -22,7 +24,7 @@ export default function Homepage() {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const { gameState } = useGameContext();
-  const isLandscape = width > height;
+  const isLandscape = isLandscapeMode(width); // Standardized landscape detection (800px breakpoint)
 
   // Responsive sizing
   const logoSize = Math.min(width * 0.25, 140);
@@ -30,8 +32,19 @@ export default function Homepage() {
   const buttonWidth = Math.min(width * 0.22, 120);
   const buttonHeight = buttonWidth * 0.77; // Maintain aspect ratio
 
+  // Play welcome background music and ambient on mount
+  useEffect(() => {
+    playMusic('bgm-map', true, 3000); // Gentle 3s fade-in for welcoming feel
+    playAmbient('ambient-map', 0.1); // Very subtle tropical ambience (10% volume)
+
+    return () => {
+      stopMusic(1500); // Smooth 1.5s fade-out when leaving
+      stopAllAmbient();
+    };
+  }, []);
+
   const handlePlay = () => {
-    playSound("click");
+    playSound("star"); // Celebratory sound for starting the educational journey
     // Check if player profile exists
     if (!gameState.playerProfile) {
       router.push("/log-masuk");

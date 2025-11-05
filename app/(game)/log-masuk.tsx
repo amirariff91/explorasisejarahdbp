@@ -17,6 +17,7 @@ import { GameTextInput } from '@/components/game/GameTextInput';
 import { useGameContext } from '@/contexts/GameContext';
 import { playSound } from '@/utils/audio';
 import { Colors, BorderRadius, Shadows, Fonts } from '@/constants/theme';
+import { isLandscapeMode } from '@/constants/layout';
 
 /**
  * Log Masuk Screen
@@ -32,7 +33,7 @@ export default function LogMasukScreen() {
   const [age, setAge] = useState('');
   const [errors, setErrors] = useState<{ name?: string; age?: string }>({});
 
-  const isLandscape = width > height;
+  const isLandscape = isLandscapeMode(width); // Standardized landscape detection (800px breakpoint)
 
   // Responsive sizing
   const panelWidth = Math.min(width * 0.85, 420);
@@ -70,12 +71,13 @@ export default function LogMasukScreen() {
 
   const handleSubmit = () => {
     if (!validateForm()) {
-      playSound('click');
+      // Play error sound for validation failure
+      playSound('click', { volume: 0.7 }); // Softer click for error
       return;
     }
 
-    // Save profile and navigate
-    playSound('click');
+    // Save profile and navigate - play success sound
+    playSound('star'); // Celebratory sound for successful profile creation
     const trimmedName = name.trim();
     const ageNum = parseInt(age, 10);
     setPlayerProfile(trimmedName, ageNum);

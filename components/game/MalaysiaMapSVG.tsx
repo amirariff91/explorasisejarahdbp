@@ -57,8 +57,17 @@ export default function MalaysiaMapSVG({ onStateSelect }: MalaysiaMapSVGProps) {
   const borneoOffsetX = useMemo(() => -220, []); // Pull East Malaysia closer to peninsula horizontally
   const borneoOffsetY = useMemo(() => -40, []); // Move East Malaysia upward within board boundaries
 
+  const handleStatePressIn = (state: MalaysianState) => {
+    playSound("click", { volume: 0.3 }); // Very subtle preview sound on touch
+    setPressedState(state);
+  };
+
+  const handleStatePressOut = () => {
+    setPressedState(null);
+  };
+
   const handleStatePress = async (state: MalaysianState) => {
-    playSound("click");
+    playSound("click"); // Full volume click on final selection
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     onStateSelect(state);
   };
@@ -99,8 +108,8 @@ export default function MalaysiaMapSVG({ onStateSelect }: MalaysiaMapSVGProps) {
         stroke={isPressed ? "#FFD700" : "#2c3e50"}
         strokeWidth={isPressed ? "4" : "2.5"}
         opacity={isPressed ? 0.95 : 0.85}
-        onPressIn={() => setPressedState(state)}
-        onPressOut={() => setPressedState(null)}
+        onPressIn={() => handleStatePressIn(state)}
+        onPressOut={handleStatePressOut}
         onPress={() => handleStatePress(state)}
       />
     );

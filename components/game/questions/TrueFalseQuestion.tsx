@@ -155,7 +155,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
               <Text
                 style={[
                   styles.buttonText,
-                  { fontSize: getResponsiveFontSize(Typography.button, isLandscape) + 6 },
+                  { fontSize: isLandscape ? 32 : 28 }, // Figma spec: 32px for action buttons
                 ]}
                 allowFontScaling={allowScaling}
                 numberOfLines={1}
@@ -189,7 +189,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
               <Text
                 style={[
                   styles.buttonText,
-                  { fontSize: getResponsiveFontSize(Typography.button, isLandscape) + 6 },
+                  { fontSize: isLandscape ? 32 : 28 }, // Figma spec: 32px for action buttons
                 ]}
                 allowFontScaling={allowScaling}
                 numberOfLines={1}

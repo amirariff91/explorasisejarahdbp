@@ -105,7 +105,7 @@ export default function StatusBar({ state }: StatusBarProps) {
           style={[
             styles.stateName,
             {
-              fontSize: getResponsiveFontSize(Typography.heading, isLandscape),
+              fontSize: isLandscape ? 32 : 28, // Figma spec: 32px for state names
             },
           ]}
           allowFontScaling={allowScaling}

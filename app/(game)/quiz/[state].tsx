@@ -1,7 +1,7 @@
 import { useGameContext } from '@/contexts/GameContext';
 import { getQuestionsForState } from '@/data/questions';
 import type { AnswerValue, MalaysianState, Question } from '@/types';
-import { playAmbient, playMusic, stopAllAmbient, stopMusic } from '@/utils/audio';
+import { playAmbient, playMusic, playSound, stopAllAmbient, stopMusic } from '@/utils/audio';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -186,7 +186,8 @@ export default function QuizScreen() {
         const nextIndex = prevIndex + 1;
 
         if (nextIndex < questions.length) {
-          // More questions remaining
+          // More questions remaining - play transition sound
+          playSound('transition', { volume: 0.5 }); // Soft transition between questions
           setIsAnswering(false);
           return nextIndex;
         } else {

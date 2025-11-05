@@ -23,7 +23,7 @@ export default function TutorialScreen() {
   const { width } = useWindowDimensions();
   const { markTutorialComplete } = useGameContext();
   const [currentStep, setCurrentStep] = useState(0);
-  const isLandscape = width >= 800; // Landscape mode threshold (Figma: 895px)
+  const isLandscape = width >= 800; // Landscape mode threshold (800px standardized breakpoint)
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
 

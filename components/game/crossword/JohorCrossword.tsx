@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,7 +11,7 @@ import {
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { playSound } from '@/utils/audio';
+import { playSound, playMusic, playAmbient, stopMusic, stopAllAmbient } from '@/utils/audio';
 import { johorCrosswordPuzzle } from '@/data/crosswords';
 import {
   Colors,
@@ -201,6 +201,7 @@ export default function JohorCrossword() {
     if (!clue) {
       return;
     }
+    playSound('click'); // Tile selection sound
     handleSelectClue(clue);
   };
 
@@ -216,15 +217,17 @@ export default function JohorCrossword() {
   };
 
   const handleCheck = () => {
-    playSound('click');
     const visitedCount = Object.values(visitedClues).filter(Boolean).length;
 
     if (visitedCount < totalClueCount) {
+      playSound('click'); // Incomplete check sound
       setFeedbackExplanation('Sila semak semua petunjuk MENEGAK dan MENDATAR terlebih dahulu.');
       setFeedbackVisible(true);
       return;
     }
 
+    // All clues visited - play success sound
+    playSound('star'); // Celebration sound for completion
     setShowSuccessModal(true);
   };
 
@@ -245,6 +248,25 @@ export default function JohorCrossword() {
   };
 
   const nextButtonSize = isLandscape ? ButtonSizes.next.landscape : ButtonSizes.next.portrait;
+
+  // Play crossword background music and ambient sounds on mount
+  useEffect(() => {
+    playMusic('bgm-quiz', true, 2000); // Reuse quiz music for crossword
+    playAmbient('ambient-quiz-soft', 0.15); // Subtle concentration ambience
+
+    return () => {
+      stopMusic(1000); // Fade out when leaving crossword
+      stopAllAmbient();
+    };
+  }, []);
+
+  // Switch to success music when modal shows
+  useEffect(() => {
+    if (showSuccessModal) {
+      stopMusic(500); // Quick fade out crossword music
+      playMusic('bgm-success', false, 1000); // Fade in success theme (no loop)
+    }
+  }, [showSuccessModal]);
 
   return (
     <ImageBackground

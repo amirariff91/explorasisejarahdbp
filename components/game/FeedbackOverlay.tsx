@@ -59,7 +59,7 @@ export default function FeedbackOverlay({
       }
 
       // Audio feedback (voice) - randomized for variety
-      playRandomFeedback(isCorrect, true); // true = include encouragement on wrong answers
+      playRandomFeedback(isCorrect, false); // false = disable encouragement to prevent double sound
 
       // Fade in background
       opacity.value = withTiming(1, { duration: 200 });
@@ -129,7 +129,7 @@ export default function FeedbackOverlay({
               styles.feedbackText,
               isCorrect ? styles.feedbackTextCorrect : styles.feedbackTextWrong,
             ]}>
-            {isCorrect ? 'BETUL!' : 'TIDAK TEPAT'}
+            {isCorrect ? 'BETUL!' : 'SALAH'}
           </Text>
 
           {/* Resource Changes (Money & Health) */}
