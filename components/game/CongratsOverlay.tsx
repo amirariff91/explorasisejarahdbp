@@ -183,7 +183,7 @@ export default function CongratsOverlay({
 
   return (
     <View style={styles.overlay} pointerEvents="auto">
-      <Animated.View style={[styles.flareContainer, flareAnimatedStyle]}>
+      <Animated.View style={[styles.flareContainer, flareAnimatedStyle]} pointerEvents="none">
         <Image source={FLARE_ASSET} style={styles.flare} contentFit="contain" />
       </Animated.View>
 
@@ -197,6 +197,7 @@ export default function CongratsOverlay({
               position as any,
               { width: size, height: size, borderRadius: size / 2 },
             ]}
+            pointerEvents="none"
           >
             <Animated.View
               style={[
@@ -217,9 +218,10 @@ export default function CongratsOverlay({
             { width: panelDimensions.width, height: panelDimensions.height },
           ]}
           contentFit="contain"
+          pointerEvents="none"
         />
 
-        <Animated.View style={[styles.starGroup, starGroupAnimatedStyle]}>
+        <Animated.View style={[styles.starGroup, starGroupAnimatedStyle]} pointerEvents="none">
           {clampedStars >= 2 && (
             <Image
               key="star-left"
