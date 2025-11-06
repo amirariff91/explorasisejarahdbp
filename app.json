@@ -10,9 +10,7 @@
     "newArchEnabled": true,
     "assetBundlePatterns": [
       "assets/audio/**/*",
-      "assets/images/game/backgrounds/**/*",
-      "assets/images/game/buttons/**/*",
-      "assets/images/game/ui-elements/**/*"
+      "assets/images/**/*"
     ],
     "ios": {
       "supportsTablet": true,

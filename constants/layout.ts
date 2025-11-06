@@ -66,58 +66,86 @@ export const QuestionBoard = {
   },
 } as const;
 
-// Component Sizes - Buttons (Mobile Game Optimized)
+// Component Sizes - Buttons (Landscape-Only, Responsive)
 export const ButtonSizes = {
+  // Figma Reference (917×412 landscape)
+  figma: {
+    answer: { width: 266, height: 78 },     // JAWAPAN 1-4 buttons
+    betul: { width: 274, height: 91 },      // BETUL button
+    salah: { width: 259, height: 121 },     // SALAH button (taller)
+    gridCell: { width: 194, height: 57 },   // Matching grid cells (3×3)
+  },
+  
   // Next Button (proceed to next question)
   next: {
+    phone: { width: 100, height: 75 },
+    tablet: { width: 120, height: 90 },
+    // Backward compatibility (landscape = tablet, portrait = phone)
     landscape: { width: 120, height: 90 },
     portrait: { width: 100, height: 75 },
   },
   // Menu Button (pause/settings)
   menu: {
+    phone: { width: 100, height: 85 },
+    tablet: { width: 120, height: 100 },
+    // Backward compatibility
     landscape: { width: 120, height: 100 },
     portrait: { width: 100, height: 85 },
   },
-  // Answer Button (BETUL/SALAH) - Increased for better touch targets
+  // Answer Button (Multiple Choice JAWAPAN buttons)
   answer: {
-    landscape: { width: 260, height: 85 },  // +5px height
-    portrait: { width: 220, height: 80 },   // +5px height
+    phone: { width: 150, height: 70 },     // Scaled for 667px width
+    tablet: { width: 240, height: 78 },    // Close to Figma (266×78)
+  },
+  // True/False Buttons (BETUL/SALAH)
+  trueFalse: {
+    phone: { width: 140, height: 72 },     // Larger for kids!
+    tablet: { width: 220, height: 85 },    // Close to Figma
   },
   // OK Button (submit fill-in-the-blank)
   ok: {
+    phone: { width: 100, height: 75 },
+    tablet: { width: 110, height: 80 },
+    // Backward compatibility
     landscape: { width: 110, height: 80 },
-    portrait: { width: 95, height: 70 },
+    portrait: { width: 100, height: 75 },
   },
   // Tutorial Continue Button
   tutorialContinue: {
+    phone: { width: 115, height: 80 },
+    tablet: { width: 130, height: 90 },
+    // Backward compatibility
     landscape: { width: 130, height: 90 },
     portrait: { width: 115, height: 80 },
   },
   // Success Modal Button
   successAction: {
-    landscape: { width: 240, height: 70 },  // +5px height
-    portrait: { width: 220, height: 65 },   // +5px height
+    phone: { width: 220, height: 70 },
+    tablet: { width: 240, height: 75 },
+    // Backward compatibility
+    landscape: { width: 240, height: 75 },
+    portrait: { width: 220, height: 70 },
   },
   // State Selection Button (fixed width)
   stateButton: {
     widthPercent: 90, // % of container
-    paddingVertical: 12,  // +2px for better touch
+    paddingVertical: 12,
     paddingHorizontal: 20,
-    minHeight: 48,  // Increased from 44
+    minHeight: 48,
   },
-  // Answer Option Button (Multiple Choice) - CRITICAL: Increased for better touch
-  answerOption: {
-    landscape: { width: 190, height: 70 },  // +13px height (was too small!)
-    portrait: { width: 170, height: 65 },   // +10px height
+  // Matching Grid Cells (3×3 grid)
+  gridCell: {
+    phone: { width: 110, height: 52 },     // Minimum 52dp height
+    tablet: { width: 160, height: 57 },    // Figma spec
   },
 } as const;
 
-// Touch Target Guidelines (Mobile Game Standards)
+// Touch Target Guidelines (Kid-Friendly, Landscape Game)
 export const TouchTargets = {
-  minimum: 60,      // Absolute minimum for game buttons
-  comfortable: 70,  // Preferred for primary actions
-  large: 80,        // For frequently used actions
-  hitSlop: 10,      // Extra padding around pressable areas
+  minimum: 48,      // iOS HIG + Material Design minimum
+  comfortable: 60,  // Primary actions (kids)
+  kids: 72,         // Ideal for children (frequently used)
+  hitSlop: 12,      // Extra padding around pressable areas (increased from 10)
 } as const;
 
 // Component Sizes - UI Elements

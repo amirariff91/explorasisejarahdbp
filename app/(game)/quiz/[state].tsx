@@ -71,10 +71,13 @@ export default function QuizScreen() {
   }, []);
 
   // Track current playing state in global context for persistence and voice playback
+  // NOTE: setCurrentState is intentionally omitted from deps to prevent infinite loop.
+  // React's setState functions are stable and don't need to be in the dependency array.
   useEffect(() => {
     if (state) setCurrentState(state);
     return () => setCurrentState(null);
-  }, [state, setCurrentState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   // Load questions for the current state
   useEffect(() => {
@@ -93,6 +96,14 @@ export default function QuizScreen() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
+
+  // Sync local question index to GameContext for persistence
+  // NOTE: Only sync when index changes (not on initial load), to avoid redundant updates
+  useEffect(() => {
+    if (state && currentQuestionIndex > 0) {
+      setQuestionIndexForState(state, currentQuestionIndex);
+    }
+  }, [currentQuestionIndex, state, setQuestionIndexForState]);
 
   // Handle state completion when all questions are answered
   // Guard by verifying every question has a recorded answer
@@ -196,7 +207,8 @@ export default function QuizScreen() {
           // More questions remaining - play transition sound
           playSound('transition', { volume: 0.5 }); // Soft transition between questions
           setIsAnswering(false);
-          if (state) setQuestionIndexForState(state, nextIndex);
+          // NOTE: setQuestionIndexForState removed from here to prevent setState during render.
+          // Question index sync is now handled by useEffect watching currentQuestionIndex changes.
           return nextIndex;
         } else {
           // All questions completed - don't call setState here

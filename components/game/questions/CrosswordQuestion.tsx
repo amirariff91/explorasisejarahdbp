@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, ImageBackground, useWindowDimensions } from 'react-native';
-import { Typography } from '@/constants/theme';
+import { getLandscapeFontSize, Typography } from '@/constants/theme';
 import { ASSETS } from '@/constants/assets';
 import type { CrosswordQuestion as CWQuestion } from '@/types';
 import { useGameContext } from '@/contexts/GameContext';
@@ -20,22 +20,22 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
   const { width } = useWindowDimensions();
-  const isLandscape = width >= 800; // Landscape mode threshold (Figma: 895px)
 
   // Filter clues by direction
   const acrossClues = question.clues.filter((clue) => clue.direction === 'across');
   const downClues = question.clues.filter((clue) => clue.direction === 'down');
 
-  const edgeMargin = isLandscape ? 40 : 30; // Reduced margins for wider content area
-  const columnGap = isLandscape ? 18 : 16;
+  // Responsive sizing based on width
+  const edgeMargin = width < 1000 ? 30 : 40;
+  const columnGap = width < 1000 ? 16 : 18;
   const baseClueBoardSize = {
-    width: isLandscape ? 180 : 150,
-    height: isLandscape ? 240 : 200,
+    width: width < 1000 ? 150 : 180,
+    height: width < 1000 ? 200 : 240,
   };
   const boardScale = 1.87;
   const scaledClueWidth = baseClueBoardSize.width * boardScale;
   const scaledClueHeight = baseClueBoardSize.height * boardScale;
-  const maxClueWidth = width * (isLandscape ? 0.26 : 0.8);
+  const maxClueWidth = width * (width < 1000 ? 0.8 : 0.26);
   const clueBoardWidth = Math.min(scaledClueWidth, maxClueWidth);
   const clueBoardHeight = (scaledClueHeight / scaledClueWidth) * clueBoardWidth;
 
@@ -58,7 +58,7 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
             resizeMode="contain">
             <View style={styles.clueBoardContent}>
               <Text
-                style={[styles.clueTitle, { fontSize: isLandscape ? 15 : 13 }]}
+                style={[styles.clueTitle, { fontSize: getLandscapeFontSize('answer', width) }]}
                 allowFontScaling={allowScaling}
                 numberOfLines={1}
                 adjustsFontSizeToFit={true}
@@ -68,7 +68,7 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
               {acrossClues.map((clue) => (
                 <Text
                   key={clue.number}
-                  style={[styles.clueText, { fontSize: isLandscape ? 14 : 12 }]}
+                  style={[styles.clueText, { fontSize: getLandscapeFontSize('clue', width) }]}
                   numberOfLines={3}
                   adjustsFontSizeToFit
                   minimumFontScale={0.8}
@@ -83,7 +83,7 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
         {/* Center Column: Title + Grid */}
         <View style={styles.gridColumn}>
           <Text
-            style={[styles.title, { fontSize: isLandscape ? 20 : 18 }]}
+            style={[styles.title, { fontSize: getLandscapeFontSize('question', width) }]}
             allowFontScaling={allowScaling}
             numberOfLines={1}
             adjustsFontSizeToFit={true}
@@ -96,9 +96,9 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
             style={[
               styles.gridContainer,
               {
-                width: isLandscape ? 260 : 220,
-                height: isLandscape ? 260 : 220,
-                marginTop: isLandscape ? 14 : 12,
+                width: width < 1000 ? 220 : 260,
+                height: width < 1000 ? 220 : 260,
+                marginTop: width < 1000 ? 12 : 14,
               },
             ]}>
           <ImageBackground
@@ -106,12 +106,12 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
             style={styles.gridBackground}
             resizeMode="contain">
               <Text
-                style={[styles.placeholderText, { fontSize: isLandscape ? 15 : 13 }]}
+                style={[styles.placeholderText, { fontSize: getLandscapeFontSize('answer', width) }]}
                 allowFontScaling={allowScaling}>
                 Interactive Grid
               </Text>
               <Text
-                style={[styles.placeholderText, { fontSize: isLandscape ? 14 : 12 }]}
+                style={[styles.placeholderText, { fontSize: getLandscapeFontSize('clue', width) }]}
                 allowFontScaling={allowScaling}>
                 Coming soon...
               </Text>
@@ -133,7 +133,7 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
             resizeMode="contain">
             <View style={styles.clueBoardContent}>
               <Text
-                style={[styles.clueTitle, { fontSize: isLandscape ? 15 : 13 }]}
+                style={[styles.clueTitle, { fontSize: getLandscapeFontSize('answer', width) }]}
                 allowFontScaling={allowScaling}
                 numberOfLines={1}
                 adjustsFontSizeToFit={true}
@@ -143,7 +143,7 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
               {downClues.map((clue) => (
                 <Text
                   key={clue.number}
-                  style={[styles.clueText, { fontSize: isLandscape ? 14 : 12 }]}
+                  style={[styles.clueText, { fontSize: getLandscapeFontSize('clue', width) }]}
                   numberOfLines={3}
                   adjustsFontSizeToFit
                   minimumFontScale={0.8}

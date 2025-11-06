@@ -15,10 +15,14 @@ export default function CrosswordScreen() {
   const { state } = useLocalSearchParams<{ state: MalaysianState }>();
   const { setCurrentState } = useGameContext();
 
+  // Track current playing state in global context for persistence
+  // NOTE: setCurrentState is intentionally omitted from deps to prevent infinite loop.
+  // React's setState functions are stable and don't need to be in the dependency array.
   useEffect(() => {
     if (state) setCurrentState(state);
     return () => setCurrentState(null);
-  }, [state, setCurrentState]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   if (state === 'johor') {
     return <JohorCrossword />;

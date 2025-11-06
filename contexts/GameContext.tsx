@@ -267,26 +267,26 @@ export function GameProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const setQuestionIndexForState = (state: MalaysianState, index: number) => {
+  const setQuestionIndexForState = useCallback((state: MalaysianState, index: number) => {
     setGameState((prev) => ({
       ...prev,
       questionIndexByState: { ...(prev.questionIndexByState ?? {}), [state]: index },
     }));
-  };
+  }, []); // Empty deps - setGameState is stable by React guarantee
 
-  const setCurrentState = (state: MalaysianState | null) => {
+  const setCurrentState = useCallback((state: MalaysianState | null) => {
     setGameState((prev) => ({
       ...prev,
       currentState: state,
     }));
-  };
+  }, []);
 
-  const markTutorialComplete = () => {
+  const markTutorialComplete = useCallback(() => {
     setGameState((prev) => ({
       ...prev,
       hasSeenTutorial: true,
     }));
-  };
+  }, []);
 
   const resetGame = async () => {
     try {
@@ -297,20 +297,20 @@ export function GameProvider({ children }: { children: ReactNode }) {
     setGameState(initialGameState);
   };
 
-  const setShowSuccessModal = (show: boolean) => {
+  const setShowSuccessModal = useCallback((show: boolean) => {
     setGameState((prev) => ({ ...prev, showSuccessModal: show }));
-  };
+  }, []);
 
-  const setAllowFontScaling = (allow: boolean) => {
+  const setAllowFontScaling = useCallback((allow: boolean) => {
     setGameState((prev) => ({ ...prev, allowFontScaling: allow }));
-  };
+  }, []);
 
-  const setPlayerProfile = (name: string, age: number) => {
+  const setPlayerProfile = useCallback((name: string, age: number) => {
     setGameState((prev) => ({
       ...prev,
       playerProfile: { name, age },
     }));
-  };
+  }, []);
 
   const value: GameContextType = useMemo(
     () => ({
@@ -330,7 +330,21 @@ export function GameProvider({ children }: { children: ReactNode }) {
       saveError,
       isLoading,
     }),
-    [gameState, saveError, isLoading]
+    [
+      gameState,
+      saveError,
+      isLoading,
+      answerQuestion,
+      completeState,
+      clearStateAnswers,
+      setCurrentState,
+      setQuestionIndexForState,
+      markTutorialComplete,
+      resetGame,
+      setShowSuccessModal,
+      setAllowFontScaling,
+      setPlayerProfile,
+    ]
   );
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

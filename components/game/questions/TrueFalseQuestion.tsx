@@ -71,22 +71,23 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
     boardWidth = boardHeight * aspectRatio;
   }
 
-  const buttonSize = isLandscape ? ButtonSizes.answer.landscape : ButtonSizes.answer.portrait;
+  // Use new trueFalse button sizes (kid-friendly, larger)
+  const buttonSize = width < 1000 ? ButtonSizes.trueFalse.phone : ButtonSizes.trueFalse.tablet;
 
   // Animation values for buttons
   const betulScale = useSharedValue(1);
   const salahScale = useSharedValue(1);
 
   const handleAnswer = async (answer: boolean) => {
-    // Animate the pressed button
+    // Animate the pressed button (snappier, kid-friendly)
     const scale = answer ? betulScale : salahScale;
-    scale.value = withSpring(0.95, { damping: 15 });
+    scale.value = withSpring(0.92, { damping: 12 }); // More squish
     setTimeout(() => {
-      scale.value = withSpring(1, { damping: 10 });
-    }, 100);
+      scale.value = withSpring(1, { damping: 10, stiffness: 200 });
+    }, 80); // Faster release
 
-    playSound('click');
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    playSound('click', { volume: 0.5 }); // Softer for kids
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); // Light feedback (not Medium)
     // Small delay for visual feedback
     setTimeout(() => {
       onAnswer(answer);

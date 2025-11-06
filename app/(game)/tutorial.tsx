@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontFamily: "Galindo",
-    fontSize: 8,
+    fontSize: 18,
     color: Colors.textPrimary,
     textAlign: "center",
     lineHeight: 30,

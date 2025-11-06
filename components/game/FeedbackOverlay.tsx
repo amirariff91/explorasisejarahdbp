@@ -2,13 +2,14 @@ import {
     BorderRadius,
     Colors,
     getTextShadowStyle,
+    getLandscapeFontSize,
     Shadows,
     Typography,
 } from '@/constants/theme';
 import { playRandomFeedback } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
 import { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import Animated, {
     Easing,
     useAnimatedStyle,
@@ -43,6 +44,14 @@ export default function FeedbackOverlay({
   healthChange,
   onDismiss,
 }: FeedbackOverlayProps) {
+  const { width } = useWindowDimensions();
+  
+  // Responsive sizing
+  const iconSize = width < 1000 ? 60 : 80; // Smaller on phone
+  const feedbackTextSize = getLandscapeFontSize('question', width); // 16px phone / 20px tablet
+  const changeTextSize = getLandscapeFontSize('answer', width); // 14px phone / 16px tablet
+  const explanationTextSize = getLandscapeFontSize('answer', width);
+  
   // Animation values
   const scale = useSharedValue(0);
   const opacity = useSharedValue(0);
@@ -121,12 +130,18 @@ export default function FeedbackOverlay({
       <View style={styles.container}>
         {/* Feedback Icon & Text */}
         <Animated.View style={[styles.iconContainer, iconAnimatedStyle]}>
-          <Text style={[styles.icon, isCorrect ? styles.iconCorrect : styles.iconWrong]}>
+          <Text 
+            style={[
+              styles.icon, 
+              { fontSize: iconSize },
+              isCorrect ? styles.iconCorrect : styles.iconWrong
+            ]}>
             {isCorrect ? '✓' : '✗'}
           </Text>
           <Text
             style={[
               styles.feedbackText,
+              { fontSize: feedbackTextSize },
               isCorrect ? styles.feedbackTextCorrect : styles.feedbackTextWrong,
             ]}>
             {isCorrect ? 'BETUL!' : 'SALAH'}
@@ -136,12 +151,12 @@ export default function FeedbackOverlay({
           {!isCorrect && (moneyChange !== undefined || healthChange !== undefined) && (
             <View style={styles.changesContainer}>
               {moneyChange !== undefined && moneyChange !== 0 && (
-                <Text style={styles.changeText}>
+                <Text style={[styles.changeText, { fontSize: changeTextSize }]}>
                   💰 {moneyChange > 0 ? '+' : ''}RM{moneyChange}
                 </Text>
               )}
               {healthChange !== undefined && healthChange !== 0 && (
-                <Text style={styles.changeText}>
+                <Text style={[styles.changeText, { fontSize: changeTextSize }]}>
                   ❤️ {healthChange > 0 ? '+' : ''}{healthChange}%
                 </Text>
               )}
@@ -156,7 +171,9 @@ export default function FeedbackOverlay({
               style={styles.explanationScroll}
               showsVerticalScrollIndicator={true}
               bounces={false}>
-              <Text style={styles.explanationText}>{explanation}</Text>
+              <Text style={[styles.explanationText, { fontSize: explanationTextSize }]}>
+                {explanation}
+              </Text>
             </ScrollView>
           </Animated.View>
         )}
@@ -188,7 +205,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   icon: {
-    fontSize: 80,
+    // fontSize set dynamically based on screen width
     fontWeight: 'bold',
     marginBottom: 10,
   },
@@ -200,7 +217,7 @@ const styles = StyleSheet.create({
   },
   feedbackText: {
     fontFamily: Typography.fontFamily,
-    fontSize: 32,
+    // fontSize set dynamically based on screen width
     fontWeight: Typography.fontWeight.bold,
     ...getTextShadowStyle(Shadows.text.strong),
   },
@@ -218,7 +235,7 @@ const styles = StyleSheet.create({
   },
   changeText: {
     fontFamily: Typography.fontFamily,
-    fontSize: 18,
+    // fontSize set dynamically based on screen width
     fontWeight: Typography.fontWeight.bold,
     color: '#ff9800', // Orange for negative changes
     ...getTextShadowStyle(Shadows.text.medium),
@@ -235,9 +252,9 @@ const styles = StyleSheet.create({
   },
   explanationText: {
     fontFamily: Typography.fontFamily,
-    fontSize: 16,
+    // fontSize set dynamically based on screen width
     color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: Typography.lineHeight.relaxed,
+    lineHeight: Typography.lineHeight.relaxed * 16, // Base lineHeight for explanation
   },
 });

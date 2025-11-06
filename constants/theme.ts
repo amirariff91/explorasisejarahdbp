@@ -59,12 +59,39 @@ export const Fonts = {
   }),
 } as const;
 
-// Typography Scale (Refined for Figma alignment)
+// Typography Scale (Landscape-Only, Figma-Aligned)
 export const Typography = {
   // Font Family - Galindo is loaded via useAppFonts hook
   fontFamily: 'Galindo',
 
-  // Font Sizes (Landscape / Portrait) - Refined to match Figma
+  // Figma Reference Sizes (917×412 landscape)
+  figma: {
+    stateLabel: 32,    // State names (e.g., "PERLIS")
+    question: 20,      // Question text
+    answer: 16,        // Answer button text
+    gridCell: 8,       // Matching grid cells (TOO SMALL - needs increase)
+    clue: 10,          // Crossword clues (TOO SMALL - needs increase)
+  },
+
+  // Phone Sizes (667-844px width, landscape)
+  phone: {
+    stateLabel: 24,    // -25% from Figma (fits small screens)
+    question: 16,      // -20% from Figma
+    answer: 14,        // -12.5% from Figma
+    gridCell: 12,      // +50% from Figma (accessibility minimum!)
+    clue: 12,          // +20% from Figma (readable)
+  },
+
+  // Tablet Sizes (1024px+ width, landscape)
+  tablet: {
+    stateLabel: 32,    // Figma spec
+    question: 20,      // Figma spec
+    answer: 16,        // Figma spec
+    gridCell: 10,      // +25% from Figma (still readable)
+    clue: 12,          // +20% from Figma (improved readability)
+  },
+
+  // Legacy sizes (maintain backward compatibility for now)
   title: {
     landscape: 28,
     portrait: 24,
@@ -102,10 +129,10 @@ export const Typography = {
     portrait: 15,
   },
 
-  // Line Heights (Refined for better readability)
+  // Line Heights (Figma spec: 1.414 = √2 ratio)
   lineHeight: {
     tight: 1.2,
-    normal: 1.4,
+    normal: 1.414,     // Figma spec (was 1.4)
     relaxed: 1.5,
   },
 
@@ -233,6 +260,19 @@ export const getResponsiveFontSize = (
   isLandscape: boolean
 ): number => {
   return isLandscape ? fontSizeConfig.landscape : fontSizeConfig.portrait;
+};
+
+// New helper for landscape-optimized typography
+export const getLandscapeFontSize = (
+  type: keyof typeof Typography.phone,
+  screenWidth: number
+): number => {
+  // Phone: 667-999px
+  if (screenWidth < 1000) {
+    return Typography.phone[type];
+  }
+  // Tablet: 1000px+
+  return Typography.tablet[type];
 };
 
 export const getTextShadowStyle = (

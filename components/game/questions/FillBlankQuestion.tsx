@@ -1,6 +1,6 @@
 import LandscapeLayout from '@/components/game/LandscapeLayout';
-import { isLandscapeMode, QuestionBoard } from '@/constants/layout';
-import { Colors, getResponsiveFontSize, Typography } from '@/constants/theme';
+import { isLandscapeMode, QuestionBoard, TouchTargets } from '@/constants/layout';
+import { Colors, getLandscapeFontSize, Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
 import type { FillBlankQuestion as FBQuestion } from '@/types';
 import { playSound } from '@/utils/audio';
@@ -47,7 +47,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const handleSubmit = async () => {
     if (answer.trim()) {
       playSound('click');
-      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       onAnswer(answer);
     }
   };
@@ -69,7 +69,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
           <Text
             style={[
               styles.questionText,
-              { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
+              { fontSize: getLandscapeFontSize('question', width) },
             ]}
             numberOfLines={3}
             adjustsFontSizeToFit
@@ -91,8 +91,8 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
         style={[
           styles.inputContainer,
           {
-            width: isLandscape ? 300 : 250,
-            height: isLandscape ? 75 : 70,
+            width: width < 1000 ? 250 : 300,
+            height: width < 1000 ? 70 : 75,
           },
         ]}
         resizeMode="contain">
@@ -100,8 +100,8 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
           style={[
             styles.input,
             {
-              fontSize: getResponsiveFontSize(Typography.body, isLandscape),
-              paddingHorizontal: isLandscape ? 24 : 20,
+              fontSize: getLandscapeFontSize('answer', width),
+              paddingHorizontal: width < 1000 ? 20 : 24,
             },
           ]}
           value={answer}
@@ -120,16 +120,18 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
 
       {/* OK Button */}
       <Pressable
-        style={[
+        style={({ pressed }) => [
           styles.okButton,
           {
-            width: isLandscape ? 110 : 95,
-            height: isLandscape ? 80 : 70,
-            marginTop: isLandscape ? 28 : 24,
+            width: width < 1000 ? 95 : 110,
+            height: width < 1000 ? 70 : 80,
+            marginTop: width < 1000 ? 24 : 28,
+            transform: [{ scale: pressed && answer.trim() ? 0.92 : 1 }],
           },
         ]}
         onPress={handleSubmit}
         disabled={!answer.trim()}
+        hitSlop={TouchTargets.hitSlop}
         accessibilityRole="button"
         accessibilityLabel="Hantar jawapan"
         accessibilityState={{ disabled: !answer.trim() }}>

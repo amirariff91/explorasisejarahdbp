@@ -14,12 +14,12 @@ import { playSound } from '@/utils/audio';
 import {
   Colors,
   Typography,
-  getResponsiveFontSize,
+  getLandscapeFontSize,
   getComponentShadowStyle,
   Shadows,
   BorderRadius,
 } from '@/constants/theme';
-import { isLandscapeMode, ButtonSizes } from '@/constants/layout';
+import { ButtonSizes, TouchTargets } from '@/constants/layout';
 import { ASSETS } from '@/constants/assets';
 
 /**
@@ -38,8 +38,7 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
   const { clearStateAnswers, gameState, setAllowFontScaling } = useGameContext();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const isLandscape = isLandscapeMode(width);
-  const baseSize = isLandscape ? ButtonSizes.menu.landscape : ButtonSizes.menu.portrait;
+  const baseSize = width < 1000 ? ButtonSizes.menu.phone : ButtonSizes.menu.tablet;
   const sizeModifier = size === 'small' ? 0.7 : 1;
   const menuButtonSize = {
     width: baseSize.width * sizeModifier,
@@ -87,16 +86,18 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
     <>
       {/* Menu Button */}
       <Pressable
-        style={[
+        style={({ pressed }) => [
           styles.menuButton,
           {
             width: menuButtonSize.width,
             height: menuButtonSize.height,
             bottom: insets.bottom + 20, // Add safe area padding to prevent home indicator overlap
             left: Math.max(insets.left, 12), // Ensure spacing from left edge, even with notches
+            transform: [{ scale: pressed ? 0.92 : 1 }],
           },
         ]}
-        onPress={handleOpenMenu}>
+        onPress={handleOpenMenu}
+        hitSlop={TouchTargets.hitSlop}>
         <Image
           source={ASSETS.shared.buttons.menu.default}
           style={styles.menuButtonImage}
@@ -111,32 +112,56 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
             style={[
               styles.menuContainer,
               {
-                width: isLandscape ? '50%' : '80%',
-                paddingVertical: isLandscape ? 40 : 30,
+                width: width < 1000 ? '80%' : '50%',
+                paddingVertical: width < 1000 ? 30 : 40,
               },
             ]}>
             <Text
               style={[
                 styles.menuTitle,
-                { fontSize: getResponsiveFontSize(Typography.title, isLandscape) },
+                { fontSize: getLandscapeFontSize('question', width) },
               ]}
               allowFontScaling={gameState.allowFontScaling}>
               MENU
             </Text>
 
-          <Pressable style={styles.menuItem} onPress={handleResume}>
+          <Pressable 
+            style={({ pressed }) => [
+              styles.menuItem,
+              pressed && { transform: [{ scale: 0.96 }] }
+            ]} 
+            onPress={handleResume}
+            hitSlop={TouchTargets.hitSlop}>
             <Text style={styles.menuItemText} allowFontScaling={gameState.allowFontScaling}>Teruskan</Text>
           </Pressable>
 
-          <Pressable style={styles.menuItem} onPress={handleRestart}>
+          <Pressable 
+            style={({ pressed }) => [
+              styles.menuItem,
+              pressed && { transform: [{ scale: 0.96 }] }
+            ]} 
+            onPress={handleRestart}
+            hitSlop={TouchTargets.hitSlop}>
             <Text style={styles.menuItemText} allowFontScaling={gameState.allowFontScaling}>Ulang Semula</Text>
           </Pressable>
 
-          <Pressable style={styles.menuItem} onPress={handleQuit}>
+          <Pressable 
+            style={({ pressed }) => [
+              styles.menuItem,
+              pressed && { transform: [{ scale: 0.96 }] }
+            ]} 
+            onPress={handleQuit}
+            hitSlop={TouchTargets.hitSlop}>
             <Text style={styles.menuItemText} allowFontScaling={gameState.allowFontScaling}>Keluar ke Peta</Text>
           </Pressable>
 
-          <Pressable style={styles.menuItemSecondary} onPress={toggleTextScaling}>
+          <Pressable 
+            style={({ pressed }) => [
+              styles.menuItemSecondary,
+              pressed && { transform: [{ scale: 0.96 }] }
+            ]} 
+            onPress={toggleTextScaling}
+            hitSlop={TouchTargets.hitSlop}>
             <Text style={styles.menuItemSecondaryText} allowFontScaling={gameState.allowFontScaling}>
               Aksesibiliti: Teks Besar {gameState.allowFontScaling ? 'Hidup' : 'Mati'}
             </Text>

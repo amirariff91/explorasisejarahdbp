@@ -1,5 +1,5 @@
 import { ButtonSizes, EdgeMargins, isLandscapeMode, QuestionBoard, TouchTargets } from '@/constants/layout';
-import { Colors, getResponsiveFontSize, Opacity, Typography } from '@/constants/theme';
+import { Colors, getLandscapeFontSize, Opacity, Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
 import type { MatchingQuestion as MQQuestion } from '@/types';
 import { playSound } from '@/utils/audio';
@@ -63,7 +63,8 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     boardWidth = boardHeight * aspectRatio;
   }
 
-  const nextButtonSize = isLandscape ? ButtonSizes.next.landscape : ButtonSizes.next.portrait;
+  // Responsive button sizing (phone <1000px, tablet ≥1000px)
+  const nextButtonSize = width < 1000 ? ButtonSizes.next.phone : ButtonSizes.next.tablet;
 
   const handleToggleOption = async (option: string) => {
     playSound('click');
@@ -105,8 +106,8 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const buttonAspectRatio = 184 / 626; // jawapan-button.png aspect ratio
   const clampedButtonHeight = clampedButtonWidth * buttonAspectRatio;
 
-  // Font size scales with button size
-  const fontSize = Math.max(10, Math.floor(clampedButtonWidth / 14));
+  // Font size scales with button size (minimum 12px for accessibility)
+  const fontSize = Math.max(12, Math.floor(clampedButtonWidth / 14));
 
   return (
     <View style={styles.container}>
@@ -129,7 +130,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
             <Text
               style={[
                 styles.titleText,
-                { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
+                { fontSize: getLandscapeFontSize('question', width) },
               ]}
               numberOfLines={1}
               adjustsFontSizeToFit
@@ -140,7 +141,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
             <Text
               style={[
                 styles.questionText,
-                { fontSize: getResponsiveFontSize(Typography.bodySmall, isLandscape) },
+                { fontSize: getLandscapeFontSize('answer', width) },
               ]}
               numberOfLines={2}
               adjustsFontSizeToFit
@@ -160,11 +161,12 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
                     return (
                       <Pressable
                         key={col}
-                        style={[
+                        style={({ pressed }) => [
                           styles.gridCell,
                           {
                             width: clampedButtonWidth,
                             height: clampedButtonHeight,
+                            transform: [{ scale: pressed ? 0.92 : 1 }],
                           },
                           isSelected && styles.gridCellSelected,
                         ]}
@@ -208,11 +210,12 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
           },
         ]}>
           <Pressable
-            style={[
+            style={({ pressed }) => [
               styles.nextButton,
               {
                 width: nextButtonSize.width,
                 height: nextButtonSize.height,
+                transform: [{ scale: pressed ? 0.92 : 1 }],
               },
             ]}
             onPress={handleSubmit}

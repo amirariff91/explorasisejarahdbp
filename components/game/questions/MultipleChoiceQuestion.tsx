@@ -110,21 +110,21 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   ];
 
   const handleSelect = async (answer: string, index: number) => {
-    // Button press animation
-    buttonScales[index].value = withSpring(0.95, { damping: 15 });
+    // Button press animation (snappier, kid-friendly)
+    buttonScales[index].value = withSpring(0.92, { damping: 12 }); // More squish
     setTimeout(() => {
-      buttonScales[index].value = withSpring(1, { damping: 10 });
-    }, 100);
+      buttonScales[index].value = withSpring(1, { damping: 10, stiffness: 200 });
+    }, 80); // Faster release
 
-    playSound('click');
-    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    playSound('click', { volume: 0.5 }); // Softer for kids
+    await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); // Light feedback
     setSelectedAnswer(answer);
     setShowNext(true);
   };
 
   const handleNext = async () => {
     if (selectedAnswer) {
-      playSound('click');
+      playSound('click', { volume: 0.5 }); // Softer
       await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onAnswer(selectedAnswer);
     }

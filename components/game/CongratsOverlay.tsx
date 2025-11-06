@@ -11,8 +11,8 @@ import Animated, {
   withRepeat,
   withSequence,
 } from 'react-native-reanimated';
-import { Colors, Typography, getResponsiveFontSize, getTextShadowStyle, Shadows, getComponentShadowStyle } from '@/constants/theme';
-import { ButtonSizes, TouchTargets, UIElements, isLandscapeMode, Spacing } from '@/constants/layout';
+import { Colors, Typography, getLandscapeFontSize, getTextShadowStyle, Shadows, getComponentShadowStyle } from '@/constants/theme';
+import { ButtonSizes, TouchTargets, UIElements, Spacing } from '@/constants/layout';
 import type { CongratsOverlayProps } from '@/types';
 
 function useSparkleAnimation(visible: boolean, delay: number) {
@@ -60,7 +60,6 @@ function useSparkleAnimation(visible: boolean, delay: number) {
 const STAR_ASSET = ASSETS.shared.ui.star;
 const PANEL_ASSET = ASSETS.games.dbpSejarah.tahniahBg;
 const BUTTON_ASSET = ASSETS.games.dbpSejarah.buttonTeruskan.default;
-const FLARE_ASSET = ASSETS.shared.ui.flare;
 
 export default function CongratsOverlay({
   visible,
@@ -74,12 +73,10 @@ export default function CongratsOverlay({
   onRestart,
 }: CongratsOverlayProps) {
   const { width } = useWindowDimensions();
-  const isLandscape = isLandscapeMode(width);
 
   const starScale = useSharedValue(0);
   const contentOpacity = useSharedValue(0);
   const contentTranslateY = useSharedValue(40);
-  const flareScale = useSharedValue(0);
 
   useEffect(() => {
     if (visible) {
@@ -92,21 +89,12 @@ export default function CongratsOverlay({
       // Content fade & slide: Smooth entrance
       contentOpacity.value = withTiming(1, { duration: 400 }); // Slightly faster
       contentTranslateY.value = withSpring(0, { damping: 14, stiffness: 150 }); // Tighter spring
-      
-      // Flare: Delayed entrance for depth
-      flareScale.value = withDelay(100, withTiming(1, { duration: 600 })); // Subtle delay
     } else {
       starScale.value = 0;
       contentOpacity.value = 0;
       contentTranslateY.value = 40;
-      flareScale.value = 0;
     }
-  }, [visible, starScale, contentOpacity, contentTranslateY, flareScale]);
-
-  const flareAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: flareScale.value }],
-    opacity: flareScale.value * 0.8,
-  }));
+  }, [visible, starScale, contentOpacity, contentTranslateY]);
 
   const starGroupAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: Math.max(starScale.value, 0) }],
@@ -134,35 +122,35 @@ export default function CongratsOverlay({
 
   const sparkleSpots = useMemo(
     () =>
-      isLandscape
+      width < 1000
         ? [
-            { top: '18%', left: '18%', size: 10 },
-            { top: '24%', right: '14%', size: 12 },
-            { bottom: '22%', left: '12%', size: 8 },
-            { bottom: '18%', right: '20%', size: 9 },
-            { top: '28%', left: '50%', size: 11 },
-            { bottom: '12%', left: '50%', size: 10 },
-          ]
-        : [
             { top: '20%', left: '22%', size: 10 },
             { top: '26%', right: '18%', size: 12 },
             { bottom: '28%', left: '18%', size: 9 },
             { bottom: '20%', right: '22%', size: 8 },
             { top: '34%', left: '50%', size: 11 },
             { bottom: '14%', left: '48%', size: 10 },
+          ]
+        : [
+            { top: '18%', left: '18%', size: 10 },
+            { top: '24%', right: '14%', size: 12 },
+            { bottom: '22%', left: '12%', size: 8 },
+            { bottom: '18%', right: '20%', size: 9 },
+            { top: '28%', left: '50%', size: 11 },
+            { bottom: '12%', left: '50%', size: 10 },
           ],
-    [isLandscape]
+    [width]
   );
 
-  const starDimensions = isLandscape
-    ? UIElements.successModal.star.landscape
-    : UIElements.successModal.star.portrait;
-  const panelDimensions = isLandscape
-    ? UIElements.successModal.tahniahBg.landscape
-    : UIElements.successModal.tahniahBg.portrait;
-  const buttonDimensions = isLandscape
-    ? ButtonSizes.successAction.landscape
-    : ButtonSizes.successAction.portrait;
+  const starDimensions = width < 1000
+    ? UIElements.successModal.star.portrait
+    : UIElements.successModal.star.landscape;
+  const panelDimensions = width < 1000
+    ? UIElements.successModal.tahniahBg.portrait
+    : UIElements.successModal.tahniahBg.landscape;
+  const buttonDimensions = width < 1000
+    ? ButtonSizes.successAction.portrait
+    : ButtonSizes.successAction.landscape;
 
   const clampedStars = Math.max(1, Math.min(3, Math.round(stars)));
 
@@ -184,10 +172,6 @@ export default function CongratsOverlay({
 
   return (
     <View style={styles.overlay} pointerEvents="auto">
-      <Animated.View style={[styles.flareContainer, flareAnimatedStyle]} pointerEvents="none">
-        <Image source={FLARE_ASSET} style={styles.flare} contentFit="contain" />
-      </Animated.View>
-
       {sparkleSpots.map((spot, index) => {
         const { size, ...position } = spot;
         return (
@@ -211,7 +195,7 @@ export default function CongratsOverlay({
         );
       })}
 
-      <Animated.View style={[styles.panelWrapper, { paddingTop: isLandscape ? 80 : 100 }, contentAnimatedStyle]}>
+      <Animated.View style={[styles.panelWrapper, { paddingTop: width < 1000 ? 100 : 80 }, contentAnimatedStyle]}>
         <Image
           source={PANEL_ASSET}
           style={[
@@ -274,7 +258,7 @@ export default function CongratsOverlay({
           <Text
             style={[
               styles.title,
-              { fontSize: getResponsiveFontSize(Typography.title, isLandscape) + 6 },
+              { fontSize: getLandscapeFontSize('stateLabel', width) },
             ]}
             allowFontScaling={allowFontScaling}
           >
@@ -293,7 +277,7 @@ export default function CongratsOverlay({
               <Text
                 style={[
                   styles.buttonText,
-                  { fontSize: getResponsiveFontSize(Typography.button, isLandscape) },
+                  { fontSize: getLandscapeFontSize('answer', width) },
                 ]}
                 allowFontScaling={allowFontScaling}
                 numberOfLines={1}
@@ -314,7 +298,7 @@ export default function CongratsOverlay({
                 style={[
                   styles.buttonText,
                   styles.secondaryButtonText,
-                  { fontSize: getResponsiveFontSize(Typography.button, isLandscape) },
+                  { fontSize: getLandscapeFontSize('answer', width) },
                 ]}
                 allowFontScaling={allowFontScaling}
                 numberOfLines={1}
@@ -418,14 +402,6 @@ const styles = StyleSheet.create({
     zIndex: 3,
   },
   star: {},
-  flareContainer: {
-    position: 'absolute',
-    zIndex: 1,
-  },
-  flare: {
-    width: UIElements.successModal.flare.width,
-    height: UIElements.successModal.flare.height,
-  },
   sparkle: {
     position: 'absolute',
     shadowColor: Colors.gold,
