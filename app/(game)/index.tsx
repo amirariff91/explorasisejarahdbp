@@ -33,12 +33,28 @@ export default function Homepage() {
   const buttonWidth = Math.min(width * 0.22, 120);
   const buttonHeight = buttonWidth * 0.77; // Maintain aspect ratio
 
-  // Play welcome background music and ambient on mount
+  // Play welcome background music and ambient on mount with synchronized SFX
   useEffect(() => {
-    playMusic('bgm-map', true, 3000); // Gentle 3s fade-in for welcoming feel
-    playAmbient('ambient-map', 0.1); // Very subtle tropical ambience (10% volume)
+    // Logo reveal sound when component mounts
+    const logoTimer = setTimeout(() => {
+      playSound('logo-reveal'); // Magical whoosh for logo appearance
+    }, 500);
+
+    // Title drop sound when title appears
+    const titleTimer = setTimeout(() => {
+      playSound('title-drop'); // Resonant gong for majestic title reveal
+    }, 1500);
+
+    // Background music starts with fade-in
+    const bgmTimer = setTimeout(() => {
+      playMusic('bgm-title', true, 3000); // Dedicated title theme with 3s fade-in
+      playAmbient('ambient-map', 0.1); // Very subtle tropical ambience (10% volume)
+    }, 2000); // Delay music slightly to let SFX shine
 
     return () => {
+      clearTimeout(logoTimer);
+      clearTimeout(titleTimer);
+      clearTimeout(bgmTimer);
       stopMusic(1500); // Smooth 1.5s fade-out when leaving
       stopAllAmbient();
     };
@@ -97,6 +113,7 @@ export default function Homepage() {
                 lineHeight: Math.max(titleFontSize * 1.12, titleFontSize + 16),
               },
             ]}
+            allowFontScaling={false}
           >
             EXPLORASI{"\n"}SEJARAH
           </Text>

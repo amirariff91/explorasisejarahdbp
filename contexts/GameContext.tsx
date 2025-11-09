@@ -113,7 +113,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
       }
       setSaveError(null); // Clear any previous errors
     } catch (error) {
-      console.error('Failed to load progress:', error);
+      if (__DEV__) {
+        console.error('Failed to load progress:', error);
+      }
       setSaveError('Gagal memuatkan data. Menggunakan data lalai.');
       // Continue with default state - don't block the app
     } finally {
@@ -141,7 +143,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
       await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(progress));
       setSaveError(null); // Clear any previous errors on successful save
     } catch (error) {
-      console.error('Failed to save progress:', error);
+      if (__DEV__) {
+        console.error('Failed to save progress:', error);
+      }
 
       // Retry logic: attempt up to 2 retries with exponential backoff
       if (retryCount < 2) {

@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   buttons: {
     width: '100%',
     alignItems: 'center',
-    gap: Spacing.lg,
+    gap: Spacing.xxl, // 24px - increased from lg (16px) to prevent accidental taps
     marginTop: Spacing.md,
   },
   button: {

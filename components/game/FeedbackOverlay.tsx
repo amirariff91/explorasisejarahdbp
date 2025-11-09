@@ -144,7 +144,7 @@ export default function FeedbackOverlay({
               { fontSize: feedbackTextSize },
               isCorrect ? styles.feedbackTextCorrect : styles.feedbackTextWrong,
             ]}>
-            {isCorrect ? 'BETUL!' : 'SALAH'}
+            {isCorrect ? 'BETUL!' : 'CUBA LAGI!'}
           </Text>
 
           {/* Resource Changes (Money & Health) */}

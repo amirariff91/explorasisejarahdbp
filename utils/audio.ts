@@ -16,7 +16,7 @@ export type FeedbackSound =
   | 'wrong-1' | 'wrong-2'
   | 'encourage-1' | 'encourage-2' | 'encourage-3';
 
-export type UISound = 'click' | 'star' | 'transition';
+export type UISound = 'click' | 'star' | 'transition' | 'logo-reveal' | 'title-drop';
 
 export type VoiceNarration = 
   | 'selamat-datang'
@@ -24,7 +24,7 @@ export type VoiceNarration =
   | 'voice-welcome' | 'voice-select-state' | 'voice-good-luck' 
   | 'voice-try-again' | 'voice-perfect-score';
 
-export type MusicSound = 'bgm-map' | 'bgm-quiz' | 'bgm-success' | 'bgm-tutorial';
+export type MusicSound = 'bgm-title' | 'bgm-map' | 'bgm-quiz' | 'bgm-success' | 'bgm-tutorial';
 
 export type AmbientSound = 'ambient-map' | 'ambient-quiz-soft' | 'ambient-celebration';
 
@@ -54,6 +54,8 @@ const SOUNDS: Record<SoundType, AudioSource> = {
   'click': require('@/assets/audio/ui/click.mp3'),
   'star': require('@/assets/audio/ui/star.mp3'),
   'transition': require('@/assets/audio/ui/transition.mp3'),
+  'logo-reveal': require('@/assets/audio/ui/logo-reveal.mp3'),
+  'title-drop': require('@/assets/audio/ui/title-drop.mp3'),
 
   // Voice narration
   'selamat-datang': require('@/assets/audio/tutorial/selamat-datang.mp3'),
@@ -68,6 +70,7 @@ const SOUNDS: Record<SoundType, AudioSource> = {
 
 // Background music asset map
 const MUSIC: Record<MusicSound, AudioSource> = {
+  'bgm-title': require('@/assets/audio/music/bgm-title.mp3'),
   'bgm-map': require('@/assets/audio/music/bgm-map.mp3'),
   'bgm-quiz': require('@/assets/audio/music/bgm-quiz.mp3'),
   'bgm-success': require('@/assets/audio/music/bgm-success.mp3'),

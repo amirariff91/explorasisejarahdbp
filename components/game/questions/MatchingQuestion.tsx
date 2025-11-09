@@ -38,19 +38,20 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     boardPaddingTop: 25,
     boardPaddingBottom: 15,
     boardPaddingHorizontal: 30,
-    questionAreaHeight: 90,
-    gridAreaTop: 15,
-    gridContainer: { gap: 20 },
+    questionAreaHeight: 140, // Increased from 90 for longer text
+    gridAreaTop: 12, // Reduced from 15 to compensate
+    gridContainer: { gap: 16 }, // Reduced from 20 for better spacing
     gridRow: { gap: 16 },
     footerContainer: { marginBottom: 30, marginRight: 30 },
   };
 
-  const baseBoardSize = isLandscape
-    ? QuestionBoard.compact.landscape
-    : QuestionBoard.compact.portrait;
+  // Responsive board sizing - phone vs tablet (1000px breakpoint)
+  const baseBoardSize = width < 1000
+    ? QuestionBoard.compact.landscape    // Phone: 420×280
+    : { width: 560, height: 373 };       // Tablet: 560×373 (33% larger)
 
-  // Responsive board sizing - Allow board to reach its base dimensions (290×200)
-  const maxBoardWidth = width * 0.80;  // Adequate for compact board
+  // Responsive board sizing - Allow board to reach its base dimensions
+  const maxBoardWidth = width * (width < 1000 ? 0.80 : 0.85);  // 80% phone, 85% tablet
   const maxBoardHeight = height * 0.85; // Allow adequate height for larger screens
   const aspectRatio = baseBoardSize.width / baseBoardSize.height;
 
@@ -99,15 +100,15 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   // Increase button size by 10%
   const buttonWidth = baseButtonWidth * 1.1;
 
-  // Clamp button width with min/max bounds
-  const clampedButtonWidth = Math.max(120, Math.min(buttonWidth, 240));
+  // Clamp button width with min/max bounds (min increased for better text display)
+  const clampedButtonWidth = Math.max(160, Math.min(buttonWidth, 260));
 
   // Calculate height based on jawapan-button aspect ratio
   const buttonAspectRatio = 184 / 626; // jawapan-button.png aspect ratio
   const clampedButtonHeight = clampedButtonWidth * buttonAspectRatio;
 
-  // Font size scales with button size (minimum 12px for accessibility)
-  const fontSize = Math.max(12, Math.floor(clampedButtonWidth / 14));
+  // Font size scales with button size (minimum 14px for WCAG accessibility)
+  const fontSize = Math.max(14, Math.floor(clampedButtonWidth / 14));
 
   return (
     <View style={styles.container}>
@@ -132,7 +133,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
                 styles.titleText,
                 { fontSize: getLandscapeFontSize('question', width) },
               ]}
-              numberOfLines={1}
+              numberOfLines={2}
               adjustsFontSizeToFit
               minimumFontScale={0.85}
               allowFontScaling={allowScaling}>
@@ -143,7 +144,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
                 styles.questionText,
                 { fontSize: getLandscapeFontSize('answer', width) },
               ]}
-              numberOfLines={2}
+              numberOfLines={3}
               adjustsFontSizeToFit
               minimumFontScale={0.85}
               allowFontScaling={allowScaling}>
@@ -182,7 +183,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
                           resizeMode="stretch">
                           <Text
                             style={[styles.gridCellText, { fontSize }]}
-                            numberOfLines={2}
+                            numberOfLines={3}
                             adjustsFontSizeToFit
                             minimumFontScale={0.85}
                             allowFontScaling={allowScaling}>

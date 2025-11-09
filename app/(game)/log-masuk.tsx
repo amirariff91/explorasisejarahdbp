@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
 
   // Panel
   panel: {
-    backgroundColor: '#1E8EEA',
+    backgroundColor: Colors.loginPanel,
     borderRadius: BorderRadius.large,
     padding: 32,
     ...Shadows.component.medium,

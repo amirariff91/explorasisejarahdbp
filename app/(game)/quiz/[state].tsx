@@ -4,7 +4,7 @@ import type { AnswerValue, MalaysianState, Question } from '@/types';
 import { playAmbient, playMusic, playSound, stopAllAmbient, stopMusic } from '@/utils/audio';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, BackHandler, ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
 import { ASSETS } from '@/constants/assets';
 
 // Question Components
@@ -129,6 +129,33 @@ export default function QuizScreen() {
     };
   }, []);
 
+  // Handle back button press with confirmation (prevent accidental exit)
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Don't show confirmation if success modal is visible (quiz completed)
+      if (showSuccessModal) return false;
+
+      Alert.alert(
+        'Keluar dari Kuiz?',
+        'Anda pasti mahu keluar? Kemajuan akan disimpan.',
+        [
+          {
+            text: 'Batal',
+            style: 'cancel',
+          },
+          {
+            text: 'Keluar',
+            style: 'destructive',
+            onPress: () => router.back(),
+          },
+        ]
+      );
+      return true; // Prevent default back behavior
+    });
+
+    return () => backHandler.remove();
+  }, [showSuccessModal, router]);
+
   // Switch to success music when modal shows
   useEffect(() => {
     if (showSuccessModal) {
@@ -164,7 +191,9 @@ export default function QuizScreen() {
   // Guard against undefined question (safety check)
   const currentQuestion = questions[currentQuestionIndex];
   if (!currentQuestion) {
-    console.error(`Question index ${currentQuestionIndex} out of bounds for state ${state}`);
+    if (__DEV__) {
+      console.error(`Question index ${currentQuestionIndex} out of bounds for state ${state}`);
+    }
     return (
       <View style={styles.container}>
         <Text>Error: Invalid question. Please restart.</Text>
