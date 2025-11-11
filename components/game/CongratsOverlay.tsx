@@ -11,8 +11,8 @@ import Animated, {
   withRepeat,
   withSequence,
 } from 'react-native-reanimated';
-import { Colors, Typography, getLandscapeFontSize, getTextShadowStyle, Shadows, getComponentShadowStyle } from '@/constants/theme';
-import { ButtonSizes, TouchTargets, UIElements, Spacing } from '@/constants/layout';
+import { Colors, Typography, getResponsiveFontSize, getTextShadowStyle, Shadows, getComponentShadowStyle } from '@/constants/theme';
+import { ButtonSizes, TouchTargets, UIElements, Spacing, getResponsiveSizeScaled, getDeviceSize } from '@/constants/layout';
 import type { CongratsOverlayProps } from '@/types';
 
 function useSparkleAnimation(visible: boolean, delay: number) {
@@ -142,15 +142,19 @@ export default function CongratsOverlay({
     [width]
   );
 
-  const starDimensions = width < 1000
-    ? UIElements.successModal.star.portrait
-    : UIElements.successModal.star.landscape;
-  const panelDimensions = width < 1000
-    ? UIElements.successModal.tahniahBg.portrait
-    : UIElements.successModal.tahniahBg.landscape;
-  const buttonDimensions = width < 1000
-    ? ButtonSizes.successAction.portrait
-    : ButtonSizes.successAction.landscape;
+  // Use responsive scaling for success modal elements (4-tier system)
+  const starDimensions = {
+    width: getResponsiveSizeScaled(UIElements.successModal.star.portrait.width, width),
+    height: getResponsiveSizeScaled(UIElements.successModal.star.portrait.height, width),
+  };
+  const panelDimensions = {
+    width: getResponsiveSizeScaled(UIElements.successModal.tahniahBg.portrait.width, width),
+    height: getResponsiveSizeScaled(UIElements.successModal.tahniahBg.portrait.height, width),
+  };
+  const buttonDimensions = {
+    width: getResponsiveSizeScaled(ButtonSizes.successAction.portrait.width, width),
+    height: getResponsiveSizeScaled(ButtonSizes.successAction.portrait.height, width),
+  };
 
   const clampedStars = Math.max(1, Math.min(3, Math.round(stars)));
 
@@ -195,7 +199,7 @@ export default function CongratsOverlay({
         );
       })}
 
-      <Animated.View style={[styles.panelWrapper, { paddingTop: width < 1000 ? 100 : 80 }, contentAnimatedStyle]}>
+      <Animated.View style={[styles.panelWrapper, { paddingTop: getResponsiveSizeScaled(100, width) }, contentAnimatedStyle]}>
         <Image
           source={PANEL_ASSET}
           style={[
@@ -206,59 +210,11 @@ export default function CongratsOverlay({
           pointerEvents="none"
         />
 
-        <Animated.View style={[styles.starGroup, starGroupAnimatedStyle]} pointerEvents="none">
-          {clampedStars >= 2 && (
-            <Image
-              key="star-left"
-              source={STAR_ASSET}
-              style={[
-                styles.star,
-                {
-                  width: starDimensions.width * 0.85,
-                  height: starDimensions.height * 0.85,
-                  transform: [{ rotate: '-8deg' }, { scale: 0.85 }],
-                },
-              ]}
-              contentFit="contain"
-            />
-          )}
-
-          <Image
-            key="star-center"
-            source={STAR_ASSET}
-            style={[
-              styles.star,
-              {
-                width: starDimensions.width,
-                height: starDimensions.height,
-                marginHorizontal: Spacing.md,
-              },
-            ]}
-            contentFit="contain"
-          />
-
-          {clampedStars >= 3 && (
-            <Image
-              key="star-right"
-              source={STAR_ASSET}
-              style={[
-                styles.star,
-                {
-                  width: starDimensions.width * 0.85,
-                  height: starDimensions.height * 0.85,
-                  transform: [{ rotate: '8deg' }, { scale: 0.85 }],
-                },
-              ]}
-              contentFit="contain"
-            />
-          )}
-        </Animated.View>
-
         <View style={styles.content}>
           <Text
             style={[
               styles.title,
-              { fontSize: getLandscapeFontSize('stateLabel', width) },
+              { fontSize: getResponsiveFontSize('stateLabel', width) },
             ]}
             allowFontScaling={allowFontScaling}
           >
@@ -277,7 +233,7 @@ export default function CongratsOverlay({
               <Text
                 style={[
                   styles.buttonText,
-                  { fontSize: getLandscapeFontSize('answer', width) },
+                  { fontSize: getResponsiveFontSize('answer', width) },
                 ]}
                 allowFontScaling={allowFontScaling}
                 numberOfLines={1}
@@ -298,7 +254,7 @@ export default function CongratsOverlay({
                 style={[
                   styles.buttonText,
                   styles.secondaryButtonText,
-                  { fontSize: getLandscapeFontSize('answer', width) },
+                  { fontSize: getResponsiveFontSize('answer', width) },
                 ]}
                 allowFontScaling={allowFontScaling}
                 numberOfLines={1}

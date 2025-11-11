@@ -2,10 +2,11 @@ import {
     BorderRadius,
     Colors,
     getTextShadowStyle,
-    getLandscapeFontSize,
+    getResponsiveFontSize,
     Shadows,
     Typography,
 } from '@/constants/theme';
+import { getResponsiveSizeScaled } from '@/constants/layout';
 import { playRandomFeedback } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
 import { useEffect } from 'react';
@@ -46,11 +47,11 @@ export default function FeedbackOverlay({
 }: FeedbackOverlayProps) {
   const { width } = useWindowDimensions();
   
-  // Responsive sizing
-  const iconSize = width < 1000 ? 60 : 80; // Smaller on phone
-  const feedbackTextSize = getLandscapeFontSize('question', width); // 16px phone / 20px tablet
-  const changeTextSize = getLandscapeFontSize('answer', width); // 14px phone / 16px tablet
-  const explanationTextSize = getLandscapeFontSize('answer', width);
+  // Responsive sizing (4-tier system)
+  const iconSize = getResponsiveSizeScaled(60, width); // Auto-scales across device tiers
+  const feedbackTextSize = getResponsiveFontSize('question', width); // 16px phone → 24px tablet-lg
+  const changeTextSize = getResponsiveFontSize('answer', width); // 14px phone → 18px tablet-lg
+  const explanationTextSize = getResponsiveFontSize('answer', width);
   
   // Animation values
   const scale = useSharedValue(0);

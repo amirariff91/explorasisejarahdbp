@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 400 400">
+  <!-- Generator: Adobe Illustrator 29.0.1, SVG Export Plug-In . SVG Version: 2.1.0 Build 192)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: url(#radial-gradient1);
+      }
+
+      .st0, .st1 {
+        fill-rule: evenodd;
+      }
+
+      .st2 {
+        opacity: .2;
+      }
+
+      .st2, .st3, .st4 {
+        mix-blend-mode: multiply;
+      }
+
+      .st2, .st5 {
+        fill: #444671;
+      }
+
+      .st1, .st6, .st7, .st8 {
+        fill: #cff6ff;
+      }
+
+      .st6 {
+        opacity: .5;
+      }
+
+      .st3 {
+        fill: #5b468c;
+        opacity: .7;
+      }
+
+      .st9 {
+        fill: url(#radial-gradient);
+      }
+
+      .st10 {
+        fill: #2e3049;
+      }
+
+      .st11 {
+        fill: url(#radial-gradient5);
+      }
+
+      .st12 {
+        isolation: isolate;
+      }
+
+      .st4 {
+        fill: #892334;
+        opacity: .6;
+      }
+
+      .st13 {
+        fill: url(#radial-gradient2);
+      }
+
+      .st14 {
+        fill: url(#radial-gradient4);
+      }
+
+      .st8 {
+        opacity: .8;
+      }
+
+      .st15 {
+        fill: url(#radial-gradient3);
+      }
+    </style>
+    <radialGradient id="radial-gradient" cx="209.42" cy="175.09" fx="209.42" fy="175.09" r="159.94" gradientTransform="translate(-3.42 -1.88) rotate(-1.81)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8ea3ad"/>
+      <stop offset="1" stop-color="#56668a"/>
+    </radialGradient>
+    <radialGradient id="radial-gradient1" cx="432.71" cy="184.65" fx="432.71" fy="184.65" r="22.93" gradientTransform="translate(-3.42 -1.88) rotate(-1.81)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#abd9d9"/>
+      <stop offset="1" stop-color="#97bfbf"/>
+    </radialGradient>
+    <radialGradient id="radial-gradient2" cx="386.38" cy="265.5" fx="386.38" fy="265.5" r="16.84" gradientTransform="translate(-19.58 .82) rotate(-9.92)" xlink:href="#radial-gradient1"/>
+    <radialGradient id="radial-gradient3" cx="387.59" cy="278.85" fx="387.59" fy="278.85" r="20.69" gradientTransform="translate(-19.58 .82) rotate(-9.92)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#a6bec9"/>
+      <stop offset="1" stop-color="#50628a"/>
+    </radialGradient>
+    <radialGradient id="radial-gradient4" cx="39.17" cy="169.67" fx="39.17" fy="169.67" r="16.83" gradientTransform="translate(25.18 36.2) rotate(15.41)" xlink:href="#radial-gradient1"/>
+    <radialGradient id="radial-gradient5" cx="40.38" cy="183.03" fx="40.38" fy="183.03" r="20.69" gradientTransform="translate(25.18 36.2) rotate(15.41)" xlink:href="#radial-gradient3"/>
+  </defs>
+  <g class="st12">
+    <g id="Layer_1">
+      <g>
+        <g>
+          <path class="st4" d="M213.37,189.63l-237.64,7.94c-4.65,5.49-7.02,8.3-11.67,13.78l7.39,55.77,15.4,16.12,266.81-5.82,177.51-9.2c4.44-4.7,7.07-7.48,11.52-12.18l1.8-55.97c-6.6-6.65-10.11-10.17-16.71-16.82l-214.42,6.39Z"/>
+          <path class="st9" d="M215.07,181.38l-239.84,8c-4.69,5.49-7.09,8.3-11.78,13.79l7.58,55.76,15.66,16.11,268.98-5.89,179.1-9.25c4.49-4.7,7.14-7.48,11.63-12.19l1.94-55.98c-6.66-6.64-10.2-10.17-16.86-16.81l-216.41,6.45Z"/>
+          <polygon class="st0" points="-24.77 189.39 -6.38 183.67 200.29 177.77 417.65 169.91 431.48 174.93 -24.77 189.39"/>
+          <polygon class="st1" points="335.9 177.91 431.48 174.93 448.34 191.74 430.38 178.93 335.9 177.91"/>
+          <polygon class="st1" points="98.77 185.58 202.5 185.91 292.23 179.28 204.01 180.15 98.77 185.58"/>
+        </g>
+        <g>
+          <path class="st6" d="M346.53,227.7c10.22-.07,47.39-2.61,74.25-6.56-24.86,4.83-39.28,6.43-39.28,6.43l-34.98.12Z"/>
+          <path class="st3" d="M346.53,227.7c10.22-.07,47.39-2.61,74.25-6.56-20.89,1.9-38.86,3.15-38.86,3.15l-35.4,3.4Z"/>
+        </g>
+        <g>
+          <path class="st3" d="M431.33,228.01c-7.44,12.34-17.74,18.61-31.39,15.07l-9.35-8.49-3.57-12.4c4.92-14.97,17.31-21.54,31.93-16.89l10.28,9.51,2.09,13.2Z"/>
+          <path class="st13" d="M389.24,217.56s2.84-9.16,6.66-13.22c4.16-4.43,23.58-14.81,33.63,6.18-9.17-5.8-31.15-10.03-40.29,7.05Z"/>
+          <path class="st15" d="M431.53,223.11c-7.1,11.78-16.93,17.76-29.96,14.39l-8.92-8.1-3.41-11.84c4.69-14.28,16.52-20.56,30.48-16.12l9.81,9.08,2,12.6Z"/>
+          <path class="st2" d="M431.53,223.11l-.42-2.62c-18.28,13.24-36.3,3.63-41.11-4.98-.27.67-.53,1.34-.77,2.05l3.41,11.84,8.92,8.1c13.03,3.37,22.86-2.61,29.96-14.39Z"/>
+          <g>
+            <polygon class="st10" points="409.01 214.56 398.55 207.12 396.15 211.68 406.38 218.22 412.13 221.89 423.56 229.2 425.2 226.07 415.17 218.94 409.01 214.56"/>
+            <polygon class="st5" points="410.9 216.93 400.44 209.49 398.42 213.11 423.56 229.2 424.79 226.78 417.06 221.31 410.9 216.93"/>
+            <polygon class="st8" points="398.17 212.97 406.36 218.22 416.82 224.91 404.98 218.11 398.17 212.97"/>
+          </g>
+          <path class="st7" d="M412.14,200.05c1.99,0,6.65.86,7.6,1.2,1.9,1.48,2.57,2.54,3.97,3.87-4.33-2.32-6.51-3.39-11.57-5.08Z"/>
+        </g>
+        <g>
+          <path class="st3" d="M26.28,249.86c-12,7.97-24,9.23-34.82.2l-4.82-11.67,2.08-12.74c10.85-11.42,24.86-12.06,36.09-1.61l5.22,12.99-3.76,12.83Z"/>
+          <path class="st14" d="M-7.28,222.4s6.49-7.06,11.68-9.1c5.65-2.22,27.65-3.3,27.75,19.97-5.81-9.16-23.86-22.4-39.43-10.87Z"/>
+          <path class="st11" d="M28.56,245.51c-11.46,7.61-22.9,8.81-33.24.19l-4.6-11.14,1.99-12.16c10.36-10.9,23.73-11.51,34.45-1.53l4.98,12.4-3.58,12.24Z"/>
+          <path class="st2" d="M28.56,245.51l.75-2.55c-22.18,4.14-34.36-12.25-35.02-22.09-.53.49-1.06.99-1.57,1.53l-1.99,12.16,4.6,11.14c10.33,8.62,21.78,7.42,33.23-.19Z"/>
+          <g>
+            <polygon class="st10" points="24.87 236.05 23.24 229.87 14.74 230.66 14.02 221.39 6.4 222.62 7.97 231.29 .59 231.98 1.71 236.22 8.85 236.17 10.61 245.86 15.84 245.01 15.16 236.12 24.87 236.05"/>
+            <polygon class="st5" points="13.64 232.89 12.92 223.62 6.76 224.54 7.97 231.29 6.87 233.52 1.06 233.99 1.71 236.22 8.85 236.17 10.61 245.86 14.62 245.18 14.06 238.35 15.16 236.12 23.02 236.05 22.15 232.09 13.64 232.89"/>
+          </g>
+          <path class="st7" d="M20.91,216.38c1.8.85,5.64,3.62,6.36,4.34,1.09,2.15,1.23,3.39,1.93,5.2-2.92-3.95-4.44-5.85-8.28-9.54Z"/>
+          <polygon class="st8" points="1.71 236.22 8.85 236.17 9.79 241.6 8.32 236.84 1.71 236.22"/>
+        </g>
+        <g>
+          <path class="st3" d="M41.59,208.66c-1.66-2.28-8.82-6.39-15.08-5.44,6.38-3.05,9.48-2.61,9.48-2.61l5.6,8.05Z"/>
+          <path class="st6" d="M41.59,208.66c-1.66-2.28-8.82-6.39-15.08-5.44,4.27,1.44,7.75,3.36,7.75,3.36l7.33,2.08Z"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

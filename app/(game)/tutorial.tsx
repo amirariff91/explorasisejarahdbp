@@ -1,4 +1,4 @@
-import { Spacing } from "@/constants/layout";
+import { Spacing, isLandscapeMode, getQuestionBoardSize, getResponsiveSizeScaled } from "@/constants/layout";
 import { Colors } from "@/constants/theme";
 import { ASSETS, ASSET_PRELOAD_CONFIG } from "@/constants/assets";
 import { useGameContext } from "@/contexts/GameContext";
@@ -26,7 +26,7 @@ export default function TutorialScreen() {
   const { width } = useWindowDimensions();
   const { markTutorialComplete } = useGameContext();
   const [currentStep, setCurrentStep] = useState(0);
-  const isLandscape = width >= 800; // Landscape mode threshold (800px standardized breakpoint)
+  const isLandscape = isLandscapeMode(width); // Use standardized landscape detection
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
   const [isPreloading, setIsPreloading] = useState(false);
@@ -105,10 +105,7 @@ export default function TutorialScreen() {
             source={ASSETS.shared.backgrounds.board}
             style={[
               styles.descriptionBoard,
-              {
-                width: isLandscape ? 600 : 460,
-                height: isLandscape ? 300 : 280,
-              },
+              getQuestionBoardSize('description', width),
             ]}
             resizeMode="contain"
           >
@@ -116,7 +113,7 @@ export default function TutorialScreen() {
               <Text
                 style={[
                   styles.description,
-                  { fontSize: isLandscape ? 18 : 17 },
+                  { fontSize: getResponsiveSizeScaled(17, width) },
                 ]}
                 numberOfLines={9}
                 adjustsFontSizeToFit
@@ -135,8 +132,8 @@ export default function TutorialScreen() {
             style={[
               styles.nextButton,
               {
-                width: isLandscape ? 130 : 115,
-                height: isLandscape ? 90 : 80,
+                width: getResponsiveSizeScaled(115, width),
+                height: getResponsiveSizeScaled(80, width),
               },
             ]}
             onPress={handleNext}

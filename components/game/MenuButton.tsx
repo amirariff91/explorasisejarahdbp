@@ -14,12 +14,12 @@ import { playSound } from '@/utils/audio';
 import {
   Colors,
   Typography,
-  getLandscapeFontSize,
+  getResponsiveFontSize,
   getComponentShadowStyle,
   Shadows,
   BorderRadius,
 } from '@/constants/theme';
-import { ButtonSizes, TouchTargets } from '@/constants/layout';
+import { ButtonSizes, TouchTargets, getResponsiveSizeScaled } from '@/constants/layout';
 import { ASSETS } from '@/constants/assets';
 
 /**
@@ -38,7 +38,11 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
   const { clearStateAnswers, gameState, setAllowFontScaling } = useGameContext();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
-  const baseSize = width < 1000 ? ButtonSizes.menu.phone : ButtonSizes.menu.tablet;
+  // Use responsive button sizing (4-tier system)
+  const baseSize = {
+    width: getResponsiveSizeScaled(ButtonSizes.menu.phone.width, width),
+    height: getResponsiveSizeScaled(ButtonSizes.menu.phone.height, width),
+  };
   const sizeModifier = size === 'small' ? 0.7 : 1;
   const menuButtonSize = {
     width: baseSize.width * sizeModifier,
@@ -112,14 +116,14 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
             style={[
               styles.menuContainer,
               {
-                width: width < 1000 ? '80%' : '50%',
-                paddingVertical: width < 1000 ? 30 : 40,
+                width: width < 1000 ? '80%' : '50%', // Width as percentage is fine
+                paddingVertical: getResponsiveSizeScaled(30, width),
               },
             ]}>
             <Text
               style={[
                 styles.menuTitle,
-                { fontSize: getLandscapeFontSize('question', width) },
+                { fontSize: getResponsiveFontSize('question', width) },
               ]}
               allowFontScaling={gameState.allowFontScaling}>
               MENU

@@ -3,7 +3,8 @@ import {
   EdgeMargins,
   getQuestionOffsets,
   isLandscapeMode,
-  QuestionBoard,
+  QuestionBoardBase,
+  getQuestionBoardSize,
   TouchTargets,
 } from '@/constants/layout';
 import {
@@ -62,16 +63,15 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
     optionRow: { gap: number };
     footerContainer: { marginBottom: number; marginRight: number };
   };
-  const baseBoardSize = isLandscape
-    ? QuestionBoard.singleBoardMC.landscape
-    : QuestionBoard.singleBoardMC.portrait;
+  // Use new responsive board sizing system (auto-scales by device tier)
+  const boardSize = getQuestionBoardSize('singleBoardMC', width);
 
   // Responsive board sizing - Allow board to reach its base dimensions
-  const maxBoardWidth = width * 0.90;  // Increased to allow base size (350px)
-  const maxBoardHeight = height * 0.88; // Allow adequate height for longer questions
-  const aspectRatio = baseBoardSize.width / baseBoardSize.height;
+  const maxBoardWidth = width * 0.90;
+  const maxBoardHeight = height * 0.88;
+  const aspectRatio = boardSize.width / boardSize.height;
 
-  let boardWidth = Math.min(baseBoardSize.width, maxBoardWidth);
+  let boardWidth = Math.min(boardSize.width, maxBoardWidth);
   let boardHeight = boardWidth / aspectRatio;
 
   // Check if height exceeds limit, recalculate if needed
@@ -151,7 +151,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
             <Text
               style={[
                 styles.questionText,
-                { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
+                { fontSize: getResponsiveFontSize('question', width) },
               ]}
               numberOfLines={7}
               adjustsFontSizeToFit
@@ -190,7 +190,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                       <Text
                         style={[
                           styles.optionText,
-                          { fontSize: getResponsiveFontSize(Typography.bodySmall, isLandscape) },
+                          { fontSize: getResponsiveFontSize('answer', width) },
                         ]}
                         numberOfLines={2}
                         adjustsFontSizeToFit
@@ -231,7 +231,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                         <Text
                           style={[
                             styles.optionText,
-                            { fontSize: getResponsiveFontSize(Typography.bodySmall, isLandscape) },
+                            { fontSize: getResponsiveFontSize('answer', width) },
                           ]}
                           numberOfLines={2}
                           adjustsFontSizeToFit

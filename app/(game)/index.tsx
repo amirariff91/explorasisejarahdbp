@@ -14,7 +14,7 @@ import { playSound, playMusic, playAmbient, stopMusic, stopAllAmbient } from "@/
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGameContext } from "@/contexts/GameContext";
 import { Colors } from "@/constants/theme";
-import { isLandscapeMode } from "@/constants/layout";
+import { isLandscapeMode, getResponsiveSizeScaled } from "@/constants/layout";
 
 /**
  * Homepage / Splash Screen
@@ -27,11 +27,18 @@ export default function Homepage() {
   const { gameState } = useGameContext();
   const isLandscape = isLandscapeMode(width); // Standardized landscape detection (800px breakpoint)
 
-  // Responsive sizing
-  const logoSize = Math.min(width * 0.25, 140);
-  const titleFontSize = Math.min(width * 0.162, isLandscape ? 86 : 102);
-  const buttonWidth = Math.min(width * 0.22, 120);
-  const buttonHeight = buttonWidth * 0.77; // Maintain aspect ratio
+  // Responsive sizing using scale factors (auto-scales by device tier)
+  // Logo: 95×130px (Figma spec), max 1.5× scale
+  const logoWidth = getResponsiveSizeScaled(95, width, 1.5);   // Max 142px on iPad Pro
+  const logoHeight = getResponsiveSizeScaled(130, width, 1.5); // Max 195px on iPad Pro
+
+  // Button: 144×110px (Figma spec), max 1.5× scale
+  const buttonWidth = getResponsiveSizeScaled(144, width, 1.5);  // Max 216px on iPad Pro
+  const buttonHeight = getResponsiveSizeScaled(110, width, 1.5); // Max 165px on iPad Pro
+
+  // Masthead: SVG viewBox 400×200, max 1.8× scale for prominent title
+  const mastheadWidth = getResponsiveSizeScaled(400, width, 1.8);   // Max 720px on iPad Pro
+  const mastheadHeight = getResponsiveSizeScaled(200, width, 1.8);  // Max 360px on iPad Pro
 
   // Play welcome background music and ambient on mount with synchronized SFX
   useEffect(() => {
@@ -85,9 +92,9 @@ export default function Homepage() {
             source={ASSETS.branding.logoDbp}
             style={[
               styles.logo,
-              { width: logoSize, height: logoSize, borderRadius: logoSize / 2 },
+              { width: logoWidth, height: logoHeight },
             ]}
-            contentFit="cover"
+            contentFit="contain"
           />
         </View>
       </View>
@@ -102,21 +109,15 @@ export default function Homepage() {
         <View style={styles.titleContainer}>
           <Image
             source={ASSETS.branding.titleMasthead}
-            style={styles.masthead}
+            style={{
+              width: mastheadWidth,
+              height: mastheadHeight,
+            }}
             contentFit="contain"
+            cachePolicy="memory-disk"
+            priority="high"
+            transition={200}
           />
-          <Text
-            style={[
-              styles.titleText,
-              {
-                fontSize: titleFontSize,
-                lineHeight: Math.max(titleFontSize * 1.12, titleFontSize + 16),
-              },
-            ]}
-            allowFontScaling={false}
-          >
-            EXPLORASI{"\n"}SEJARAH
-          </Text>
         </View>
       </View>
 
@@ -130,10 +131,7 @@ export default function Homepage() {
         <Pressable style={styles.nextButtonContainer} onPress={handlePlay}>
           <Image
             source={ASSETS.shared.buttons.next.default}
-            style={[
-              styles.nextButton,
-              { width: buttonWidth, height: buttonHeight },
-            ]}
+            style={{ width: buttonWidth, height: buttonHeight }}
             contentFit="contain"
           />
         </Pressable>
@@ -163,9 +161,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   logo: {
-    width: 140,
-    height: 140,
-    borderRadius: 80,
+    // Dimensions set dynamically via inline styles
   },
 
   // Masthead Outer Container
@@ -185,26 +181,6 @@ const styles = StyleSheet.create({
     maxWidth: "95%",
     position: "relative",
   },
-  masthead: {
-    width: "100%",
-    height: 105,
-    maxWidth: 245,
-  },
-  titleText: {
-    position: "absolute",
-    fontFamily: "Galindo",
-    fontSize: 111,
-    fontWeight: "bold",
-    color: Colors.gold,
-    textAlign: "center",
-    // Thick blue stroke outline (Figma-matched)
-    textShadowColor: "#1565C0",
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 6,
-    letterSpacing: 0,
-    width: "100%",
-    top: "18%",
-  },
 
   // Button Outer Container
   buttonOuterContainer: {
@@ -219,9 +195,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     top: "50%",
     paddingBottom: 15,
-  },
-  nextButton: {
-    width: 120,
-    height: 92,
   },
 });

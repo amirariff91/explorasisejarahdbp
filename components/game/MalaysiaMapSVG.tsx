@@ -54,8 +54,9 @@ export default function MalaysiaMapSVG({ onStateSelect }: MalaysiaMapSVGProps) {
     [mapHeight],
   );
 
-  const borneoOffsetX = useMemo(() => -220, []); // Pull East Malaysia closer to peninsula horizontally
-  const borneoOffsetY = useMemo(() => -40, []); // Move East Malaysia upward within board boundaries
+  // Responsive Borneo positioning - scales with map size for iPad and phone
+  const borneoOffsetX = useMemo(() => -(mapWidth * 0.31), [mapWidth]); // ~31% of map width (was fixed -220)
+  const borneoOffsetY = useMemo(() => -(mapHeight * 0.08), [mapHeight]); // ~8% of map height (was fixed -40)
 
   const handleStatePressIn = (state: MalaysianState) => {
     playSound("click", { volume: 0.3 }); // Very subtle preview sound on touch

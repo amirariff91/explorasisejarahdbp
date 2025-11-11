@@ -1,4 +1,4 @@
-import { ButtonSizes, EdgeMargins, isLandscapeMode, QuestionBoard, TouchTargets } from '@/constants/layout';
+import { ButtonSizes, EdgeMargins, isLandscapeMode, QuestionBoardBase, getQuestionBoardSize, TouchTargets } from '@/constants/layout';
 import {
   Colors,
   getResponsiveFontSize,
@@ -53,16 +53,15 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
     buttonGap: 30,
   };
 
-  const baseBoardSize = isLandscape
-    ? QuestionBoard.standard.landscape
-    : QuestionBoard.standard.portrait;
+  // Use new responsive board sizing system (auto-scales by device tier)
+  const boardSize = getQuestionBoardSize('standard', width);
 
-  // Responsive board sizing - Allow board to reach its base dimensions (408×264)
-  const maxBoardWidth = width * 0.90;  // Increased to allow full board size
-  const maxBoardHeight = height * 0.88; // Allow adequate height
-  const aspectRatio = baseBoardSize.width / baseBoardSize.height;
+  // Constrain to viewport (90% width, 88% height)
+  const maxBoardWidth = width * 0.90;
+  const maxBoardHeight = height * 0.88;
+  const aspectRatio = boardSize.width / boardSize.height;
 
-  let boardWidth = Math.min(baseBoardSize.width, maxBoardWidth);
+  let boardWidth = Math.min(boardSize.width, maxBoardWidth);
   let boardHeight = boardWidth / aspectRatio;
 
   // Check if height exceeds limit, recalculate if needed
@@ -123,7 +122,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
             <Text
               style={[
                 styles.questionText,
-                { fontSize: getResponsiveFontSize(Typography.heading, isLandscape) },
+                { fontSize: getResponsiveFontSize('question', width) },
               ]}
               numberOfLines={5}
               adjustsFontSizeToFit
@@ -157,7 +156,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
               <Text
                 style={[
                   styles.buttonText,
-                  { fontSize: isLandscape ? 32 : 28 }, // Figma spec: 32px for action buttons
+                  { fontSize: getResponsiveFontSize('answer', width) * 1.15 }, // Slightly larger for action buttons
                 ]}
                 allowFontScaling={allowScaling}
                 numberOfLines={1}
@@ -191,7 +190,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
               <Text
                 style={[
                   styles.buttonText,
-                  { fontSize: isLandscape ? 32 : 28 }, // Figma spec: 32px for action buttons
+                  { fontSize: getResponsiveFontSize('answer', width) * 1.15 }, // Slightly larger for action buttons
                 ]}
                 allowFontScaling={allowScaling}
                 numberOfLines={1}

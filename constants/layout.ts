@@ -6,7 +6,34 @@
 // Responsive Breakpoints
 export const Breakpoints = {
   // Landscape mode threshold (standardized across all components)
-  landscape: 800, // px - Optimized for landscape tablets (917�412 Figma design)
+  landscape: 800, // px - Optimized for landscape tablets (917×412 Figma design)
+} as const;
+
+/**
+ * Unified Device Breakpoints - 4-Tier System
+ * Replaces dual breakpoint conflicts (800px vs 1000px)
+ */
+export const DeviceBreakpoints = {
+  phoneLandscape: 800,    // 667-799px - Phone landscape (iPhone SE, iPhone 8)
+  tabletSmall: 1000,      // 800-999px - Tablet small (iPad Mini landscape)
+  tabletMedium: 1200,     // 1000-1199px - Tablet medium (iPad 9.7", iPad Air landscape)
+  tabletLarge: 1366,      // 1200+ px - Tablet large (iPad Pro 12.9" landscape)
+} as const;
+
+/**
+ * Device Size Classification
+ */
+export type DeviceSize = 'phone' | 'tablet-sm' | 'tablet-md' | 'tablet-lg';
+
+/**
+ * Scale Factors for Responsive Sizing
+ * Base scale (phone) = 1.0, scales up for larger devices
+ */
+export const ScaleFactors = {
+  phone: 1.0,        // 667-799px - Base scale
+  'tablet-sm': 1.2,  // 800-999px - 20% larger
+  'tablet-md': 1.5,  // 1000-1199px - 50% larger
+  'tablet-lg': 1.8,  // 1200px+ - 80% larger
 } as const;
 
 // Edge Margins (Dead Zones for thumb grips)
@@ -32,37 +59,76 @@ export const Spacing = {
   sectionGap: { landscape: 28, portrait: 24 },
 } as const;
 
-// Component Sizes - Question Boards
-export const QuestionBoard = {
+/**
+ * Base Question Board Sizes - Phone Tier (667-799px)
+ * These sizes are scaled up for larger devices using getQuestionBoardSize()
+ */
+export const QuestionBoardBase = {
   // Standard Question Board (True/False, Fill Blank)
   standard: {
-    landscape: { width: 480, height: 300 },  // Increased from 408×264
-    portrait: { width: 380, height: 340 },   // Increased from 336×312
+    width: 480,
+    height: 300,
   },
   // Compact Board (Matching, smaller content)
   compact: {
-    landscape: { width: 420, height: 280 },  // +24% larger for 3×3 grid readability
-    portrait: { width: 340, height: 260 },   // Increased for better spacing
+    width: 420,
+    height: 280,
   },
   // Large Board (Tutorial, State Selection)
+  large: {
+    width: 380,
+    height: 160,
+  },
+  // Description Board (Tutorial descriptions)
+  description: {
+    width: 380,
+    height: 200,
+  },
+  // Clue Board (Crossword clues)
+  clue: {
+    width: 180,
+    height: 240,
+  },
+  // Single Board (Multiple Choice - question + answers on same board)
+  singleBoardMC: {
+    width: 680,
+    height: 380,
+  },
+  // Map Board (State selection map container)
+  map: {
+    width: 600,
+    height: 450,
+  },
+} as const;
+
+/**
+ * @deprecated Use QuestionBoardBase with getQuestionBoardSize() instead
+ * Legacy board sizes with landscape/portrait variants
+ */
+export const QuestionBoard = {
+  standard: {
+    landscape: { width: 480, height: 300 },
+    portrait: { width: 380, height: 340 },
+  },
+  compact: {
+    landscape: { width: 420, height: 280 },
+    portrait: { width: 340, height: 260 },
+  },
   large: {
     landscape: { width: 380, height: 160 },
     portrait: { width: 300, height: 200 },
   },
-  // Description Board (Tutorial descriptions)
   description: {
     landscape: { width: 380, height: 200 },
     portrait: { width: 320, height: 180 },
   },
-  // Clue Board (Crossword clues)
   clue: {
     landscape: { width: 180, height: 240 },
     portrait: { width: 150, height: 200 },
   },
-  // Single Board (Multiple Choice - question + answers on same board)
   singleBoardMC: {
-    landscape: { width: 680, height: 380 },  // ~1.79:1 ratio - Comfortable fit for content
-    portrait: { width: 460, height: 380 },   // Increased for better phone portrait fit
+    landscape: { width: 680, height: 380 },
+    portrait: { width: 460, height: 380 },
   },
 } as const;
 
@@ -405,6 +471,90 @@ export const getResponsiveSize = <T extends { landscape: any; portrait: any }>(
   isLandscape: boolean
 ): T['landscape'] | T['portrait'] => {
   return isLandscape ? sizeConfig.landscape : sizeConfig.portrait;
+};
+
+/**
+ * Get Device Size Tier
+ * Classifies device into one of 4 tiers based on screen width
+ *
+ * @param width - Screen width in pixels
+ * @returns DeviceSize tier ('phone' | 'tablet-sm' | 'tablet-md' | 'tablet-lg')
+ *
+ * @example
+ * getDeviceSize(667)  // 'phone'
+ * getDeviceSize(1024) // 'tablet-md'
+ * getDeviceSize(1366) // 'tablet-lg'
+ */
+export const getDeviceSize = (width: number): DeviceSize => {
+  if (width < DeviceBreakpoints.tabletSmall) return 'phone';
+  if (width < DeviceBreakpoints.tabletMedium) return 'tablet-sm';
+  if (width < DeviceBreakpoints.tabletLarge) return 'tablet-md';
+  return 'tablet-lg';
+};
+
+/**
+ * Get Scale Factor for Device
+ * Returns multiplier for responsive sizing based on device tier
+ *
+ * @param width - Screen width in pixels
+ * @returns Scale multiplier (1.0, 1.2, 1.5, or 1.8)
+ *
+ * @example
+ * getScaleFactor(667)  // 1.0 (phone)
+ * getScaleFactor(1024) // 1.5 (tablet-md)
+ * getScaleFactor(1366) // 1.8 (tablet-lg)
+ */
+export const getScaleFactor = (width: number): number => {
+  const deviceSize = getDeviceSize(width);
+  return ScaleFactors[deviceSize];
+};
+
+/**
+ * Get Responsive Size with Scaling
+ * Scales a base size proportionally based on device tier
+ *
+ * @param baseSize - Base dimension in pixels (for phone-sized devices)
+ * @param width - Screen width in pixels
+ * @param maxScale - Maximum scale factor (default 2.0)
+ * @returns Scaled dimension rounded to nearest integer
+ *
+ * @example
+ * getResponsiveSizeScaled(100, 667)  // 100 (phone: 1.0×)
+ * getResponsiveSizeScaled(100, 1024) // 150 (tablet-md: 1.5×)
+ * getResponsiveSizeScaled(100, 1366) // 180 (tablet-lg: 1.8×)
+ */
+export const getResponsiveSizeScaled = (
+  baseSize: number,
+  width: number,
+  maxScale: number = 2.0
+): number => {
+  const scale = Math.min(getScaleFactor(width), maxScale);
+  return Math.round(baseSize * scale);
+};
+
+/**
+ * Get Responsive Question Board Size
+ * Scales board dimensions based on device tier
+ *
+ * @param type - Board type (standard, compact, large, description, clue, singleBoardMC)
+ * @param width - Screen width in pixels
+ * @returns Scaled board dimensions { width, height }
+ *
+ * @example
+ * getQuestionBoardSize('standard', 667)  // { width: 480, height: 300 } (phone)
+ * getQuestionBoardSize('standard', 1024) // { width: 720, height: 450 } (tablet-md: 1.5×)
+ * getQuestionBoardSize('standard', 1366) // { width: 864, height: 540 } (tablet-lg: 1.8×)
+ */
+export const getQuestionBoardSize = (
+  type: keyof typeof QuestionBoardBase,
+  width: number
+): { width: number; height: number } => {
+  const base = QuestionBoardBase[type];
+  const scale = getScaleFactor(width);
+  return {
+    width: Math.round(base.width * scale),
+    height: Math.round(base.height * scale),
+  };
 };
 
 export const getQuestionOffsets = (

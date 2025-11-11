@@ -1,5 +1,5 @@
-import { ButtonSizes, EdgeMargins, isLandscapeMode, QuestionBoard, TouchTargets } from '@/constants/layout';
-import { Colors, getLandscapeFontSize, Opacity, Typography } from '@/constants/theme';
+import { ButtonSizes, EdgeMargins, isLandscapeMode, QuestionBoardBase, getQuestionBoardSize, TouchTargets } from '@/constants/layout';
+import { Colors, getResponsiveFontSize, Opacity, Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
 import type { MatchingQuestion as MQQuestion } from '@/types';
 import { playSound } from '@/utils/audio';
@@ -45,17 +45,15 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     footerContainer: { marginBottom: 30, marginRight: 30 },
   };
 
-  // Responsive board sizing - phone vs tablet (1000px breakpoint)
-  const baseBoardSize = width < 1000
-    ? QuestionBoard.compact.landscape    // Phone: 420×280
-    : { width: 560, height: 373 };       // Tablet: 560×373 (33% larger)
+  // Use new responsive board sizing system (auto-scales by device tier)
+  const boardSize = getQuestionBoardSize('compact', width);
 
   // Responsive board sizing - Allow board to reach its base dimensions
   const maxBoardWidth = width * (width < 1000 ? 0.80 : 0.85);  // 80% phone, 85% tablet
   const maxBoardHeight = height * 0.85; // Allow adequate height for larger screens
-  const aspectRatio = baseBoardSize.width / baseBoardSize.height;
+  const aspectRatio = boardSize.width / boardSize.height;
 
-  let boardWidth = Math.min(baseBoardSize.width, maxBoardWidth);
+  let boardWidth = Math.min(boardSize.width, maxBoardWidth);
   let boardHeight = boardWidth / aspectRatio;
 
   // Check if height exceeds limit, recalculate if needed
@@ -131,7 +129,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
             <Text
               style={[
                 styles.titleText,
-                { fontSize: getLandscapeFontSize('question', width) },
+                { fontSize: getResponsiveFontSize('question', width) },
               ]}
               numberOfLines={2}
               adjustsFontSizeToFit
@@ -142,7 +140,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
             <Text
               style={[
                 styles.questionText,
-                { fontSize: getLandscapeFontSize('answer', width) },
+                { fontSize: getResponsiveFontSize('answer', width) },
               ]}
               numberOfLines={3}
               adjustsFontSizeToFit

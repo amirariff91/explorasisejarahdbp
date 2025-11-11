@@ -154,6 +154,47 @@ export const Typography = {
   },
 } as const;
 
+/**
+ * Responsive Typography Scale - 4-Tier Device System
+ * Unified scaling strategy that works across all device sizes
+ *
+ * Device Classification:
+ * - phone: 667-799px (scale 1.0×)
+ * - tablet-sm: 800-999px (scale 1.2×)
+ * - tablet-md: 1000-1199px (scale 1.5×)
+ * - tablet-lg: 1200px+ (scale 1.8×)
+ */
+export const TypographyScale = {
+  phone: {
+    stateLabel: 24,
+    question: 16,
+    answer: 14,
+    gridCell: 12,
+    clue: 12,
+  },
+  'tablet-sm': {
+    stateLabel: 28,    // 24 × 1.2 ≈ 28
+    question: 18,      // 16 × 1.2 ≈ 18
+    answer: 15,        // 14 × 1.2 ≈ 15
+    gridCell: 14,      // 12 × 1.2 ≈ 14
+    clue: 14,          // 12 × 1.2 ≈ 14
+  },
+  'tablet-md': {
+    stateLabel: 32,    // 24 × 1.5 ≈ 32
+    question: 20,      // 16 × 1.5 ≈ 20
+    answer: 16,        // 14 × 1.5 ≈ 16
+    gridCell: 16,      // 12 × 1.5 ≈ 16
+    clue: 16,          // 12 × 1.5 ≈ 16
+  },
+  'tablet-lg': {
+    stateLabel: 38,    // 24 × 1.8 ≈ 38
+    question: 24,      // 16 × 1.8 ≈ 24
+    answer: 18,        // 14 × 1.8 ≈ 18
+    gridCell: 18,      // 12 × 1.8 ≈ 18
+    clue: 18,          // 12 × 1.8 ≈ 18
+  },
+} as const;
+
 // Text Shadow Presets (Refined to match Figma - visible but subtle)
 export const Shadows = {
   text: {
@@ -256,14 +297,41 @@ export const ButtonAnimations = {
 } as const;
 
 // Helper Functions
+
+/**
+ * Get responsive font size using unified 4-tier system
+ *
+ * @param type - Font type (stateLabel, question, answer, gridCell, clue)
+ * @param width - Screen width in pixels
+ * @returns Scaled font size appropriate for device
+ *
+ * @example
+ * const fontSize = getResponsiveFontSize('question', width);
+ */
 export const getResponsiveFontSize = (
+  type: keyof typeof TypographyScale.phone,
+  width: number
+): number => {
+  const { getDeviceSize } = require('@/constants/layout');
+  const deviceSize = getDeviceSize(width);
+  return TypographyScale[deviceSize][type];
+};
+
+/**
+ * @deprecated Use getResponsiveFontSize(type, width) instead
+ * Legacy helper for landscape/portrait font sizes
+ */
+export const getResponsiveFontSizeLegacy = (
   fontSizeConfig: { landscape: number; portrait: number },
   isLandscape: boolean
 ): number => {
   return isLandscape ? fontSizeConfig.landscape : fontSizeConfig.portrait;
 };
 
-// New helper for landscape-optimized typography
+/**
+ * @deprecated Use getResponsiveFontSize(type, width) instead
+ * Old 2-tier landscape helper (1000px breakpoint)
+ */
 export const getLandscapeFontSize = (
   type: keyof typeof Typography.phone,
   screenWidth: number

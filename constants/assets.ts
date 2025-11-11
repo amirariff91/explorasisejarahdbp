@@ -161,10 +161,10 @@ export const ASSETS: AssetManifest = {
   // BRANDING & PLATFORM ASSETS
   // ============================================================================
   branding: {
-    // Using safe PNG fallbacks until real assets are exported
-    logoDbp: require('@/assets/images/icon.png'),
-    logoDbpSvg: require('@/assets/images/icon.png'),
-    titleMasthead: require('@/assets/images/splash-icon.png'),
+    // DBP logo assets
+    logoDbp: require('@/assets/images/game/logo-dbp/logo-dbp.png'),
+    logoDbpSvg: require('@/assets/images/game/logo-dbp/logo-dbp.png'),
+    titleMasthead: require('@/assets/images/game/masthead/title-masthead.svg'),
     splashScreenSafe: require('@/assets/images/splash-icon.png'),
     splashScreenFull: require('@/assets/images/splash-icon.png'),
     appIconIos: require('@/assets/images/icon.png'),

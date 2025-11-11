@@ -1,6 +1,6 @@
 import LandscapeLayout from '@/components/game/LandscapeLayout';
-import { isLandscapeMode, QuestionBoard, TouchTargets } from '@/constants/layout';
-import { Colors, getLandscapeFontSize, Typography } from '@/constants/theme';
+import { isLandscapeMode, QuestionBoardBase, getQuestionBoardSize, TouchTargets } from '@/constants/layout';
+import { Colors, getResponsiveFontSize, Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
 import type { FillBlankQuestion as FBQuestion } from '@/types';
 import { playSound } from '@/utils/audio';
@@ -34,13 +34,12 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const isLandscape = isLandscapeMode(width); // Use consistent landscape detection
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
-  const baseBoardSize = isLandscape
-    ? QuestionBoard.standard.landscape
-    : QuestionBoard.standard.portrait;
-  const boardScale = 1.25;  // Optimized for 480px base board
-  const scaledBoardWidth = baseBoardSize.width * boardScale;
-  const scaledBoardHeight = baseBoardSize.height * boardScale;
-  const maxBoardWidth = width * (isLandscape ? 0.85 : 0.92); // Allow adequate board size
+  // Use new responsive board sizing system (auto-scales by device tier)
+  const boardSize = getQuestionBoardSize('standard', width);
+  const boardScale = 1.25;  // Slightly larger for fill-blank questions
+  const scaledBoardWidth = boardSize.width * boardScale;
+  const scaledBoardHeight = boardSize.height * boardScale;
+  const maxBoardWidth = width * (isLandscape ? 0.85 : 0.92);
   const boardWidth = Math.min(scaledBoardWidth, maxBoardWidth);
   const boardHeight = (scaledBoardHeight / scaledBoardWidth) * boardWidth;
 
@@ -69,7 +68,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
           <Text
             style={[
               styles.questionText,
-              { fontSize: getLandscapeFontSize('question', width) },
+              { fontSize: getResponsiveFontSize('question', width) },
             ]}
             numberOfLines={3}
             adjustsFontSizeToFit
@@ -100,7 +99,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
           style={[
             styles.input,
             {
-              fontSize: getLandscapeFontSize('answer', width),
+              fontSize: getResponsiveFontSize('answer', width),
               paddingHorizontal: width < 1000 ? 20 : 24,
             },
           ]}

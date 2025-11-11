@@ -15,14 +15,24 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.amirariff.explorasisejarahdbp",
+      "requiresFullScreen": true,
       "infoPlist": {
         "UIBackgroundModes": [
           "audio"
+        ],
+        "UISupportedInterfaceOrientations": [
+          "UIInterfaceOrientationLandscapeLeft",
+          "UIInterfaceOrientationLandscapeRight"
+        ],
+        "UISupportedInterfaceOrientations~ipad": [
+          "UIInterfaceOrientationLandscapeLeft",
+          "UIInterfaceOrientationLandscapeRight"
         ]
       }
     },
     "android": {
       "package": "com.amirariff.explorasisejarahdbp",
+      "screenOrientation": "landscape",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
