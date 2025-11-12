@@ -6,7 +6,8 @@ import {
   StyleSheet,
   KeyboardTypeOptions,
 } from 'react-native';
-import { Colors, BorderRadius, Shadows } from '@/constants/theme';
+import { Colors, BorderRadius, Shadows, getResponsiveFontSize } from '@/constants/theme';
+import { getResponsiveSizeScaled } from '@/constants/layout';
 
 interface GameTextInputProps {
   label: string;
@@ -17,6 +18,7 @@ interface GameTextInputProps {
   error?: string;
   maxLength?: number;
   accessibilityLabel?: string;
+  width: number; // Required for responsive sizing
 }
 
 /**
@@ -32,20 +34,34 @@ export function GameTextInput({
   error,
   maxLength,
   accessibilityLabel,
+  width,
 }: GameTextInputProps) {
   const [isFocused, setIsFocused] = useState(false);
+
+  // Responsive sizing
+  const inputHeight = getResponsiveSizeScaled(50, width);
+  const labelFontSize = getResponsiveFontSize('answer', width);
+  const inputFontSize = getResponsiveFontSize('answer', width);
+  const horizontalPadding = getResponsiveSizeScaled(14, width);
+  const labelMargin = getResponsiveSizeScaled(6, width);
 
   return (
     <View style={styles.container}>
       {/* Label */}
-      <Text style={styles.label}>{label.toUpperCase()}</Text>
+      <Text style={[styles.label, { fontSize: labelFontSize, marginBottom: labelMargin }]}>
+        {label.toUpperCase()}
+      </Text>
 
       {/* Input Container - Outer blue panel */}
       <View style={[styles.outerContainer, isFocused && styles.outerContainerFocused]}>
         {/* Inner recessed slot - darker blue inset */}
-        <View style={styles.innerSlot}>
+        <View
+          style={[
+            styles.innerSlot,
+            { height: inputHeight, paddingHorizontal: horizontalPadding },
+          ]}>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { fontSize: inputFontSize }]}
             value={value}
             onChangeText={onChangeText}
             placeholder={placeholder}
@@ -71,7 +87,15 @@ export function GameTextInput({
       </View>
 
       {/* Error Message */}
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
+      {error ? (
+        <Text
+          style={[
+            styles.errorText,
+            { fontSize: getResponsiveFontSize('clue', width) },
+          ]}>
+          {error}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -79,14 +103,11 @@ export function GameTextInput({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    marginVertical: 8,
   },
 
   label: {
-    fontSize: 16,
     fontWeight: '600',
     color: Colors.textLight,
-    marginBottom: 8,
     letterSpacing: 0.5,
   },
 
@@ -106,9 +127,7 @@ const styles = StyleSheet.create({
   innerSlot: {
     backgroundColor: '#1680D7',
     borderRadius: BorderRadius.small - 2,
-    height: 60,
     justifyContent: 'center',
-    paddingHorizontal: 16,
     // Inset shadow effect
     borderWidth: 2,
     borderColor: 'rgba(0, 0, 0, 0.15)',
@@ -117,14 +136,12 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    fontSize: 18,
     color: Colors.textLight,
     fontWeight: '500',
     height: '100%',
   },
 
   errorText: {
-    fontSize: 13,
     color: '#ff6b6b',
     marginTop: 4,
     marginLeft: 4,

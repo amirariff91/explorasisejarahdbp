@@ -5,10 +5,12 @@ import {
   ImageBackground,
   Pressable,
   useWindowDimensions,
+  Animated,
+  Easing,
 } from "react-native";
 import { useRouter } from "expo-router";
 import { Image } from "expo-image";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ASSETS } from "@/constants/assets";
 import { playSound, playMusic, playAmbient, stopMusic, stopAllAmbient } from "@/utils/audio";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -27,6 +29,9 @@ export default function Homepage() {
   const { gameState } = useGameContext();
   const isLandscape = isLandscapeMode(width); // Standardized landscape detection (800px breakpoint)
 
+  // Button breathing animation
+  const buttonScale = useRef(new Animated.Value(1)).current;
+
   // Responsive sizing using scale factors (auto-scales by device tier)
   // Logo: 95×130px (Figma spec), max 1.5× scale
   const logoWidth = getResponsiveSizeScaled(95, width, 1.5);   // Max 142px on iPad Pro
@@ -36,9 +41,17 @@ export default function Homepage() {
   const buttonWidth = getResponsiveSizeScaled(144, width, 1.5);  // Max 216px on iPad Pro
   const buttonHeight = getResponsiveSizeScaled(110, width, 1.5); // Max 165px on iPad Pro
 
-  // Masthead: SVG viewBox 400×200, max 1.8× scale for prominent title
-  const mastheadWidth = getResponsiveSizeScaled(400, width, 1.8);   // Max 720px on iPad Pro
-  const mastheadHeight = getResponsiveSizeScaled(200, width, 1.8);  // Max 360px on iPad Pro
+  // Masthead: 564×242px (Figma spec), max 1.8× scale for prominent title
+  const mastheadWidth = getResponsiveSizeScaled(564, width, 1.8);   // Max 1015px on iPad Pro
+  const mastheadHeight = getResponsiveSizeScaled(242, width, 1.8);  // Max 436px on iPad Pro
+
+  // Calculate responsive spacing to prevent overlaps
+  const minLogoToTitle = 20; // Minimum gap between logo and title
+  const minTitleToButton = 40; // Minimum gap between title and button
+
+  const logoTop = insets.top + height * 0.05;
+  const titleTop = logoTop + logoHeight + (isLandscape ? height * 0.08 : height * 0.12);
+  const buttonBottom = insets.bottom + height * 0.08;
 
   // Play welcome background music and ambient on mount with synchronized SFX
   useEffect(() => {
@@ -58,6 +71,24 @@ export default function Homepage() {
       playAmbient('ambient-map', 0.1); // Very subtle tropical ambience (10% volume)
     }, 2000); // Delay music slightly to let SFX shine
 
+    // Start gentle breathing animation for play button (kid-friendly)
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(buttonScale, {
+          toValue: 1.08, // Subtle scale up
+          duration: 1250, // 1.25 seconds
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(buttonScale, {
+          toValue: 1.0, // Back to normal
+          duration: 1250, // 1.25 seconds
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+
     return () => {
       clearTimeout(logoTimer);
       clearTimeout(titleTimer);
@@ -65,7 +96,23 @@ export default function Homepage() {
       stopMusic(1500); // Smooth 1.5s fade-out when leaving
       stopAllAmbient();
     };
-  }, []);
+  }, [buttonScale]);
+
+  // Button press handlers for tactile feedback
+  const handlePressIn = () => {
+    Animated.spring(buttonScale, {
+      toValue: 0.95, // Slightly squish
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(buttonScale, {
+      toValue: 1.08, // Return to breathing animation state
+      friction: 3, // Bouncy feel
+      useNativeDriver: true,
+    }).start();
+  };
 
   const handlePlay = () => {
     playSound("star"); // Celebratory sound for starting the educational journey
@@ -84,9 +131,7 @@ export default function Homepage() {
       resizeMode="cover"
     >
       {/* DBP Logo Container - Top Center */}
-      <View
-        style={[styles.logoOuterContainer, { top: insets.top + height * 0.05 }]}
-      >
+      <View style={[styles.logoOuterContainer, { top: logoTop }]}>
         <View style={styles.logoContainer}>
           <Image
             source={ASSETS.branding.logoDbp}
@@ -100,12 +145,7 @@ export default function Homepage() {
       </View>
 
       {/* Masthead Container - Center */}
-      <View
-        style={[
-          styles.mastheadOuterContainer,
-          { top: isLandscape ? "28%" : "35%" },
-        ]}
-      >
+      <View style={[styles.mastheadOuterContainer, { top: titleTop }]}>
         <View style={styles.titleContainer}>
           <Image
             source={ASSETS.branding.titleMasthead}
@@ -121,19 +161,20 @@ export default function Homepage() {
         </View>
       </View>
 
-      {/* Button Container - Bottom Center */}
-      <View
-        style={[
-          styles.buttonOuterContainer,
-          { bottom: insets.bottom + height * 0.08 },
-        ]}
-      >
-        <Pressable style={styles.nextButtonContainer} onPress={handlePlay}>
-          <Image
-            source={ASSETS.shared.buttons.next.default}
-            style={{ width: buttonWidth, height: buttonHeight }}
-            contentFit="contain"
-          />
+      {/* Button Container - Bottom Center with Breathing Animation */}
+      <View style={[styles.buttonOuterContainer, { bottom: buttonBottom }]}>
+        <Pressable
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          onPress={handlePlay}
+        >
+          <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+            <Image
+              source={ASSETS.shared.buttons.next.default}
+              style={{ width: buttonWidth, height: buttonHeight }}
+              contentFit="contain"
+            />
+          </Animated.View>
         </Pressable>
       </View>
     </ImageBackground>
@@ -152,7 +193,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignItems: "center",
     justifyContent: "center",
-    bottom: "60%",
+    // top is set dynamically via inline styles
   },
   logoContainer: {
     alignItems: "center",
@@ -189,11 +230,6 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: "center",
     justifyContent: "center",
-  },
-  nextButtonContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    top: "50%",
-    paddingBottom: 15,
+    // bottom is set dynamically via inline styles
   },
 });

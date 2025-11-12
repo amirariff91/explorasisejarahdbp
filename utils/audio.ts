@@ -10,8 +10,7 @@ import type { AudioPlayer, AudioSource } from 'expo-audio';
 import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
 
 // Sound type definitions
-export type FeedbackSound = 
-  | 'betul' | 'tidak-tepat' | 'hebat' | 'tahniah' | 'bagus' | 'cuba-lagi'
+export type FeedbackSound =
   | 'correct-1' | 'correct-2' | 'correct-3'
   | 'wrong-1' | 'wrong-2'
   | 'encourage-1' | 'encourage-2' | 'encourage-3';
@@ -32,15 +31,7 @@ type SoundType = FeedbackSound | UISound | VoiceNarration;
 
 // Sound asset map
 const SOUNDS: Record<SoundType, AudioSource> = {
-  // Original feedback sounds (voice)
-  'betul': require('@/assets/audio/feedback/betul.mp3'),
-  'tidak-tepat': require('@/assets/audio/feedback/tidak-tepat.mp3'),
-  'hebat': require('@/assets/audio/feedback/hebat.mp3'),
-  'tahniah': require('@/assets/audio/feedback/tahniah.mp3'),
-  'bagus': require('@/assets/audio/feedback/bagus.mp3'),
-  'cuba-lagi': require('@/assets/audio/feedback/cuba-lagi.mp3'),
-
-  // New feedback variations
+  // Feedback variations (instrumental only, no voiceovers)
   'correct-1': require('@/assets/audio/feedback/correct-1.mp3'),
   'correct-2': require('@/assets/audio/feedback/correct-2.mp3'),
   'correct-3': require('@/assets/audio/feedback/correct-3.mp3'),
@@ -112,9 +103,9 @@ const stateVoiceCache: Map<MalaysianState, AudioPlayer> = new Map();
 let currentMusic: AudioPlayer | null = null;
 let currentMusicName: MusicSound | null = null;
 
-// Feedback variation arrays for randomization
-const CORRECT_FEEDBACK: FeedbackSound[] = ['betul', 'correct-1', 'correct-2', 'correct-3', 'hebat', 'bagus'];
-const WRONG_FEEDBACK: FeedbackSound[] = ['tidak-tepat', 'wrong-1', 'wrong-2', 'cuba-lagi'];
+// Feedback variation arrays for randomization (instrumental only, no voiceovers)
+const CORRECT_FEEDBACK: FeedbackSound[] = ['correct-1', 'correct-2', 'correct-3'];
+const WRONG_FEEDBACK: FeedbackSound[] = ['wrong-1', 'wrong-2'];
 const ENCOURAGE_FEEDBACK: FeedbackSound[] = ['encourage-1', 'encourage-2', 'encourage-3'];
 
 // Debug mode (enabled in development only)
@@ -219,15 +210,11 @@ export async function unloadAllSounds(): Promise<void> {
 /**
  * Play feedback sound based on correctness
  * Helper function for quiz questions
+ * Uses randomized instrumental feedback
  */
 export async function playFeedback(isCorrect: boolean, isPerfect?: boolean): Promise<void> {
-  if (isPerfect) {
-    await playSound('hebat'); // "Hebat!" for perfect scores
-  } else if (isCorrect) {
-    await playSound('betul'); // "Betul!" for correct answers
-  } else {
-    await playSound('tidak-tepat'); // "Tidak tepat" for wrong answers
-  }
+  // Use randomized feedback for variety
+  await playRandomFeedback(isCorrect, false);
 }
 
 /**
@@ -235,11 +222,8 @@ export async function playFeedback(isCorrect: boolean, isPerfect?: boolean): Pro
  * For success modals and achievements
  */
 export async function playCelebration(): Promise<void> {
-  // Play both voice and SFX for maximum celebration!
-  await Promise.all([
-    playSound('tahniah'), // "Tahniah!"
-    playSound('star', { volume: 0.7 }), // Star SFX (slightly quieter)
-  ]);
+  // Play celebration SFX only (no voiceover)
+  await playSound('star', { volume: 0.8 });
 }
 
 /**

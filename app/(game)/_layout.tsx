@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Stack } from 'expo-router';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import { GameProvider } from '@/contexts/GameContext';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { initializeAudio } from '@/utils/audio';
@@ -12,6 +13,28 @@ export default function GameLayout() {
   // Initialize audio system on app startup
   useEffect(() => {
     initializeAudio();
+  }, []);
+
+  // Lock screen orientation to landscape
+  useEffect(() => {
+    const lockOrientation = async () => {
+      try {
+        await ScreenOrientation.lockAsync(
+          ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
+        );
+      } catch (error) {
+        console.warn('Failed to lock screen orientation:', error);
+      }
+    };
+
+    lockOrientation();
+
+    return () => {
+      // Unlock orientation when component unmounts
+      ScreenOrientation.unlockAsync().catch((error) => {
+        console.warn('Failed to unlock screen orientation:', error);
+      });
+    };
   }, []);
 
   return (

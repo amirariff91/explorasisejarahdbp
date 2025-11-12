@@ -1,14 +1,10 @@
 import { useState } from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ImageBackground,
   Pressable,
   useWindowDimensions,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Image } from 'expo-image';
@@ -16,8 +12,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GameTextInput } from '@/components/game/GameTextInput';
 import { useGameContext } from '@/contexts/GameContext';
 import { playSound } from '@/utils/audio';
-import { Colors, BorderRadius, Shadows, Fonts } from '@/constants/theme';
+import { Colors, BorderRadius, Shadows } from '@/constants/theme';
 import { ASSETS } from '@/constants/assets';
+import { getResponsiveSizeScaled } from '@/constants/layout';
 
 /**
  * Log Masuk Screen
@@ -33,12 +30,13 @@ export default function LogMasukScreen() {
   const [age, setAge] = useState('');
   const [errors, setErrors] = useState<{ name?: string; age?: string }>({});
 
-  // Landscape not used on this screen currently; keep width-based sizing
-
-  // Responsive sizing
-  const panelWidth = Math.min(width * 0.85, 420);
-  const buttonWidth = Math.min(width * 0.22, 120);
+  // Responsive sizing using 4-tier system
+  const panelWidth = getResponsiveSizeScaled(320, width);
+  const panelPadding = getResponsiveSizeScaled(20, width, 1.5); // Cap at 1.5× for panels
+  const inputGap = getResponsiveSizeScaled(12, width);
+  const buttonWidth = getResponsiveSizeScaled(100, width);
   const buttonHeight = buttonWidth * 0.77;
+  const safeAreaPadding = getResponsiveSizeScaled(20, width);
 
   const validateForm = (): boolean => {
     const newErrors: { name?: string; age?: string } = {};
@@ -105,81 +103,80 @@ export default function LogMasukScreen() {
       source={ASSETS.shared.backgrounds.main}
       style={styles.container}
       resizeMode="cover">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}>
-        <ScrollView
-          contentContainerStyle={[
-            styles.scrollContent,
-            { paddingTop: insets.top + 40, paddingBottom: insets.bottom + 40 },
-          ]}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
-          {/* Blue Panel Container */}
-          <View style={[styles.panel, { width: panelWidth }]}>
-            {/* Title */}
-            <Text style={styles.title}>LOG MASUK</Text>
+      <View
+        style={[
+          styles.content,
+          {
+            paddingTop: insets.top + safeAreaPadding,
+            paddingBottom: insets.bottom + safeAreaPadding,
+          },
+        ]}>
+        {/* Blue Panel Container */}
+        <View
+          style={[
+            styles.panel,
+            {
+              width: panelWidth,
+              padding: panelPadding,
+            },
+          ]}>
+          {/* Input Fields Container */}
+          <View style={[styles.inputsContainer, { gap: inputGap }]}>
+            <GameTextInput
+              label="NAMA"
+              value={name}
+              onChangeText={(text) => {
+                setName(text);
+                if (errors.name) {
+                  setErrors((prev) => ({ ...prev, name: undefined }));
+                }
+              }}
+              placeholder="Masukkan nama anda"
+              maxLength={30}
+              error={errors.name}
+              accessibilityLabel="Nama pengguna"
+              width={width}
+            />
 
-            {/* Input Fields Container */}
-            <View style={styles.inputsContainer}>
-              <GameTextInput
-                label="NAMA"
-                value={name}
-                onChangeText={(text) => {
-                  setName(text);
-                  if (errors.name) {
-                    setErrors((prev) => ({ ...prev, name: undefined }));
-                  }
-                }}
-                placeholder="Masukkan nama anda"
-                maxLength={30}
-                error={errors.name}
-                accessibilityLabel="Nama pengguna"
-              />
-
-              <GameTextInput
-                label="UMUR"
-                value={age}
-                onChangeText={(text) => {
-                  setAge(text);
-                  if (errors.age) {
-                    setErrors((prev) => ({ ...prev, age: undefined }));
-                  }
-                }}
-                placeholder="6-12"
-                keyboardType="number-pad"
-                maxLength={2}
-                error={errors.age}
-                accessibilityLabel="Umur pengguna"
-              />
-            </View>
-
-            {/* Submit Button */}
-            <View style={styles.buttonContainer}>
-              <Pressable
-                style={[
-                  styles.button,
-                  !isFormValid() && styles.buttonDisabled,
-                ]}
-                onPress={handleSubmit}
-                disabled={!isFormValid()}
-                accessibilityRole="button"
-                accessibilityLabel="Mula bermain"
-                accessibilityState={{ disabled: !isFormValid() }}>
-                <Image
-                  source={ASSETS.shared.buttons.next.default}
-                  style={[
-                    styles.buttonImage,
-                    { width: buttonWidth, height: buttonHeight },
-                  ]}
-                  contentFit="contain"
-                />
-              </Pressable>
-            </View>
+            <GameTextInput
+              label="UMUR"
+              value={age}
+              onChangeText={(text) => {
+                setAge(text);
+                if (errors.age) {
+                  setErrors((prev) => ({ ...prev, age: undefined }));
+                }
+              }}
+              placeholder="6-12"
+              keyboardType="number-pad"
+              maxLength={2}
+              error={errors.age}
+              accessibilityLabel="Umur pengguna"
+              width={width}
+            />
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+
+          {/* Submit Button */}
+          <View style={styles.buttonContainer}>
+            <Pressable
+              style={[styles.button, !isFormValid() && styles.buttonDisabled]}
+              onPress={handleSubmit}
+              disabled={!isFormValid()}
+              accessibilityRole="button"
+              accessibilityLabel="Mula bermain"
+              accessibilityState={{ disabled: !isFormValid() }}>
+              <Image
+                source={ASSETS.shared.buttons.next.default}
+                style={[
+                  styles.buttonImage,
+                  { width: buttonWidth, height: buttonHeight },
+                ]}
+                contentFit="contain"
+              />
+            </Pressable>
+          </View>
+        </View>
+      </View>
     </ImageBackground>
   );
 }
@@ -189,12 +186,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  keyboardView: {
+  content: {
     flex: 1,
-  },
-
-  scrollContent: {
-    flexGrow: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -203,7 +196,6 @@ const styles = StyleSheet.create({
   panel: {
     backgroundColor: Colors.loginPanel,
     borderRadius: BorderRadius.large,
-    padding: 32,
     ...Shadows.component.medium,
     // Add subtle border for depth
     borderWidth: 3,
@@ -212,32 +204,16 @@ const styles = StyleSheet.create({
     borderRightColor: 'rgba(0, 0, 0, 0.15)',
   },
 
-  // Title
-  title: {
-    fontFamily: Fonts.rounded,
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: Colors.gold,
-    textAlign: 'center',
-    marginBottom: 24,
-    textShadowColor: '#000',
-    textShadowOffset: { width: 2, height: 2 },
-    textShadowRadius: 4,
-    letterSpacing: 1,
-  },
-
   // Inputs Container
   inputsContainer: {
     width: '100%',
-    gap: 8,
-    marginBottom: 24,
   },
 
   // Button Container
   buttonContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 8,
+    marginTop: 16,
   },
 
   button: {

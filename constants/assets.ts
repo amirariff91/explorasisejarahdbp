@@ -164,7 +164,7 @@ export const ASSETS: AssetManifest = {
     // DBP logo assets
     logoDbp: require('@/assets/images/game/logo-dbp/logo-dbp.png'),
     logoDbpSvg: require('@/assets/images/game/logo-dbp/logo-dbp.png'),
-    titleMasthead: require('@/assets/images/game/masthead/title-masthead.svg'),
+    titleMasthead: require('@/assets/images/game/masthead/title-masthead.png'),
     splashScreenSafe: require('@/assets/images/splash-icon.png'),
     splashScreenFull: require('@/assets/images/splash-icon.png'),
     appIconIos: require('@/assets/images/icon.png'),

@@ -2,7 +2,7 @@ import { Spacing, isLandscapeMode, getQuestionBoardSize, getResponsiveSizeScaled
 import { Colors } from "@/constants/theme";
 import { ASSETS, ASSET_PRELOAD_CONFIG } from "@/constants/assets";
 import { useGameContext } from "@/contexts/GameContext";
-import { playMusic, playSound, playTutorialNarration, stopMusic } from "@/utils/audio";
+import { playMusic, playSound, stopMusic } from "@/utils/audio";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -63,11 +63,6 @@ export default function TutorialScreen() {
       .finally(() => setIsPreloading(false));
   }, []);
 
-  // Play voice narration when step changes
-  useEffect(() => {
-    playTutorialNarration(currentStep);
-  }, [currentStep]);
-
   const handleNext = () => {
     playSound('click'); // UI feedback
     
@@ -80,7 +75,7 @@ export default function TutorialScreen() {
     }
   };
 
-  const edgeMargin = isLandscape ? 40 : 30;
+  const edgeMargin = getResponsiveSizeScaled(40, width);
 
   return (
     <ImageBackground
@@ -90,9 +85,16 @@ export default function TutorialScreen() {
     >
       {/* Warmup indicator (subtle) */}
       {isPreloading && (
-        <View style={styles.warmupBadge}>
+        <View style={[styles.warmupBadge, {
+          top: getResponsiveSizeScaled(8, width),
+          right: getResponsiveSizeScaled(8, width),
+          paddingHorizontal: getResponsiveSizeScaled(10, width),
+          paddingVertical: getResponsiveSizeScaled(6, width),
+          borderRadius: getResponsiveSizeScaled(12, width),
+          gap: getResponsiveSizeScaled(6, width),
+        }]}>
           <ActivityIndicator size="small" color="#fff" />
-          <Text style={styles.warmupText} allowFontScaling={allowScaling}>Memuatkan aset...</Text>
+          <Text style={[styles.warmupText, { fontSize: getResponsiveSizeScaled(12, width) }]} allowFontScaling={allowScaling}>Memuatkan aset...</Text>
         </View>
       )}
       {/* Single-Column Layout: Description + Controls */}
@@ -109,11 +111,18 @@ export default function TutorialScreen() {
             ]}
             resizeMode="contain"
           >
-            <View style={styles.boardContent}>
+            <View style={[styles.boardContent, {
+              paddingTop: getResponsiveSizeScaled(46, width),
+              paddingBottom: getResponsiveSizeScaled(46, width),
+              paddingHorizontal: getResponsiveSizeScaled(27, width),
+            }]}>
               <Text
                 style={[
                   styles.description,
-                  { fontSize: getResponsiveSizeScaled(17, width) },
+                  {
+                    fontSize: getResponsiveSizeScaled(17, width),
+                    lineHeight: getResponsiveSizeScaled(17, width) * 1.7,
+                  },
                 ]}
                 numberOfLines={9}
                 adjustsFontSizeToFit
@@ -177,17 +186,12 @@ const styles = StyleSheet.create({
   },
   boardContent: {
     width: "70%",  // More text space with smaller board
-    paddingTop: 46,
-    paddingBottom: 46,
-    paddingHorizontal: 27,
     alignItems: "center",
   },
   description: {
     fontFamily: "Galindo",
-    fontSize: 18,
     color: Colors.textPrimary,
     textAlign: "center",
-    lineHeight: 30,
     maxWidth: "100%",
   },
 
@@ -207,20 +211,13 @@ const styles = StyleSheet.create({
   },
   warmupBadge: {
     position: 'absolute',
-    top: 8,
-    right: 8,
     backgroundColor: 'rgba(0,0,0,0.35)',
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
     zIndex: 10,
   },
   warmupText: {
     fontFamily: "Galindo",
-    fontSize: 12,
     color: '#fff',
   },
 });
