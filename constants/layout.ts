@@ -394,7 +394,7 @@ export const QuestionOffsets = {
       boardPaddingTop: 28,              // Optimized for 380px height
       boardPaddingBottom: 15,           // Reduced to compensate for taller question area
       boardPaddingHorizontal: 40,       // Wide padding for content breathing room
-      questionAreaHeight: 140,          // Increased from 90 to accommodate long questions (e.g. Kedah)
+      questionAreaHeight: 160,          // Increased to 160 for better text overflow handling
       answerAreaTop: 15,                // Reduced to compensate for taller question area
       optionsContainer: { gap: 24 },    // Vertical gap between button rows
       optionRow: { gap: 20 },           // Horizontal gap between buttons
@@ -404,7 +404,7 @@ export const QuestionOffsets = {
       boardPaddingTop: 28,
       boardPaddingBottom: 12,           // Reduced to compensate for taller question area
       boardPaddingHorizontal: 32,
-      questionAreaHeight: 130,          // Increased from 90 to accommodate long questions
+      questionAreaHeight: 145,          // Increased to 145 for better text overflow handling
       answerAreaTop: 15,                // Reduced to compensate
       optionsContainer: { gap: 22 },
       optionRow: { gap: 16 },

@@ -48,7 +48,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
     boardPaddingTop: 25,
     boardPaddingBottom: 15,
     boardPaddingHorizontal: 30,
-    questionAreaHeight: 90,
+    questionAreaHeight: 120,  // Increased to 120 for better text overflow handling
     buttonsAreaTop: 15,
     buttonGap: 30,
   };
@@ -122,11 +122,14 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
             <Text
               style={[
                 styles.questionText,
-                { fontSize: getResponsiveFontSize('question', width) },
+                {
+                  fontSize: getResponsiveFontSize('question', width),
+                  lineHeight: getResponsiveFontSize('question', width) * Typography.lineHeight.normal,
+                },
               ]}
               numberOfLines={5}
               adjustsFontSizeToFit
-              minimumFontScale={0.85}
+              minimumFontScale={0.9}
               allowFontScaling={allowScaling}>
               {question.question}
             </Text>
@@ -236,7 +239,7 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: Typography.lineHeight.normal * 20, // 1.4 * 20 = 28
+    // lineHeight calculated dynamically inline
   },
 
   // Buttons Section (Bottom of board - Vertical per Figma)

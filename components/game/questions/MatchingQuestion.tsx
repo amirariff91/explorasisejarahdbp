@@ -38,7 +38,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     boardPaddingTop: 25,
     boardPaddingBottom: 15,
     boardPaddingHorizontal: 30,
-    questionAreaHeight: 140, // Increased from 90 for longer text
+    questionAreaHeight: 170,  // Increased to 170 for better text overflow handling
     gridAreaTop: 12, // Reduced from 15 to compensate
     gridContainer: { gap: 16 }, // Reduced from 20 for better spacing
     gridRow: { gap: 16 },
@@ -129,22 +129,28 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
             <Text
               style={[
                 styles.titleText,
-                { fontSize: getResponsiveFontSize('question', width) },
+                {
+                  fontSize: getResponsiveFontSize('question', width),
+                  lineHeight: getResponsiveFontSize('question', width) * Typography.lineHeight.normal,
+                },
               ]}
               numberOfLines={2}
               adjustsFontSizeToFit
-              minimumFontScale={0.85}
+              minimumFontScale={0.9}
               allowFontScaling={allowScaling}>
               {question.title}
             </Text>
             <Text
               style={[
                 styles.questionText,
-                { fontSize: getResponsiveFontSize('answer', width) },
+                {
+                  fontSize: getResponsiveFontSize('answer', width),
+                  lineHeight: getResponsiveFontSize('answer', width) * Typography.lineHeight.tight,
+                },
               ]}
               numberOfLines={3}
               adjustsFontSizeToFit
-              minimumFontScale={0.85}
+              minimumFontScale={0.9}
               allowFontScaling={allowScaling}>
               {question.question}
             </Text>
@@ -181,9 +187,9 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
                           resizeMode="stretch">
                           <Text
                             style={[styles.gridCellText, { fontSize }]}
-                            numberOfLines={3}
+                            numberOfLines={4}
                             adjustsFontSizeToFit
-                            minimumFontScale={0.85}
+                            minimumFontScale={0.9}
                             allowFontScaling={allowScaling}>
                             {isSelected && '✓ '}
                             {option}
@@ -268,7 +274,7 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: Typography.lineHeight.tight * 16, // 1.2 * 16 = 19.2
+    // lineHeight calculated dynamically inline
   },
 
   // Grid Section (Bottom of board)
@@ -296,7 +302,7 @@ const styles = StyleSheet.create({
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 4,
+    padding: 6,  // Increased from 4 for better text space
   },
   gridCellText: {
     fontFamily: Typography.fontFamily,

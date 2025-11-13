@@ -151,11 +151,14 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
             <Text
               style={[
                 styles.questionText,
-                { fontSize: getResponsiveFontSize('question', width) },
+                {
+                  fontSize: getResponsiveFontSize('question', width),
+                  lineHeight: getResponsiveFontSize('question', width) * Typography.lineHeight.normal,
+                },
               ]}
               numberOfLines={7}
               adjustsFontSizeToFit
-              minimumFontScale={0.8}
+              minimumFontScale={0.9}
               allowFontScaling={allowScaling}>
               {question.question}
             </Text>
@@ -192,9 +195,9 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                           styles.optionText,
                           { fontSize: getResponsiveFontSize('answer', width) },
                         ]}
-                        numberOfLines={2}
+                        numberOfLines={3}
                         adjustsFontSizeToFit
-                        minimumFontScale={0.85}
+                        minimumFontScale={0.9}
                         allowFontScaling={allowScaling}>
                         {option}
                       </Text>
@@ -233,9 +236,9 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                             styles.optionText,
                             { fontSize: getResponsiveFontSize('answer', width) },
                           ]}
-                          numberOfLines={2}
+                          numberOfLines={3}
                           adjustsFontSizeToFit
-                          minimumFontScale={0.85}
+                          minimumFontScale={0.9}
                           allowFontScaling={allowScaling}>
                           {option}
                         </Text>
@@ -311,7 +314,7 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: Typography.lineHeight.normal * 20, // 1.4 * 20 = 28
+    // lineHeight calculated dynamically inline
   },
 
   // Answers Section (Bottom of board)
@@ -346,7 +349,7 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
     textAlign: 'center',
     fontWeight: Typography.fontWeight.semiBold,
-    paddingHorizontal: 8,
+    paddingHorizontal: 12,  // Increased from 8 for better text space
   },
 
   // Footer: Next Button (Outside board)

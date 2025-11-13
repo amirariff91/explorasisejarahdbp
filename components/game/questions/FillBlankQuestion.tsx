@@ -68,11 +68,14 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
           <Text
             style={[
               styles.questionText,
-              { fontSize: getResponsiveFontSize('question', width) },
+              {
+                fontSize: getResponsiveFontSize('question', width),
+                lineHeight: getResponsiveFontSize('question', width) * Typography.lineHeight.normal,
+              },
             ]}
             numberOfLines={3}
             adjustsFontSizeToFit
-            minimumFontScale={0.85}
+            minimumFontScale={0.9}
             allowFontScaling={allowScaling}>
             {question.question}
           </Text>
@@ -174,7 +177,7 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: Typography.lineHeight.normal * 20, // 1.4 * 20 = 28
+    // lineHeight calculated dynamically inline
   },
 
   // Right Section: Input + OK Button

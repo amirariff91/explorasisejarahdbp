@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ImageBackground, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, useWindowDimensions, ScrollView } from 'react-native';
 import { getResponsiveFontSize, Typography } from '@/constants/theme';
 import { getResponsiveSizeScaled, getQuestionBoardSize } from '@/constants/layout';
 import { ASSETS } from '@/constants/assets';
@@ -55,25 +55,29 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
             ]}
             resizeMode="contain">
             <View style={styles.clueBoardContent}>
-              <Text
-                style={[styles.clueTitle, { fontSize: getResponsiveFontSize('answer', width) }]}
-                allowFontScaling={allowScaling}
-                numberOfLines={1}
-                adjustsFontSizeToFit={true}
-                minimumFontScale={0.8}>
-                MENDATAR
-              </Text>
-              {acrossClues.map((clue) => (
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.clueScrollContent}>
                 <Text
-                  key={clue.number}
-                  style={[styles.clueText, { fontSize: getResponsiveFontSize('clue', width) }]}
-                  numberOfLines={3}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.8}
-                  allowFontScaling={allowScaling}>
-                  {clue.number}. {clue.clue}
+                  style={[styles.clueTitle, { fontSize: getResponsiveFontSize('answer', width) }]}
+                  allowFontScaling={allowScaling}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  minimumFontScale={0.8}>
+                  MENDATAR
                 </Text>
-              ))}
+                {acrossClues.map((clue) => (
+                  <Text
+                    key={clue.number}
+                    style={[styles.clueText, { fontSize: getResponsiveFontSize('clue', width) }]}
+                    numberOfLines={3}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.8}
+                    allowFontScaling={allowScaling}>
+                    {clue.number}. {clue.clue}
+                  </Text>
+                ))}
+              </ScrollView>
             </View>
           </ImageBackground>
         </View>
@@ -130,25 +134,29 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
             ]}
             resizeMode="contain">
             <View style={styles.clueBoardContent}>
-              <Text
-                style={[styles.clueTitle, { fontSize: getResponsiveFontSize('answer', width) }]}
-                allowFontScaling={allowScaling}
-                numberOfLines={1}
-                adjustsFontSizeToFit={true}
-                minimumFontScale={0.8}>
-                MENEGAK
-              </Text>
-              {downClues.map((clue) => (
+              <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.clueScrollContent}>
                 <Text
-                  key={clue.number}
-                  style={[styles.clueText, { fontSize: getResponsiveFontSize('clue', width) }]}
-                  numberOfLines={3}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.8}
-                  allowFontScaling={allowScaling}>
-                  {clue.number}. {clue.clue}
+                  style={[styles.clueTitle, { fontSize: getResponsiveFontSize('answer', width) }]}
+                  allowFontScaling={allowScaling}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  minimumFontScale={0.8}>
+                  MENEGAK
                 </Text>
-              ))}
+                {downClues.map((clue) => (
+                  <Text
+                    key={clue.number}
+                    style={[styles.clueText, { fontSize: getResponsiveFontSize('clue', width) }]}
+                    numberOfLines={3}
+                    adjustsFontSizeToFit
+                    minimumFontScale={0.8}
+                    allowFontScaling={allowScaling}>
+                    {clue.number}. {clue.clue}
+                  </Text>
+                ))}
+              </ScrollView>
             </View>
           </ImageBackground>
         </View>
@@ -187,6 +195,10 @@ const styles = StyleSheet.create({
   clueBoardContent: {
     width: '80%',
     paddingVertical: 16,
+    flex: 1,  // Allow ScrollView to take available height
+  },
+  clueScrollContent: {
+    flexGrow: 1,
   },
   clueTitle: {
     fontFamily: Typography.fontFamily,
