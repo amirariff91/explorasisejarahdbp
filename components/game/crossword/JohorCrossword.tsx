@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -23,11 +23,11 @@ import {
 } from '@/constants/theme';
 import {
   isLandscapeMode,
-  QuestionBoard,
   LayoutRatios,
   Spacing,
   ButtonSizes,
   getQuestionOffsets,
+  getQuestionBoardSize,
 } from '@/constants/layout';
 import StatusBar from '@/components/game/StatusBar';
 import MenuButton from '@/components/game/MenuButton';
@@ -162,11 +162,37 @@ export default function JohorCrossword() {
     return ids;
   }, [visitedClues, clueMap]);
 
-  const clueBoardSize = isLandscape
-    ? QuestionBoard.clue.landscape
-    : QuestionBoard.clue.portrait;
+  const crosswordOffsets = getQuestionOffsets('crossword', isLandscape) as {
+    containerPadding: { paddingTop: number; paddingBottom: number };
+    columnGap: number;
+    gridContainer: { marginTop: number };
+    clueContent: { width: string; paddingVertical: number };
+  };
+  const columnGap = crosswordOffsets.columnGap;
 
-  const gridMaxWidth = width * (isLandscape ? 0.42 : 0.78);
+  // Compute available width for three-column layout (clues | grid | clues)
+  const horizontalPadding = isLandscape
+    ? Spacing.contentPadding.landscape
+    : Spacing.contentPadding.portrait;
+  const totalColumnFlex =
+    LayoutRatios.threeColumn.crossword.left +
+    LayoutRatios.threeColumn.crossword.center +
+    LayoutRatios.threeColumn.crossword.right;
+
+  // Total width for columns after side padding and inter-column gaps
+  const columnsWidth = Math.max(
+    width - horizontalPadding * 2 - (isLandscape ? columnGap * 2 : 0),
+    0,
+  );
+
+  const centerColumnShare = LayoutRatios.threeColumn.crossword.center / totalColumnFlex;
+  const clueColumnShare = LayoutRatios.threeColumn.crossword.left / totalColumnFlex;
+
+  const centerColumnWidth = columnsWidth * centerColumnShare;
+  const clueColumnWidth = columnsWidth * clueColumnShare;
+
+  // Responsive grid sizing constrained to center column
+  const gridMaxWidth = isLandscape ? centerColumnWidth : width * 0.78;
   const gridMaxHeight = height * (isLandscape ? 0.58 : 0.42);
 
   const baseTileSize = Math.min(
@@ -182,13 +208,22 @@ export default function JohorCrossword() {
 
   const gridWidth = tileSize * PUZZLE.gridSize.cols;
   const gridHeight = tileSize * PUZZLE.gridSize.rows;
-  const crosswordOffsets = getQuestionOffsets('crossword', isLandscape) as {
-    containerPadding: { paddingTop: number; paddingBottom: number };
-    columnGap: number;
-    gridContainer: { marginTop: number };
-    clueContent: { width: string; paddingVertical: number };
+
+  // Responsive clue board sizing using new question board system
+  const baseClueBoardSize = getQuestionBoardSize('clue', width);
+  const clueBoardScale = isLandscape ? 1.9 : 1.6;
+  const scaledClueWidth = baseClueBoardSize.width * clueBoardScale;
+  const scaledClueHeight = baseClueBoardSize.height * clueBoardScale;
+
+  const maxClueWidth = isLandscape ? clueColumnWidth : width * 0.9;
+  const safeScaledClueWidth = scaledClueWidth || 1;
+  const clueWidth = Math.min(scaledClueWidth, maxClueWidth);
+  const clueHeight = scaledClueHeight * (clueWidth / safeScaledClueWidth);
+
+  const clueBoardSize = {
+    width: clueWidth,
+    height: clueHeight,
   };
-  const columnGap = crosswordOffsets.columnGap;
 
   const handleSelectWord = (wordId?: string) => {
     if (!wordId) {
@@ -409,13 +444,14 @@ export default function JohorCrossword() {
       <MenuButton />
 
       <Pressable
-        style={[
+        style={({ pressed }) => [
           styles.nextButton,
           {
             width: nextButtonSize.width,
             height: nextButtonSize.height,
             bottom: insets.bottom + 20,
             right: Math.max(insets.right, 16),
+            transform: [{ scale: pressed ? 0.92 : 1 }],
           },
         ]}
         accessibilityRole="button"
@@ -465,14 +501,25 @@ function ClueBoard({
   boardHeight,
   onSelect,
 }: ClueBoardProps) {
+  const scrollRef = useRef<ScrollView | null>(null);
+  const itemLayoutRef = useRef<Record<string, number>>({});
+
+  useEffect(() => {
+    if (!activeClueId) return;
+    const y = itemLayoutRef.current[activeClueId];
+    if (y === undefined || !scrollRef.current) return;
+    const offset = Math.max(y - 40, 0);
+    scrollRef.current.scrollTo({ y: offset, animated: true });
+  }, [activeClueId]);
+
   return (
     <ImageBackground
       source={ASSETS.games.dbpSejarah.soalanBoard}
       style={[
         styles.clueBoard,
         {
-          width: boardWidth * 1.9,
-          height: boardHeight * 1.9,
+          width: boardWidth,
+          height: boardHeight,
         },
       ]}
       resizeMode="contain">
@@ -481,10 +528,12 @@ function ClueBoard({
           style={styles.clueTitle}
           allowFontScaling={allowScaling}
           numberOfLines={1}
-          adjustsFontSizeToFit>
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}>
           {title}
         </Text>
         <ScrollView
+          ref={scrollRef}
           style={styles.clueScroll}
           bounces={false}
           showsVerticalScrollIndicator={false}>
@@ -495,6 +544,14 @@ function ClueBoard({
               <Pressable
                 key={clue.id}
                 onPress={() => onSelect(clue)}
+                onLayout={(event) => {
+                  const y = event.nativeEvent.layout.y;
+                  itemLayoutRef.current[clue.id] = y;
+                  if (activeClueId === clue.id && scrollRef.current) {
+                    const offset = Math.max(y - 40, 0);
+                    scrollRef.current.scrollTo({ y: offset, animated: true });
+                  }
+                }}
                 style={[styles.clueItem, isActive && styles.clueItemActive, isVisited && styles.clueItemVisited]}
                 accessibilityRole="button"
                 accessibilityLabel={`Petunjuk ${clue.number}. ${clue.text}`}

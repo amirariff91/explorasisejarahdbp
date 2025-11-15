@@ -33,9 +33,19 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
   const boardScale = 1.87;
   const scaledClueWidth = baseClueBoardSize.width * boardScale;
   const scaledClueHeight = baseClueBoardSize.height * boardScale;
-  const maxClueWidth = width * (width < 1000 ? 0.8 : 0.26); // Percentage-based, OK to keep
-  const clueBoardWidth = Math.min(scaledClueWidth, maxClueWidth);
+  const totalColumns = 3;
+  const availableWidth = Math.max(
+    width - edgeMargin * 2 - columnGap * (totalColumns - 1),
+    0,
+  );
+  const columnWidth = availableWidth / totalColumns || 0;
+
+  const clueBoardMaxWidth = columnWidth;
+  const clueBoardWidth = Math.min(scaledClueWidth, clueBoardMaxWidth);
   const clueBoardHeight = (scaledClueHeight / scaledClueWidth) * clueBoardWidth;
+
+  const baseGridSize = getResponsiveSizeScaled(220, width);
+  const gridSize = Math.min(baseGridSize, columnWidth);
 
   return (
     <View style={styles.container}>
@@ -98,8 +108,8 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
             style={[
               styles.gridContainer,
               {
-                width: getResponsiveSizeScaled(220, width),
-                height: getResponsiveSizeScaled(220, width),
+                width: gridSize,
+                height: gridSize,
                 marginTop: getResponsiveSizeScaled(12, width),
               },
             ]}>

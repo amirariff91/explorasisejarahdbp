@@ -43,9 +43,35 @@ export default function Homepage() {
   const mastheadWidth = getResponsiveSizeScaled(564, width, 1.8);   // Max 1015px on iPad Pro
   const mastheadHeight = getResponsiveSizeScaled(242, width, 1.8);  // Max 436px on iPad Pro
 
-  const logoTop = insets.top + height * 0.05;
-  const titleTop = logoTop + logoHeight + (isLandscape ? height * 0.08 : height * 0.12);
-  const buttonBottom = insets.bottom + height * 0.08;
+  // Vertical responsiveness: scale content so it fits short phone heights (e.g. Pixel 8a landscape)
+  const availableHeight = height - insets.top - insets.bottom;
+  const baseTopPadding = getResponsiveSizeScaled(isLandscape ? 16 : 24, width);
+  const baseBottomPadding = getResponsiveSizeScaled(isLandscape ? 24 : 32, width);
+  const baseLogoPaddingVertical = 20; // logoContainer paddingTop + paddingBottom
+  const baseTitlePaddingVertical = 40; // titleContainer paddingTop + paddingBottom
+
+  const baseContentHeight =
+    baseTopPadding +
+    baseBottomPadding +
+    baseLogoPaddingVertical +
+    logoHeight +
+    baseTitlePaddingVertical +
+    mastheadHeight +
+    buttonHeight;
+
+  const verticalScale =
+    availableHeight > 0
+      ? Math.min(1, availableHeight / baseContentHeight)
+      : 1;
+  const paddingScale = verticalScale;
+
+  // Rebalance vertical space between elements on short screens:
+  // Make the title masthead slightly larger, and logo/button slightly smaller,
+  // while keeping the total height <= the uniformly-scaled layout.
+  const useRebalancedScales = verticalScale < 0.99;
+  const logoScale = useRebalancedScales ? verticalScale * 0.8 : 1;
+  const mastheadScale = useRebalancedScales ? verticalScale * 1.2 : 1;
+  const buttonSizeScale = useRebalancedScales ? verticalScale * 0.7 : 1;
 
   // Play welcome background music and ambient on mount with synchronized SFX
   useEffect(() => {
@@ -124,52 +150,84 @@ export default function Homepage() {
       style={styles.container}
       resizeMode="cover"
     >
-      {/* DBP Logo Container - Top Center */}
-      <View style={[styles.logoOuterContainer, { top: logoTop }]}>
-        <View style={styles.logoContainer}>
-          <Image
-            source={ASSETS.branding.logoDbp}
-            style={[
-              styles.logo,
-              { width: logoWidth, height: logoHeight },
-            ]}
-            contentFit="contain"
-          />
-        </View>
-      </View>
+      <View
+        style={[
+          styles.content,
+          {
+            paddingTop:
+              insets.top + baseTopPadding * paddingScale,
+            paddingBottom:
+              insets.bottom +
+              baseBottomPadding * paddingScale +
+              getResponsiveSizeScaled(4, width), // small cushion above Android nav bar
+          },
+        ]}
+      >
+        {/* Top Stack: Logo + Title */}
+        <View style={styles.topSection}>
+          {/* DBP Logo */}
+          <View style={styles.logoOuterContainer}>
+            <View
+              style={[
+                styles.logoContainer,
+                { paddingVertical: 10 * paddingScale },
+              ]}
+            >
+              <Image
+                source={ASSETS.branding.logoDbp}
+                style={{
+                  width: logoWidth * logoScale,
+                  height: logoHeight * logoScale,
+                }}
+                contentFit="contain"
+              />
+            </View>
+          </View>
 
-      {/* Masthead Container - Center */}
-      <View style={[styles.mastheadOuterContainer, { top: titleTop }]}>
-        <View style={styles.titleContainer}>
-          <Image
-            source={ASSETS.branding.titleMasthead}
-            style={{
-              width: mastheadWidth,
-              height: mastheadHeight,
-            }}
-            contentFit="contain"
-            cachePolicy="memory-disk"
-            priority="high"
-            transition={200}
-          />
+          {/* Masthead */}
+          <View style={styles.mastheadOuterContainer}>
+            <View
+              style={[
+                styles.titleContainer,
+                { paddingVertical: 20 * paddingScale },
+              ]}
+            >
+              <Image
+                source={ASSETS.branding.titleMasthead}
+                style={{
+                  width: mastheadWidth * mastheadScale,
+                  height: mastheadHeight * mastheadScale,
+                }}
+                contentFit="contain"
+                cachePolicy="memory-disk"
+                priority="high"
+                transition={200}
+              />
+            </View>
+          </View>
         </View>
-      </View>
 
-      {/* Button Container - Bottom Center with Breathing Animation */}
-      <View style={[styles.buttonOuterContainer, { bottom: buttonBottom }]}>
-        <Pressable
-          onPressIn={handlePressIn}
-          onPressOut={handlePressOut}
-          onPress={handlePlay}
-        >
-          <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
-            <Image
-              source={ASSETS.shared.buttons.next.default}
-              style={{ width: buttonWidth, height: buttonHeight }}
-              contentFit="contain"
-            />
-          </Animated.View>
-        </Pressable>
+        {/* Button Container - Bottom with Breathing Animation */}
+        <View style={styles.buttonOuterContainer}>
+          <Pressable
+            onPressIn={handlePressIn}
+            onPressOut={handlePressOut}
+            onPress={handlePlay}
+            accessibilityRole="button"
+            accessibilityLabel="Mula bermain"
+          >
+            <Animated.View style={{ transform: [{ scale: buttonScale }] }}>
+              <Image
+                source={ASSETS.shared.buttons.next.default}
+                style={{
+                  width: buttonWidth * buttonSizeScale,
+                  height: buttonHeight * buttonSizeScale,
+                }}
+                contentFit="contain"
+              />
+            </Animated.View>
+          </Pressable>
+        </View>
       </View>
     </ImageBackground>
   );
@@ -178,16 +236,20 @@ export default function Homepage() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  content: {
+    flex: 1,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "space-between",
+  },
+  topSection: {
+    alignItems: "center",
   },
 
   // Logo Outer Container
   logoOuterContainer: {
-    position: "absolute",
     alignItems: "center",
-    justifyContent: "center",
-    // top is set dynamically via inline styles
+    justifyContent: "flex-start",
   },
   logoContainer: {
     alignItems: "center",
@@ -201,9 +263,6 @@ const styles = StyleSheet.create({
 
   // Masthead Outer Container
   mastheadOuterContainer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -219,11 +278,7 @@ const styles = StyleSheet.create({
 
   // Button Outer Container
   buttonOuterContainer: {
-    position: "absolute",
-    left: 0,
-    right: 0,
     alignItems: "center",
-    justifyContent: "center",
-    // bottom is set dynamically via inline styles
+    justifyContent: "flex-end",
   },
 });

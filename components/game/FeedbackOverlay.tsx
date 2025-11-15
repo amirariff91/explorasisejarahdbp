@@ -1,10 +1,10 @@
 import {
-    BorderRadius,
-    Colors,
-    getTextShadowStyle,
-    getResponsiveFontSize,
-    Shadows,
-    Typography,
+  BorderRadius,
+  Colors,
+  getTextShadowStyle,
+  getResponsiveFontSize,
+  Shadows,
+  Typography,
 } from '@/constants/theme';
 import { getResponsiveSizeScaled } from '@/constants/layout';
 import { playRandomFeedback } from '@/utils/audio';
@@ -12,13 +12,14 @@ import * as Haptics from 'expo-haptics';
 import { useEffect } from 'react';
 import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import Animated, {
-    Easing,
-    useAnimatedStyle,
-    useSharedValue,
-    withSequence,
-    withSpring,
-    withTiming,
+  Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
 } from 'react-native-reanimated';
+import { useGameContext } from '@/contexts/GameContext';
 
 interface FeedbackOverlayProps {
   visible: boolean;
@@ -46,6 +47,8 @@ export default function FeedbackOverlay({
   onDismiss,
 }: FeedbackOverlayProps) {
   const { width } = useWindowDimensions();
+  const { gameState } = useGameContext();
+  const allowScaling = gameState.allowFontScaling;
   
   // Responsive sizing (4-tier system)
   const iconSize = getResponsiveSizeScaled(60, width); // Auto-scales across device tiers
@@ -136,7 +139,11 @@ export default function FeedbackOverlay({
               styles.icon, 
               { fontSize: iconSize },
               isCorrect ? styles.iconCorrect : styles.iconWrong
-            ]}>
+            ]}
+            allowFontScaling={allowScaling}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}>
             {isCorrect ? '✓' : '✗'}
           </Text>
           <Text
@@ -144,7 +151,11 @@ export default function FeedbackOverlay({
               styles.feedbackText,
               { fontSize: feedbackTextSize },
               isCorrect ? styles.feedbackTextCorrect : styles.feedbackTextWrong,
-            ]}>
+            ]}
+            allowFontScaling={allowScaling}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}>
             {isCorrect ? 'BETUL!' : 'CUBA LAGI!'}
           </Text>
 
@@ -152,12 +163,22 @@ export default function FeedbackOverlay({
           {!isCorrect && (moneyChange !== undefined || healthChange !== undefined) && (
             <View style={styles.changesContainer}>
               {moneyChange !== undefined && moneyChange !== 0 && (
-                <Text style={[styles.changeText, { fontSize: changeTextSize }]}>
+                <Text
+                  style={[styles.changeText, { fontSize: changeTextSize }]}
+                  allowFontScaling={allowScaling}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.85}>
                   💰 {moneyChange > 0 ? '+' : ''}RM{moneyChange}
                 </Text>
               )}
               {healthChange !== undefined && healthChange !== 0 && (
-                <Text style={[styles.changeText, { fontSize: changeTextSize }]}>
+                <Text
+                  style={[styles.changeText, { fontSize: changeTextSize }]}
+                  allowFontScaling={allowScaling}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit
+                  minimumFontScale={0.85}>
                   ❤️ {healthChange > 0 ? '+' : ''}{healthChange}%
                 </Text>
               )}
@@ -172,7 +193,9 @@ export default function FeedbackOverlay({
               style={styles.explanationScroll}
               showsVerticalScrollIndicator={true}
               bounces={false}>
-              <Text style={[styles.explanationText, { fontSize: explanationTextSize }]}>
+              <Text
+                style={[styles.explanationText, { fontSize: explanationTextSize }]}
+                allowFontScaling={allowScaling}>
                 {explanation}
               </Text>
             </ScrollView>

@@ -1,5 +1,5 @@
 import LandscapeLayout from '@/components/game/LandscapeLayout';
-import { isLandscapeMode, getQuestionBoardSize, TouchTargets } from '@/constants/layout';
+import { isLandscapeMode, getQuestionBoardSize, TouchTargets, getEdgeMargin, getColumnGap } from '@/constants/layout';
 import { Colors, getResponsiveFontSize, Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
 import type { FillBlankQuestion as FBQuestion } from '@/types';
@@ -39,7 +39,12 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const boardScale = 1.25;  // Slightly larger for fill-blank questions
   const scaledBoardWidth = boardSize.width * boardScale;
   const scaledBoardHeight = boardSize.height * boardScale;
-  const maxBoardWidth = width * (isLandscape ? 0.85 : 0.92);
+  const edgeMargin = getEdgeMargin(isLandscape);
+  const columnGap = getColumnGap(isLandscape);
+  const totalFlex = 40 + 58;
+  const leftFlexRatio = 40 / totalFlex;
+  const availableWidth = width - edgeMargin * 2 - columnGap;
+  const maxBoardWidth = availableWidth * leftFlexRatio;
   const boardWidth = Math.min(scaledBoardWidth, maxBoardWidth);
   const boardHeight = (scaledBoardHeight / scaledBoardWidth) * boardWidth;
 

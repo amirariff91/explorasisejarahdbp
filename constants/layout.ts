@@ -82,7 +82,7 @@ export const QuestionBoardBase = {
   // Description Board (Tutorial descriptions)
   description: {
     width: 380,
-    height: 200,
+    height: 240,
   },
   // Clue Board (Crossword clues)
   clue: {

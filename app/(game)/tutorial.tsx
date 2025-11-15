@@ -75,6 +75,8 @@ export default function TutorialScreen() {
   };
 
   const edgeMargin = getResponsiveSizeScaled(40, width);
+  const descriptionBoardSize = getQuestionBoardSize('description', width);
+  const verticalPadding = getResponsiveSizeScaled(32, width);
 
   return (
     <ImageBackground
@@ -106,13 +108,13 @@ export default function TutorialScreen() {
             source={ASSETS.shared.backgrounds.board}
             style={[
               styles.descriptionBoard,
-              getQuestionBoardSize('description', width),
+              descriptionBoardSize,
             ]}
             resizeMode="contain"
           >
             <View style={[styles.boardContent, {
-              paddingTop: getResponsiveSizeScaled(46, width),
-              paddingBottom: getResponsiveSizeScaled(46, width),
+              paddingTop: verticalPadding,
+              paddingBottom: verticalPadding,
               paddingHorizontal: getResponsiveSizeScaled(27, width),
             }]}>
               <Text
@@ -123,9 +125,9 @@ export default function TutorialScreen() {
                     lineHeight: getResponsiveSizeScaled(17, width) * 1.7,
                   },
                 ]}
-                numberOfLines={9}
+                numberOfLines={6}
                 adjustsFontSizeToFit
-                minimumFontScale={0.85}
+                minimumFontScale={0.9}
                 allowFontScaling={allowScaling}
               >
                 {currentTutorial.description}
@@ -184,7 +186,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   boardContent: {
-    width: "70%",  // More text space with smaller board
+    width: "80%",  // More text space with smaller board
     alignItems: "center",
   },
   description: {

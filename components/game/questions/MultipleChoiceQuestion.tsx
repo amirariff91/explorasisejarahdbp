@@ -261,11 +261,12 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
           },
         ]}>
           <Pressable
-            style={[
+            style={({ pressed }) => [
               styles.nextButton,
               {
                 width: nextButtonSize.width,
                 height: nextButtonSize.height,
+                transform: [{ scale: pressed ? 0.92 : 1 }],
               },
             ]}
             onPress={handleNext}

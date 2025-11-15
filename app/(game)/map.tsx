@@ -155,8 +155,13 @@ export default function StateSelectionScreen() {
         {/* Left Section - Tutorial */}
         <View style={styles.topBarLeft}>
           <Pressable
-            style={styles.tutorialButtonCompact}
+            style={({ pressed }) => [
+              styles.tutorialButtonCompact,
+              { transform: [{ scale: pressed ? 0.96 : 1 }] },
+            ]}
             onPress={handleTutorial}
+            accessibilityRole="button"
+            accessibilityLabel="Lihat tutorial permainan"
           >
             <Text
               style={styles.tutorialButtonText}
@@ -248,8 +253,24 @@ export default function StateSelectionScreen() {
             else router.push(`/quiz/${s}`);
           };
           return (
-            <Pressable style={styles.warmupBadge} onPress={onResume} accessibilityRole="button">
-              <Text style={styles.warmupText} allowFontScaling={allowScaling}>{label}</Text>
+            <Pressable
+              style={({ pressed }) => [
+                styles.warmupBadge,
+                { transform: [{ scale: pressed ? 0.97 : 1 }] },
+              ]}
+              onPress={onResume}
+              accessibilityRole="button"
+              accessibilityLabel={label}
+            >
+              <Text
+                style={styles.warmupText}
+                allowFontScaling={allowScaling}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.85}
+              >
+                {label}
+              </Text>
             </Pressable>
           );
         })()}
