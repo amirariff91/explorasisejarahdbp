@@ -1,7 +1,7 @@
 import MalaysiaMapSVG from "@/components/game/MalaysiaMapSVG";
 import { BorderRadius, Colors, Shadows, Typography, getComponentShadowStyle } from "@/constants/theme";
 import { useGameContext } from "@/contexts/GameContext";
-import { isLandscapeMode, getQuestionBoardSize } from "@/constants/layout";
+import { getQuestionBoardSize } from "@/constants/layout";
 import type { MalaysianState } from "@/types";
 import { playAmbient, playMusic, playSound, stopAllAmbient, stopMusic } from "@/utils/audio";
 import { useRouter } from "expo-router";
@@ -42,7 +42,6 @@ export default function StateSelectionScreen() {
   const { width } = useWindowDimensions();
   const { gameState, isLoading, saveError, setCurrentState } = useGameContext();
   const insets = useSafeAreaInsets();
-  const isLandscape = isLandscapeMode(width);
   const allowScaling = gameState.allowFontScaling;
 
   // Route guard: Check if player profile exists

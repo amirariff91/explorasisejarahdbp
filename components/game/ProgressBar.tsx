@@ -66,7 +66,8 @@ export default function ProgressBar({ currentQuestion, totalQuestions }: Progres
       <Text
         style={[
           styles.counterText,
-          { fontSize: getResponsiveFontSize(Typography.bodySmall, isLandscape) },
+          // Use unified responsive typography scale (answer text size tier)
+          { fontSize: getResponsiveFontSize('answer', width) },
         ]}>
         Soalan {currentQuestion} daripada {totalQuestions}
       </Text>

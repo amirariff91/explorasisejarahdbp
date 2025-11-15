@@ -1,4 +1,4 @@
-import { ButtonSizes, EdgeMargins, isLandscapeMode, QuestionBoardBase, getQuestionBoardSize, TouchTargets } from '@/constants/layout';
+import { ButtonSizes, EdgeMargins, getQuestionBoardSize, TouchTargets } from '@/constants/layout';
 import {
   Colors,
   getResponsiveFontSize,
@@ -41,7 +41,6 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   const { gameState } = useGameContext();
   const { width, height } = useWindowDimensions();
-  const isLandscape = isLandscapeMode(width);
   const allowScaling = gameState.allowFontScaling;
   // Simple responsive offsets for True/False questions
   const offsets = {

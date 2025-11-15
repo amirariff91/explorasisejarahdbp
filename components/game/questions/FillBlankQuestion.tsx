@@ -1,5 +1,5 @@
 import LandscapeLayout from '@/components/game/LandscapeLayout';
-import { isLandscapeMode, QuestionBoardBase, getQuestionBoardSize, TouchTargets } from '@/constants/layout';
+import { isLandscapeMode, getQuestionBoardSize, TouchTargets } from '@/constants/layout';
 import { Colors, getResponsiveFontSize, Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
 import type { FillBlankQuestion as FBQuestion } from '@/types';

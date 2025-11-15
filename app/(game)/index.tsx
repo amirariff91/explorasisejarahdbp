@@ -1,6 +1,5 @@
 import {
   View,
-  Text,
   StyleSheet,
   ImageBackground,
   Pressable,
@@ -15,7 +14,6 @@ import { ASSETS } from "@/constants/assets";
 import { playSound, playMusic, playAmbient, stopMusic, stopAllAmbient } from "@/utils/audio";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGameContext } from "@/contexts/GameContext";
-import { Colors } from "@/constants/theme";
 import { isLandscapeMode, getResponsiveSizeScaled } from "@/constants/layout";
 
 /**
@@ -44,10 +42,6 @@ export default function Homepage() {
   // Masthead: 564×242px (Figma spec), max 1.8× scale for prominent title
   const mastheadWidth = getResponsiveSizeScaled(564, width, 1.8);   // Max 1015px on iPad Pro
   const mastheadHeight = getResponsiveSizeScaled(242, width, 1.8);  // Max 436px on iPad Pro
-
-  // Calculate responsive spacing to prevent overlaps
-  const minLogoToTitle = 20; // Minimum gap between logo and title
-  const minTitleToButton = 40; // Minimum gap between title and button
 
   const logoTop = insets.top + height * 0.05;
   const titleTop = logoTop + logoHeight + (isLandscape ? height * 0.08 : height * 0.12);

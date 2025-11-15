@@ -5,58 +5,26 @@
  * Migrated from expo-av (deprecated in SDK 54)
  */
 
-import type { MalaysianState } from '@/types';
 import type { AudioPlayer, AudioSource } from 'expo-audio';
 import { createAudioPlayer, setAudioModeAsync } from 'expo-audio';
 
-// Sound type definitions
-export type FeedbackSound =
-  | 'correct-1' | 'correct-2' | 'correct-3'
-  | 'wrong-1' | 'wrong-2'
-  | 'encourage-1' | 'encourage-2' | 'encourage-3';
-
+// Sound type definitions (SFX only - no voiceovers)
 export type UISound = 'click' | 'star' | 'transition' | 'logo-reveal' | 'title-drop';
-
-export type VoiceNarration = 
-  | 'selamat-datang'
-  | 'voice-tutorial-step1' | 'voice-tutorial-step2'
-  | 'voice-welcome' | 'voice-select-state' | 'voice-good-luck' 
-  | 'voice-try-again' | 'voice-perfect-score';
 
 export type MusicSound = 'bgm-title' | 'bgm-map' | 'bgm-quiz' | 'bgm-success' | 'bgm-tutorial';
 
 export type AmbientSound = 'ambient-map' | 'ambient-quiz-soft' | 'ambient-celebration';
 
-type SoundType = FeedbackSound | UISound | VoiceNarration;
+type SoundType = UISound;
 
-// Sound asset map
+// Sound asset map (SFX only)
 const SOUNDS: Record<SoundType, AudioSource> = {
-  // Feedback variations (instrumental only, no voiceovers)
-  'correct-1': require('@/assets/audio/feedback/correct-1.mp3'),
-  'correct-2': require('@/assets/audio/feedback/correct-2.mp3'),
-  'correct-3': require('@/assets/audio/feedback/correct-3.mp3'),
-  'wrong-1': require('@/assets/audio/feedback/wrong-1.mp3'),
-  'wrong-2': require('@/assets/audio/feedback/wrong-2.mp3'),
-  'encourage-1': require('@/assets/audio/feedback/encourage-1.mp3'),
-  'encourage-2': require('@/assets/audio/feedback/encourage-2.mp3'),
-  'encourage-3': require('@/assets/audio/feedback/encourage-3.mp3'),
-
   // UI sounds (SFX)
   'click': require('@/assets/audio/ui/click.mp3'),
   'star': require('@/assets/audio/ui/star.mp3'),
   'transition': require('@/assets/audio/ui/transition.mp3'),
   'logo-reveal': require('@/assets/audio/ui/logo-reveal.mp3'),
   'title-drop': require('@/assets/audio/ui/title-drop.mp3'),
-
-  // Voice narration
-  'selamat-datang': require('@/assets/audio/tutorial/selamat-datang.mp3'),
-  'voice-tutorial-step1': require('@/assets/audio/tutorial/voice-tutorial-step1.mp3'),
-  'voice-tutorial-step2': require('@/assets/audio/tutorial/voice-tutorial-step2.mp3'),
-  'voice-welcome': require('@/assets/audio/tutorial/voice-welcome.mp3'),
-  'voice-select-state': require('@/assets/audio/tutorial/voice-select-state.mp3'),
-  'voice-good-luck': require('@/assets/audio/tutorial/voice-good-luck.mp3'),
-  'voice-try-again': require('@/assets/audio/tutorial/voice-try-again.mp3'),
-  'voice-perfect-score': require('@/assets/audio/tutorial/voice-perfect-score.mp3'),
 };
 
 // Background music asset map
@@ -75,38 +43,14 @@ const AMBIENT: Record<AmbientSound, AudioSource> = {
   'ambient-celebration': require('@/assets/audio/ambient/ambient-celebration.mp3'),
 };
 
-// State completion voice map
-const STATE_VOICES: Record<MalaysianState, AudioSource> = {
-  'perlis': require('@/assets/audio/states/complete-perlis.mp3'),
-  'kedah': require('@/assets/audio/states/complete-kedah.mp3'),
-  'pulau-pinang': require('@/assets/audio/states/complete-pulau-pinang.mp3'),
-  'perak': require('@/assets/audio/states/complete-perak.mp3'),
-  'selangor': require('@/assets/audio/states/complete-selangor.mp3'),
-  'kuala-lumpur': require('@/assets/audio/states/complete-kuala-lumpur.mp3'),
-  'negeri-sembilan': require('@/assets/audio/states/complete-negeri-sembilan.mp3'),
-  'melaka': require('@/assets/audio/states/complete-melaka.mp3'),
-  'johor': require('@/assets/audio/states/complete-johor.mp3'),
-  'pahang': require('@/assets/audio/states/complete-pahang.mp3'),
-  'terengganu': require('@/assets/audio/states/complete-terengganu.mp3'),
-  'kelantan': require('@/assets/audio/states/complete-kelantan.mp3'),
-  'sabah': require('@/assets/audio/states/complete-sabah.mp3'),
-  'sarawak': require('@/assets/audio/states/complete-sarawak.mp3'),
-};
-
 // Sound instance caches
 const soundCache: Map<SoundType, AudioPlayer> = new Map();
 const musicCache: Map<MusicSound, AudioPlayer> = new Map();
 const ambientCache: Map<AmbientSound, AudioPlayer> = new Map();
-const stateVoiceCache: Map<MalaysianState, AudioPlayer> = new Map();
 
 // Current playing music track
 let currentMusic: AudioPlayer | null = null;
 let currentMusicName: MusicSound | null = null;
-
-// Feedback variation arrays for randomization (instrumental only, no voiceovers)
-const CORRECT_FEEDBACK: FeedbackSound[] = ['correct-1', 'correct-2', 'correct-3'];
-const WRONG_FEEDBACK: FeedbackSound[] = ['wrong-1', 'wrong-2'];
-const ENCOURAGE_FEEDBACK: FeedbackSound[] = ['encourage-1', 'encourage-2', 'encourage-3'];
 
 // Debug mode (enabled in development only)
 const DEBUG_AUDIO = __DEV__;
@@ -232,22 +176,11 @@ export async function playCelebration(): Promise<void> {
  */
 export async function playRandomFeedback(isCorrect: boolean, includeEncouragement = false): Promise<void> {
   try {
+    // Use simple SFX-only feedback with no voice layers.
     if (isCorrect) {
-      // Pick random correct feedback
-      const feedback = CORRECT_FEEDBACK[Math.floor(Math.random() * CORRECT_FEEDBACK.length)];
-      await playSound(feedback);
+      await playSound('star', { volume: 0.8 });
     } else {
-      // Pick random wrong feedback
-      const feedback = WRONG_FEEDBACK[Math.floor(Math.random() * WRONG_FEEDBACK.length)];
-      await playSound(feedback);
-      
-      // Optionally add encouragement after wrong answer
-      if (includeEncouragement && Math.random() > 0.5) {
-        setTimeout(async () => {
-          const encourage = ENCOURAGE_FEEDBACK[Math.floor(Math.random() * ENCOURAGE_FEEDBACK.length)];
-          await playSound(encourage);
-        }, 1500); // Play encouragement 1.5s after wrong feedback
-      }
+      await playSound('transition', { volume: 0.7 });
     }
   } catch (error) {
     // Fail silently
@@ -431,40 +364,6 @@ export async function stopAllAmbient(): Promise<void> {
 }
 
 /**
- * Play state completion voice
- * @param state - Malaysian state identifier
- */
-export async function playStateCompletionVoice(state: MalaysianState): Promise<void> {
-  try {
-    let player = stateVoiceCache.get(state);
-    if (!player) {
-      player = createAudioPlayer(STATE_VOICES[state]);
-      stateVoiceCache.set(state, player);
-    }
-
-    player.volume = 1.0;
-    player.loop = false;
-    player.seekTo(0);
-    player.play();
-  } catch (error) {
-    // Fail silently
-  }
-}
-
-/**
- * Play tutorial step narration
- * @param stepIndex - Tutorial step (0 or 1)
- */
-export async function playTutorialNarration(stepIndex: number): Promise<void> {
-  try {
-    const voiceName: VoiceNarration = stepIndex === 0 ? 'voice-tutorial-step1' : 'voice-tutorial-step2';
-    await playSound(voiceName);
-  } catch (error) {
-    // Fail silently
-  }
-}
-
-/**
  * Unload all cached audio (sounds, music, ambient, state voices)
  * Call during cleanup or app background
  */
@@ -479,13 +378,11 @@ export async function unloadAllAudio(): Promise<void> {
     Array.from(soundCache.values()).forEach(player => player.remove());
     Array.from(musicCache.values()).forEach(player => player.remove());
     Array.from(ambientCache.values()).forEach(player => player.remove());
-    Array.from(stateVoiceCache.values()).forEach(player => player.remove());
 
     // Clear caches
     soundCache.clear();
     musicCache.clear();
     ambientCache.clear();
-    stateVoiceCache.clear();
 
     currentMusic = null;
     currentMusicName = null;

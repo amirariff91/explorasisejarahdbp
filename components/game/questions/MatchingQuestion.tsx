@@ -1,4 +1,4 @@
-import { ButtonSizes, EdgeMargins, isLandscapeMode, QuestionBoardBase, getQuestionBoardSize, TouchTargets } from '@/constants/layout';
+import { ButtonSizes, EdgeMargins, getQuestionBoardSize, TouchTargets } from '@/constants/layout';
 import { Colors, getResponsiveFontSize, Opacity, Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
 import type { MatchingQuestion as MQQuestion } from '@/types';
@@ -32,7 +32,6 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [showNext, setShowNext] = useState(false);
   const { width, height } = useWindowDimensions();
-  const isLandscape = isLandscapeMode(width);
   // Simple responsive offsets for Matching questions
   const offsets = {
     boardPaddingTop: 25,

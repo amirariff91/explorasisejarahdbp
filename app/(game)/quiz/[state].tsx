@@ -70,12 +70,12 @@ export default function QuizScreen() {
     };
   }, []);
 
-  // Track current playing state in global context for persistence and voice playback
-  // NOTE: setCurrentState is intentionally omitted from deps to prevent infinite loop.
-  // React's setState functions are stable and don't need to be in the dependency array.
+  // Track current playing state in global context for persistence and voice playback.
+  // NOTE: setCurrentState is intentionally omitted from deps to prevent infinite loops.
+  // We intentionally keep the last played state after unmount so the map screen can
+  // surface a \"resume\" badge using GameContext.currentState.
   useEffect(() => {
     if (state) setCurrentState(state);
-    return () => setCurrentState(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
@@ -276,6 +276,7 @@ export default function QuizScreen() {
       case 'multipleChoice':
         return (
           <MultipleChoiceQuestion
+            key={currentQuestion.id}
             question={currentQuestion}
             onAnswer={handleAnswer}
           />
@@ -283,6 +284,7 @@ export default function QuizScreen() {
       case 'trueFalse':
         return (
           <TrueFalseQuestion
+            key={currentQuestion.id}
             question={currentQuestion}
             onAnswer={handleAnswer}
           />
@@ -290,6 +292,7 @@ export default function QuizScreen() {
       case 'fillBlank':
         return (
           <FillBlankQuestion
+            key={currentQuestion.id}
             question={currentQuestion}
             onAnswer={handleAnswer}
           />
@@ -297,6 +300,7 @@ export default function QuizScreen() {
       case 'matching':
         return (
           <MatchingQuestion
+            key={currentQuestion.id}
             question={currentQuestion}
             onAnswer={handleAnswer}
           />
@@ -304,6 +308,7 @@ export default function QuizScreen() {
       case 'crossword':
         return (
           <CrosswordQuestion
+            key={currentQuestion.id}
             question={currentQuestion}
             onAnswer={handleAnswer}
           />

@@ -1,4 +1,4 @@
-import { Spacing, isLandscapeMode, getQuestionBoardSize, getResponsiveSizeScaled } from "@/constants/layout";
+import { Spacing, getQuestionBoardSize, getResponsiveSizeScaled } from "@/constants/layout";
 import { Colors } from "@/constants/theme";
 import { ASSETS, ASSET_PRELOAD_CONFIG } from "@/constants/assets";
 import { useGameContext } from "@/contexts/GameContext";
@@ -26,7 +26,6 @@ export default function TutorialScreen() {
   const { width } = useWindowDimensions();
   const { markTutorialComplete } = useGameContext();
   const [currentStep, setCurrentStep] = useState(0);
-  const isLandscape = isLandscapeMode(width); // Use standardized landscape detection
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
   const [isPreloading, setIsPreloading] = useState(false);

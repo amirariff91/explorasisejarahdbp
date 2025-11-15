@@ -77,7 +77,8 @@ export default function StatusBar({ state }: StatusBarProps) {
         <Text
           style={[
             styles.statusText,
-            { fontSize: getResponsiveFontSize(Typography.bodySmall, isLandscape) },
+            // Use unified responsive typography scale for compact HUD text
+            { fontSize: getResponsiveFontSize('answer', width) },
           ]}
           allowFontScaling={allowScaling}
           numberOfLines={1}
@@ -134,7 +135,8 @@ export default function StatusBar({ state }: StatusBarProps) {
         <Text
           style={[
             styles.statusText,
-            { fontSize: getResponsiveFontSize(Typography.bodySmall, isLandscape) },
+            // Use unified responsive typography scale for compact HUD text
+            { fontSize: getResponsiveFontSize('answer', width) },
           ]}
           allowFontScaling={allowScaling}
           numberOfLines={1}

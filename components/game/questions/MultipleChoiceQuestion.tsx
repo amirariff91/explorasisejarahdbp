@@ -3,7 +3,6 @@ import {
   EdgeMargins,
   getQuestionOffsets,
   isLandscapeMode,
-  QuestionBoardBase,
   getQuestionBoardSize,
   TouchTargets,
 } from '@/constants/layout';

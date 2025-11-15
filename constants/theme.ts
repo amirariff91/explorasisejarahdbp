@@ -312,8 +312,9 @@ export const getResponsiveFontSize = (
   type: keyof typeof TypographyScale.phone,
   width: number
 ): number => {
-  const { getDeviceSize } = require('@/constants/layout');
-  const deviceSize = getDeviceSize(width);
+  // Use typed dynamic import to avoid circular deps while keeping strong typing
+  const layout = require('@/constants/layout') as typeof import('@/constants/layout');
+  const deviceSize = layout.getDeviceSize(width);
   return TypographyScale[deviceSize][type];
 };
 

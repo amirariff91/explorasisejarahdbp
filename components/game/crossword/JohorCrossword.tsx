@@ -297,7 +297,8 @@ export default function JohorCrossword() {
             style={[
               styles.title,
               {
-                fontSize: getResponsiveFontSize(Typography.title, isLandscape) + 10,
+                // Use stateLabel tier and bump slightly for prominent crossword title
+                fontSize: getResponsiveFontSize('stateLabel', width) + 4,
               },
             ]}
             allowFontScaling={allowScaling}

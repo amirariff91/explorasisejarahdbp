@@ -12,7 +12,7 @@ import Animated, {
   withSequence,
 } from 'react-native-reanimated';
 import { Colors, Typography, getResponsiveFontSize, getTextShadowStyle, Shadows, getComponentShadowStyle } from '@/constants/theme';
-import { ButtonSizes, TouchTargets, UIElements, Spacing, getResponsiveSizeScaled, getDeviceSize } from '@/constants/layout';
+import { ButtonSizes, TouchTargets, UIElements, Spacing, getResponsiveSizeScaled } from '@/constants/layout';
 import type { CongratsOverlayProps } from '@/types';
 
 function useSparkleAnimation(visible: boolean, delay: number) {
@@ -57,7 +57,6 @@ function useSparkleAnimation(visible: boolean, delay: number) {
   }));
 }
 
-const STAR_ASSET = ASSETS.shared.ui.star;
 const PANEL_ASSET = ASSETS.games.dbpSejarah.tahniahBg;
 const BUTTON_ASSET = ASSETS.games.dbpSejarah.buttonTeruskan.default;
 
@@ -96,9 +95,7 @@ export default function CongratsOverlay({
     }
   }, [visible, starScale, contentOpacity, contentTranslateY]);
 
-  const starGroupAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: Math.max(starScale.value, 0) }],
-  }));
+  // Star group animation retained for future visual polish; currently not applied to the tree
 
   const contentAnimatedStyle = useAnimatedStyle(() => ({
     opacity: contentOpacity.value,
@@ -143,10 +140,6 @@ export default function CongratsOverlay({
   );
 
   // Use responsive scaling for success modal elements (4-tier system)
-  const starDimensions = {
-    width: getResponsiveSizeScaled(UIElements.successModal.star.portrait.width, width),
-    height: getResponsiveSizeScaled(UIElements.successModal.star.portrait.height, width),
-  };
   const panelDimensions = {
     width: getResponsiveSizeScaled(UIElements.successModal.tahniahBg.portrait.width, width),
     height: getResponsiveSizeScaled(UIElements.successModal.tahniahBg.portrait.height, width),
@@ -155,8 +148,6 @@ export default function CongratsOverlay({
     width: getResponsiveSizeScaled(ButtonSizes.successAction.portrait.width, width),
     height: getResponsiveSizeScaled(ButtonSizes.successAction.portrait.height, width),
   };
-
-  const clampedStars = Math.max(1, Math.min(3, Math.round(stars)));
 
   const renderReward = () => {
     if (!reward) return null;

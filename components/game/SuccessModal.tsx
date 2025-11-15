@@ -1,6 +1,6 @@
 import { useGameContext } from '@/contexts/GameContext';
 import type { SuccessModalProps } from '@/types';
-import { playAmbient, playSound, playStateCompletionVoice, stopAmbient } from '@/utils/audio';
+import { playAmbient, playSound, stopAmbient } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
 import { useEffect } from 'react';
 import CongratsOverlay from './CongratsOverlay';
@@ -17,17 +17,9 @@ export default function SuccessModal({ visible, onContinue, onRestart }: Success
     if (visible) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-      // Sequential audio playback for clearer celebration experience
-      playSound('star'); // 1. Celebration sound effect
-
-      // 2. Wait 500ms, then play state completion voice (snappier celebration)
-      if (gameState.currentState) {
-        setTimeout(() => {
-          playStateCompletionVoice(gameState.currentState!);
-        }, 500);
-      }
-
-      // 3. Start ambient celebration at lower volume (less overwhelming)
+      // Celebration SFX + ambient (no voiceover)
+      playSound('star'); // Celebration sound effect
+      // Start ambient celebration at lower volume (less overwhelming)
       playAmbient('ambient-celebration', 0.3);
     }
   }, [visible, gameState.currentState]);
