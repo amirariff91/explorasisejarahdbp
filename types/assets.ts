@@ -36,8 +36,6 @@ export interface BackgroundAssets {
  * UI element assets (bars, decorations, effects)
  */
 export interface UIAssets {
-  healthBar: AssetSource;
-  duitBar: AssetSource;
   bgNation: AssetSource;
   star: AssetSource;
   flare: AssetSource;

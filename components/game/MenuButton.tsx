@@ -10,7 +10,7 @@ import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, usePathname } from 'expo-router';
 import { useGameContext } from '@/contexts/GameContext';
-import { playSound } from '@/utils/audio';
+import { playSound, playMenuSound } from '@/utils/audio';
 import {
   Colors,
   Typography,
@@ -50,7 +50,7 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
   };
 
   const handleOpenMenu = () => {
-    playSound('transition', { volume: 0.6 }); // Slide-in effect for menu opening
+    playMenuSound(); // Slide-in effect for menu opening
     setShowMenu(true);
   };
 
@@ -76,7 +76,7 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
   };
 
   const handleQuit = () => {
-    playSound('transition', { volume: 0.4 }); // Exit transition
+    playMenuSound(); // Exit transition
     setShowMenu(false);
     router.back();
   };
@@ -129,44 +129,65 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
               MENU
             </Text>
 
-          <Pressable 
+          <Pressable
             style={({ pressed }) => [
               styles.menuItem,
               pressed && { transform: [{ scale: 0.96 }] }
-            ]} 
+            ]}
             onPress={handleResume}
             hitSlop={TouchTargets.hitSlop}>
-            <Text style={styles.menuItemText} allowFontScaling={gameState.allowFontScaling}>Teruskan</Text>
+            <Text
+              style={[styles.menuItemText, { fontSize: getResponsiveFontSize('answer', width) }]}
+              allowFontScaling={gameState.allowFontScaling}
+            >
+              Teruskan
+            </Text>
           </Pressable>
 
-          <Pressable 
+          <Pressable
             style={({ pressed }) => [
               styles.menuItem,
               pressed && { transform: [{ scale: 0.96 }] }
-            ]} 
+            ]}
             onPress={handleRestart}
             hitSlop={TouchTargets.hitSlop}>
-            <Text style={styles.menuItemText} allowFontScaling={gameState.allowFontScaling}>Ulang Semula</Text>
+            <Text
+              style={[styles.menuItemText, { fontSize: getResponsiveFontSize('answer', width) }]}
+              allowFontScaling={gameState.allowFontScaling}
+            >
+              Ulang Semula
+            </Text>
           </Pressable>
 
-          <Pressable 
+          <Pressable
             style={({ pressed }) => [
               styles.menuItem,
               pressed && { transform: [{ scale: 0.96 }] }
-            ]} 
+            ]}
             onPress={handleQuit}
             hitSlop={TouchTargets.hitSlop}>
-            <Text style={styles.menuItemText} allowFontScaling={gameState.allowFontScaling}>Keluar ke Peta</Text>
+            <Text
+              style={[styles.menuItemText, { fontSize: getResponsiveFontSize('answer', width) }]}
+              allowFontScaling={gameState.allowFontScaling}
+            >
+              Keluar ke Peta
+            </Text>
           </Pressable>
 
-          <Pressable 
+          <Pressable
             style={({ pressed }) => [
               styles.menuItemSecondary,
               pressed && { transform: [{ scale: 0.96 }] }
-            ]} 
+            ]}
             onPress={toggleTextScaling}
             hitSlop={TouchTargets.hitSlop}>
-            <Text style={styles.menuItemSecondaryText} allowFontScaling={gameState.allowFontScaling}>
+            <Text
+              style={[styles.menuItemSecondaryText, { fontSize: getResponsiveFontSize('answer', width) }]}
+              allowFontScaling={gameState.allowFontScaling}
+              numberOfLines={1}
+              adjustsFontSizeToFit
+              minimumFontScale={0.8}
+            >
               Aksesibiliti: Teks Besar {gameState.allowFontScaling ? 'Hidup' : 'Mati'}
             </Text>
           </Pressable>
@@ -221,8 +242,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   menuItemText: {
+    // Dynamic: fontSize
     fontFamily: Typography.fontFamily,
-    fontSize: 16,
     fontWeight: Typography.fontWeight.bold,
     color: Colors.textLight,
   },
@@ -236,8 +257,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   menuItemSecondaryText: {
+    // Dynamic: fontSize
     fontFamily: Typography.fontFamily,
-    fontSize: 14,
     color: Colors.textSecondary,
     fontWeight: Typography.fontWeight.semiBold,
   },

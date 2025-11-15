@@ -12,7 +12,6 @@ import { Image } from "expo-image";
 import { useEffect, useRef } from "react";
 import { ASSETS } from "@/constants/assets";
 import { playSound, playMusic, playAmbient, stopMusic, stopAllAmbient } from "@/utils/audio";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useGameContext } from "@/contexts/GameContext";
 import { isLandscapeMode, getResponsiveSizeScaled } from "@/constants/layout";
 
@@ -23,7 +22,6 @@ import { isLandscapeMode, getResponsiveSizeScaled } from "@/constants/layout";
 export default function Homepage() {
   const router = useRouter();
   const { width, height } = useWindowDimensions();
-  const insets = useSafeAreaInsets();
   const { gameState } = useGameContext();
   const isLandscape = isLandscapeMode(width); // Standardized landscape detection (800px breakpoint)
 
@@ -44,7 +42,7 @@ export default function Homepage() {
   const mastheadHeight = getResponsiveSizeScaled(242, width, 1.8);  // Max 436px on iPad Pro
 
   // Vertical responsiveness: scale content so it fits short phone heights (e.g. Pixel 8a landscape)
-  const availableHeight = height - insets.top - insets.bottom;
+  const availableHeight = height;
   const baseTopPadding = getResponsiveSizeScaled(isLandscape ? 16 : 24, width);
   const baseBottomPadding = getResponsiveSizeScaled(isLandscape ? 24 : 32, width);
   const baseLogoPaddingVertical = 20; // logoContainer paddingTop + paddingBottom
@@ -113,7 +111,7 @@ export default function Homepage() {
       clearTimeout(logoTimer);
       clearTimeout(titleTimer);
       clearTimeout(bgmTimer);
-      stopMusic(1500); // Smooth 1.5s fade-out when leaving
+      // No stopMusic needed - next screen's playMusic() will handle transition
       stopAllAmbient();
     };
   }, [buttonScale]);
@@ -154,10 +152,8 @@ export default function Homepage() {
         style={[
           styles.content,
           {
-            paddingTop:
-              insets.top + baseTopPadding * paddingScale,
+            paddingTop: baseTopPadding * paddingScale,
             paddingBottom:
-              insets.bottom +
               baseBottomPadding * paddingScale +
               getResponsiveSizeScaled(4, width), // small cushion above Android nav bar
           },

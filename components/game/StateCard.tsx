@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { useEffect } from 'react';
+import { View, Text, StyleSheet, Pressable, useWindowDimensions } from 'react-native';
+import { useEffect, useMemo } from 'react';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -11,7 +11,8 @@ import Animated, {
 import * as Haptics from 'expo-haptics';
 import { playSound } from '@/utils/audio';
 import type { MalaysianState } from '@/types';
-import { Typography, Colors, getTextShadowStyle, Shadows, StateVisuals, BorderRadius } from '@/constants/theme';
+import { Typography, Colors, getTextShadowStyle, Shadows, StateVisuals, BorderRadius, getResponsiveFontSize } from '@/constants/theme';
+import { getResponsiveSizeScaled } from '@/constants/layout';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -35,8 +36,31 @@ export default function StateCard({
   isRecommended = false,
   onPress,
 }: StateCardProps) {
+  const { width } = useWindowDimensions();
+
   // Get visual theme for this state
   const visuals = StateVisuals[stateId];
+
+  // Calculate responsive dimensions
+  const dimensions = useMemo(() => ({
+    cardWidth: getResponsiveSizeScaled(100, width),
+    cardHeight: getResponsiveSizeScaled(90, width),
+    borderWidth: getResponsiveSizeScaled(4, width),
+    padding: getResponsiveSizeScaled(8, width),
+    emojiSize: getResponsiveSizeScaled(48, width),
+    emojiMargin: getResponsiveSizeScaled(4, width),
+    stateNameSize: getResponsiveFontSize('clue', width), // Uses clue scale (12→18px)
+    checkmarkContainer: getResponsiveSizeScaled(20, width),
+    checkmarkSize: getResponsiveSizeScaled(14, width),
+    checkmarkInset: getResponsiveSizeScaled(4, width),
+    badgeInset: getResponsiveSizeScaled(-8, width),
+    badgePaddingH: getResponsiveSizeScaled(6, width),
+    badgePaddingV: getResponsiveSizeScaled(2, width),
+    badgeBorder: getResponsiveSizeScaled(2, width),
+    badgeTextSize: getResponsiveSizeScaled(8, width),
+    shadowOffset: getResponsiveSizeScaled(3, width),
+    shadowRadius: getResponsiveSizeScaled(2, width),
+  }), [width]);
 
   const scale = useSharedValue(1);
   const pulseScale = useSharedValue(1);
@@ -83,8 +107,14 @@ export default function StateCard({
       style={[
         styles.card,
         {
+          width: dimensions.cardWidth,
+          height: dimensions.cardHeight,
+          borderWidth: dimensions.borderWidth,
+          padding: dimensions.padding,
           backgroundColor: visuals.color,
           borderColor: visuals.borderColor,
+          shadowOffset: { width: dimensions.shadowOffset, height: dimensions.shadowOffset },
+          shadowRadius: dimensions.shadowRadius,
         },
         animatedStyle,
       ]}
@@ -94,24 +124,48 @@ export default function StateCard({
       accessibilityHint="Double tap to start quiz for this state"
     >
       {/* Big Emoji Icon */}
-      <Text style={styles.emoji}>{visuals.emoji}</Text>
+      <Text style={[styles.emoji, { fontSize: dimensions.emojiSize, marginBottom: dimensions.emojiMargin }]}>
+        {visuals.emoji}
+      </Text>
 
       {/* State Name */}
-      <Text style={styles.stateName} numberOfLines={2} adjustsFontSizeToFit minimumFontScale={0.8}>
+      <Text
+        style={[styles.stateName, { fontSize: dimensions.stateNameSize }]}
+        numberOfLines={2}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}
+      >
         {stateName}
       </Text>
 
       {/* Completion Checkmark */}
       {isCompleted && (
-        <View style={styles.checkmarkContainer}>
-          <Text style={styles.checkmark}>✓</Text>
+        <View style={[
+          styles.checkmarkContainer,
+          {
+            top: dimensions.checkmarkInset,
+            right: dimensions.checkmarkInset,
+            width: dimensions.checkmarkContainer,
+            height: dimensions.checkmarkContainer,
+          }
+        ]}>
+          <Text style={[styles.checkmark, { fontSize: dimensions.checkmarkSize }]}>✓</Text>
         </View>
       )}
 
       {/* Recommended Badge */}
       {isRecommended && !isCompleted && (
-        <View style={styles.recommendedBadge}>
-          <Text style={styles.recommendedText}>Seterusnya</Text>
+        <View style={[
+          styles.recommendedBadge,
+          {
+            top: dimensions.badgeInset,
+            right: dimensions.badgeInset,
+            paddingHorizontal: dimensions.badgePaddingH,
+            paddingVertical: dimensions.badgePaddingV,
+            borderWidth: dimensions.badgeBorder,
+          }
+        ]}>
+          <Text style={[styles.recommendedText, { fontSize: dimensions.badgeTextSize }]}>Seterusnya</Text>
         </View>
       )}
     </AnimatedPressable>
@@ -120,64 +174,51 @@ export default function StateCard({
 
 const styles = StyleSheet.create({
   card: {
-    width: 100,
-    height: 90,
+    // Dynamic: width, height, borderWidth, padding, shadowOffset, shadowRadius
     borderRadius: BorderRadius.medium,
-    borderWidth: 4,
-    padding: 8,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
     // Outer shadow (bottom-right depth) - illustrated button style
     shadowColor: '#000',
-    shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.5,
-    shadowRadius: 2,
     elevation: 6,
   },
   emoji: {
-    fontSize: 48,
-    marginBottom: 4,
+    // Dynamic: fontSize, marginBottom
     textAlign: 'center',
   },
   stateName: {
+    // Dynamic: fontSize
     fontFamily: Typography.fontFamily,
-    fontSize: 11,
     fontWeight: Typography.fontWeight.bold,
     color: Colors.textLight,
     textAlign: 'center',
     ...getTextShadowStyle(Shadows.text.subtle),
   },
   checkmarkContainer: {
+    // Dynamic: top, right, width, height
     position: 'absolute',
-    top: 4,
-    right: 4,
     backgroundColor: 'rgba(255,255,255,0.3)',
     borderRadius: BorderRadius.small,
-    width: 20,
-    height: 20,
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkmark: {
-    fontSize: 14,
+    // Dynamic: fontSize
     color: Colors.textLight,
     fontWeight: 'bold',
   },
   recommendedBadge: {
+    // Dynamic: top, right, paddingHorizontal, paddingVertical, borderWidth
     position: 'absolute',
-    top: -8,
-    right: -8,
     backgroundColor: '#2196F3',
     borderRadius: BorderRadius.small,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderWidth: 2,
     borderColor: '#fff',
   },
   recommendedText: {
+    // Dynamic: fontSize
     fontFamily: Typography.fontFamily,
-    fontSize: 8,
     fontWeight: Typography.fontWeight.bold,
     color: Colors.textLight,
   },

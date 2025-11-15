@@ -17,12 +17,11 @@ export default function SuccessModal({ visible, onContinue, onRestart }: Success
     if (visible) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-      // Celebration SFX + ambient (no voiceover)
-      playSound('star'); // Celebration sound effect
+      // Celebration ambient only (FeedbackOverlay already plays star SFX for correct answers)
       // Start ambient celebration at lower volume (less overwhelming)
       playAmbient('ambient-celebration', 0.3);
     }
-  }, [visible, gameState.currentState]);
+  }, [visible]);
 
   const handleContinue = () => {
     playSound('click');

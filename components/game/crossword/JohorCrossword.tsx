@@ -56,7 +56,7 @@ export default function JohorCrossword() {
   const { width, height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const isLandscape = isLandscapeMode(width);
-  const { gameState, completeState, setShowSuccessModal: setGlobalSuccessModal } = useGameContext();
+  const { gameState, completeState, setShowSuccessModal } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
 
   const [activeClueId, setActiveClueId] = useState<string | null>(INITIAL_ACTIVE_CLUE_ID);
@@ -68,7 +68,6 @@ export default function JohorCrossword() {
   });
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackExplanation, setFeedbackExplanation] = useState<string | undefined>(undefined);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const wordMap = useMemo(() => {
     const entries = PUZZLE.words.map((word: CrosswordPuzzleWord) => [word.id, word] as const);
@@ -264,10 +263,8 @@ export default function JohorCrossword() {
 
     // All clues visited - play success sound
     playSound('star'); // Celebration sound for completion
-    // Mark state as completed in global game state but avoid showing the global modal here
+    // Mark state as completed and show success modal
     completeState('johor');
-    setGlobalSuccessModal(false);
-    setShowSuccessModal(true);
   };
 
   const handleFeedbackDismiss = () => {
@@ -294,18 +291,18 @@ export default function JohorCrossword() {
     playAmbient('ambient-quiz-soft', 0.15); // Subtle concentration ambience
 
     return () => {
-      stopMusic(1000); // Fade out when leaving crossword
+      // No stopMusic needed - next screen's playMusic() will handle transition
       stopAllAmbient();
     };
   }, []);
 
   // Switch to success music when modal shows
   useEffect(() => {
-    if (showSuccessModal) {
-      stopMusic(500); // Quick fade out crossword music
+    if (gameState.showSuccessModal) {
+      // No explicit stopMusic needed - playMusic will handle the transition
       playMusic('bgm-success', false, 1000); // Fade in success theme (no loop)
     }
-  }, [showSuccessModal]);
+  }, [gameState.showSuccessModal]);
 
   return (
     <ImageBackground
@@ -472,7 +469,7 @@ export default function JohorCrossword() {
       />
 
       <SuccessModal
-        visible={showSuccessModal}
+        visible={gameState.showSuccessModal}
         onContinue={handleSuccessContinue}
         onRestart={handleSuccessRestart}
       />

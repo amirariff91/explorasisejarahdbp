@@ -37,7 +37,6 @@ export interface BaseQuestion {
   type: QuestionType;
   question: string;
   explanation?: string;
-  timeLimit?: number; // Time limit in seconds (e.g., 600 for 10 minutes)
   imagePath?: string; // Optional image path for questions with images
 }
 
@@ -152,10 +151,17 @@ export interface PlayerProfile {
   age: number;
 }
 
+// State Timer State
+export interface StateTimerState {
+  startTime: number; // Unix timestamp when timer started
+  duration: number; // Total duration in seconds
+  isPaused: boolean;
+  pausedAt?: number; // Unix timestamp when paused
+  pausedDuration: number; // Accumulated pause time in seconds
+}
+
 // Game State
 export interface GameState {
-  money: number; // Starts at 100, -2 per wrong answer
-  health: number; // Health points (0-100)
   currentState: MalaysianState | null;
   completedStates: MalaysianState[];
   currentQuestionIndex: number;
@@ -165,6 +171,8 @@ export interface GameState {
   showSuccessModal: boolean;
   hasSeenTutorial: boolean;
   playerProfile: PlayerProfile | null;
+  // State-level timer (null if no timer for current state)
+  stateTimer: StateTimerState | null;
   // UI settings
   allowFontScaling: boolean;
 }
@@ -181,15 +189,11 @@ export interface StateInfo {
 // Answer Result
 export interface AnswerResult {
   isCorrect: boolean;
-  moneyChange: number; // -2 if wrong, 0 if correct
-  healthChange: number;
   explanation?: string;
 }
 
 // Game Progress (for persistence)
 export interface GameProgress {
-  money: number;
-  health: number;
   completedStates: MalaysianState[];
   hasSeenTutorial: boolean;
   lastPlayedState: MalaysianState | null;
@@ -200,6 +204,8 @@ export interface GameProgress {
   // Persist quiz progress across sessions
   answers?: Record<string, AnswerValue>;
   questionIndexByState?: Partial<Record<MalaysianState, number>>;
+  // State timer state (for resuming timed quizzes)
+  stateTimer?: StateTimerState | null;
 }
 
 // Tutorial Step

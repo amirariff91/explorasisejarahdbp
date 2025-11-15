@@ -218,14 +218,6 @@ export const TouchTargets = {
 export const UIElements = {
   // StatusBar elements
   statusBar: {
-    healthBar: {
-      landscape: { width: 200, height: 50 },
-      portrait: { width: 160, height: 50 },
-    },
-    moneyBar: {
-      landscape: { width: 200, height: 50 },
-      portrait: { width: 160, height: 50 },
-    },
     stateIndicator: {
       landscape: { width: 240, height: 55 },
       portrait: { width: 200, height: 70 },

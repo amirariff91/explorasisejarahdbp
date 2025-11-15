@@ -1,5 +1,5 @@
 import LandscapeLayout from '@/components/game/LandscapeLayout';
-import { isLandscapeMode, getQuestionBoardSize, TouchTargets, getEdgeMargin, getColumnGap } from '@/constants/layout';
+import { isLandscapeMode, getQuestionBoardSize, getResponsiveSizeScaled, TouchTargets, getEdgeMargin, getColumnGap } from '@/constants/layout';
 import { Colors, getResponsiveFontSize, Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
 import type { FillBlankQuestion as FBQuestion } from '@/types';
@@ -98,8 +98,8 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
         style={[
           styles.inputContainer,
           {
-            width: width < 1000 ? 250 : 300,
-            height: width < 1000 ? 70 : 75,
+            width: getResponsiveSizeScaled(250, width),
+            height: getResponsiveSizeScaled(70, width),
           },
         ]}
         resizeMode="contain">
@@ -108,7 +108,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
             styles.input,
             {
               fontSize: getResponsiveFontSize('answer', width),
-              paddingHorizontal: width < 1000 ? 20 : 24,
+              paddingHorizontal: getResponsiveSizeScaled(20, width),
             },
           ]}
           value={answer}
@@ -130,9 +130,9 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
         style={({ pressed }) => [
           styles.okButton,
           {
-            width: width < 1000 ? 95 : 110,
-            height: width < 1000 ? 70 : 80,
-            marginTop: width < 1000 ? 24 : 28,
+            width: getResponsiveSizeScaled(95, width),
+            height: getResponsiveSizeScaled(70, width),
+            marginTop: getResponsiveSizeScaled(24, width),
             transform: [{ scale: pressed && answer.trim() ? 0.92 : 1 }],
           },
         ]}

@@ -52,6 +52,10 @@ const ambientCache: Map<AmbientSound, AudioPlayer> = new Map();
 let currentMusic: AudioPlayer | null = null;
 let currentMusicName: MusicSound | null = null;
 
+// Click sound debouncing
+let lastClickTime = 0;
+const CLICK_DEBOUNCE_MS = 150; // Prevent click sounds within 150ms of each other
+
 // Debug mode (enabled in development only)
 const DEBUG_AUDIO = __DEV__;
 
@@ -90,6 +94,18 @@ export async function playSound(
 ): Promise<void> {
   try {
     const { volume = 1.0, shouldLoop = false } = options || {};
+
+    // Debounce click sounds to prevent rapid-fire duplicates
+    if (soundName === 'click') {
+      const now = Date.now();
+      if (now - lastClickTime < CLICK_DEBOUNCE_MS) {
+        if (DEBUG_AUDIO) {
+          console.log(`[Audio] ⏭️  Click debounced (${now - lastClickTime}ms since last click)`);
+        }
+        return; // Skip this click
+      }
+      lastClickTime = now;
+    }
 
     if (DEBUG_AUDIO) {
       console.log(`[Audio] 🔊 Playing sound: ${soundName} (volume: ${volume})`);
@@ -204,11 +220,12 @@ export async function playMusic(
     }
 
     // Stop current music if different track
+    // IMPORTANT: await stopMusic to prevent overlap during transitions
     if (currentMusic && currentMusicName !== musicName) {
       if (DEBUG_AUDIO) {
         console.log(`[Audio] 🔄 Switching from ${currentMusicName} to ${musicName}`);
       }
-      await stopMusic(1000); // Fade out current music
+      await stopMusic(1000); // Wait for fade-out to complete before starting new track
     }
 
     // Check if this music is already playing
@@ -361,6 +378,25 @@ export async function stopAllAmbient(): Promise<void> {
   } catch (error) {
     // Fail silently
   }
+}
+
+/**
+ * Semantic wrapper functions for transition sounds
+ * These provide clarity about different use cases of the 'transition' sound
+ */
+
+/**
+ * Play menu transition sound (for opening/closing menus)
+ */
+export async function playMenuSound(): Promise<void> {
+  return playSound('transition', { volume: 0.6 });
+}
+
+/**
+ * Play question transition sound (for moving between quiz questions)
+ */
+export async function playQuestionTransitionSound(): Promise<void> {
+  return playSound('transition', { volume: 0.4 });
 }
 
 /**

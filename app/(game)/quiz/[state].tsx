@@ -1,7 +1,7 @@
 import { useGameContext } from '@/contexts/GameContext';
 import { getQuestionsForState } from '@/data/questions';
 import type { AnswerValue, MalaysianState, Question } from '@/types';
-import { playAmbient, playMusic, playSound, stopAllAmbient, stopMusic } from '@/utils/audio';
+import { playAmbient, playMusic, playSound, playQuestionTransitionSound, stopAllAmbient, stopMusic } from '@/utils/audio';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, BackHandler, ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -15,6 +15,7 @@ import MultipleChoiceQuestion from '@/components/game/questions/MultipleChoiceQu
 import TrueFalseQuestion from '@/components/game/questions/TrueFalseQuestion';
 
 // UI Components
+import CountdownTimer from '@/components/game/CountdownTimer';
 import FeedbackOverlay from '@/components/game/FeedbackOverlay';
 import MenuButton from '@/components/game/MenuButton';
 import StatusBar from '@/components/game/StatusBar';
@@ -37,6 +38,10 @@ export default function QuizScreen() {
     setShowSuccessModal,
     setCurrentState,
     setQuestionIndexForState,
+    startStateTimer,
+    pauseStateTimer,
+    resumeStateTimer,
+    isTimerExpired,
   } = useGameContext();
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -48,8 +53,6 @@ export default function QuizScreen() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [feedbackIsCorrect, setFeedbackIsCorrect] = useState(false);
   const [feedbackExplanation, setFeedbackExplanation] = useState<string | undefined>(undefined);
-  const [feedbackMoneyChange, setFeedbackMoneyChange] = useState<number | undefined>(undefined);
-  const [feedbackHealthChange, setFeedbackHealthChange] = useState<number | undefined>(undefined);
 
   // Track component mount state to prevent setState on unmounted component
   const isMountedRef = useRef(true);
@@ -105,6 +108,13 @@ export default function QuizScreen() {
     }
   }, [currentQuestionIndex, state, setQuestionIndexForState]);
 
+  // Start state timer when quiz begins (only for states with timers)
+  useEffect(() => {
+    if (state && questions.length > 0 && !gameState.stateTimer) {
+      startStateTimer(state);
+    }
+  }, [state, questions.length, startStateTimer, gameState.stateTimer]);
+
   // Handle state completion when all questions are answered
   // Guard by verifying every question has a recorded answer
   useEffect(() => {
@@ -124,7 +134,7 @@ export default function QuizScreen() {
     playAmbient('ambient-quiz-soft', 0.15); // Very subtle concentration ambience
 
     return () => {
-      stopMusic(1000); // Fade out when leaving quiz
+      // No stopMusic needed - next screen's playMusic() will handle transition
       stopAllAmbient();
     };
   }, []);
@@ -208,11 +218,14 @@ export default function QuizScreen() {
     setIsAnswering(true);
     const result = answerQuestion(currentQuestion.id, answer, currentQuestion);
 
+    // Pause timer during feedback (if timer exists)
+    if (gameState.stateTimer) {
+      pauseStateTimer();
+    }
+
     // Show feedback overlay with result
     setFeedbackIsCorrect(result.isCorrect);
     setFeedbackExplanation(result.explanation);
-    setFeedbackMoneyChange(result.moneyChange);
-    setFeedbackHealthChange(result.healthChange);
     setShowFeedback(true);
 
     // Clear any existing timer
@@ -229,12 +242,17 @@ export default function QuizScreen() {
       // Hide feedback
       setShowFeedback(false);
 
+      // Resume timer after feedback (if timer exists and not expired)
+      if (gameState.stateTimer && !isTimerExpired()) {
+        resumeStateTimer();
+      }
+
       setCurrentQuestionIndex((prevIndex) => {
         const nextIndex = prevIndex + 1;
 
         if (nextIndex < questions.length) {
           // More questions remaining - play transition sound
-          playSound('transition', { volume: 0.5 }); // Soft transition between questions
+          playQuestionTransitionSound(); // Soft transition between questions
           setIsAnswering(false);
           // NOTE: setQuestionIndexForState removed from here to prevent setState during render.
           // Question index sync is now handled by useEffect watching currentQuestionIndex changes.
@@ -269,6 +287,21 @@ export default function QuizScreen() {
     setQuestionIndexForState(state, 0);
     setIsAnswering(false); // Reset answer lock on restart
     hasCompletedRef.current = false; // Allow completion detection again after restart
+    // Restart timer for states with timers
+    if (state) {
+      startStateTimer(state);
+    }
+  };
+
+  const handleTimerExpire = () => {
+    // When timer expires, auto-complete the state
+    if (!isMountedRef.current || !state) return;
+
+    // Mark state as completed even if not all questions answered
+    if (!hasCompletedRef.current) {
+      hasCompletedRef.current = true;
+      completeState(state);
+    }
   };
 
   const renderQuestion = () => {
@@ -325,6 +358,14 @@ export default function QuizScreen() {
       resizeMode="cover">
       <StatusBar state={state} />
 
+      {/* Countdown Timer (only shown for states with timers) */}
+      {gameState.stateTimer && (
+        <CountdownTimer
+          allowFontScaling={gameState.allowFontScaling}
+          onExpire={handleTimerExpire}
+        />
+      )}
+
       <MenuButton size="small" />
 
       <View style={styles.content}>{renderQuestion()}</View>
@@ -334,8 +375,6 @@ export default function QuizScreen() {
         visible={showFeedback}
         isCorrect={feedbackIsCorrect}
         explanation={feedbackExplanation}
-        moneyChange={feedbackMoneyChange}
-        healthChange={feedbackHealthChange}
         onDismiss={handleFeedbackDismiss}
       />
 

@@ -10,6 +10,7 @@ import {
 } from 'react';
 import * as SecureStore from 'expo-secure-store';
 import { debounce } from '@/utils/debounce';
+import { getStateTimer } from '@/constants/stateTimers';
 import type {
   GameState,
   GameProgress,
@@ -17,6 +18,7 @@ import type {
   Question,
   AnswerResult,
   AnswerValue,
+  StateTimerState,
 } from '@/types';
 
 interface GameContextType {
@@ -33,6 +35,13 @@ interface GameContextType {
   setShowSuccessModal: (show: boolean) => void;
   setAllowFontScaling: (allow: boolean) => void;
   setPlayerProfile: (name: string, age: number) => void;
+  // State timer functions
+  startStateTimer: (state: MalaysianState) => void;
+  pauseStateTimer: () => void;
+  resumeStateTimer: () => void;
+  getTimeRemaining: () => number | null;
+  isTimerExpired: () => boolean;
+  clearStateTimer: () => void;
   saveError: string | null;
   isLoading: boolean;
 }
@@ -40,15 +49,8 @@ interface GameContextType {
 const GameContext = createContext<GameContextType | undefined>(undefined);
 
 const STORAGE_KEY = 'dbp_sejarah_game_progress';
-const INITIAL_MONEY = 100;
-const INITIAL_HEALTH = 100;
-// Align with tutorial copy: "Jika jawapan anda salah RM2.00 akan ditolak."
-const MONEY_PENALTY = 2;
-const HEALTH_PENALTY = 2;
 
 const initialGameState: GameState = {
-  money: INITIAL_MONEY,
-  health: INITIAL_HEALTH,
   currentState: null,
   completedStates: [],
   currentQuestionIndex: 0,
@@ -57,6 +59,7 @@ const initialGameState: GameState = {
   showSuccessModal: false,
   hasSeenTutorial: false,
   playerProfile: null,
+  stateTimer: null,
   allowFontScaling: false,
 };
 
@@ -100,8 +103,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
         const progress: GameProgress = JSON.parse(savedData);
         setGameState((prev) => ({
           ...prev,
-          money: progress.money,
-          health: progress.health,
           completedStates: progress.completedStates,
           hasSeenTutorial: progress.hasSeenTutorial,
           currentState: progress.lastPlayedState,
@@ -109,6 +110,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           allowFontScaling: progress.allowFontScaling ?? false,
           answers: progress.answers ?? {},
           questionIndexByState: progress.questionIndexByState ?? {},
+          stateTimer: progress.stateTimer ?? null,
         }));
       }
       setSaveError(null); // Clear any previous errors
@@ -128,8 +130,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
       // Read from ref to ensure we always save the latest state
       const current = latestStateRef.current;
       const progress: GameProgress = {
-        money: current.money,
-        health: current.health,
         completedStates: current.completedStates,
         hasSeenTutorial: current.hasSeenTutorial,
         lastPlayedState: current.currentState,
@@ -138,6 +138,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         allowFontScaling: current.allowFontScaling,
         answers: current.answers,
         questionIndexByState: current.questionIndexByState,
+        stateTimer: current.stateTimer,
       };
 
       await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(progress));
@@ -218,13 +219,9 @@ export function GameProvider({ children }: { children: ReactNode }) {
     question: Question
   ): AnswerResult => {
     const isCorrect = checkAnswer(question, answer);
-    const moneyChange = isCorrect ? 0 : -MONEY_PENALTY;
-    const healthChange = isCorrect ? 0 : -HEALTH_PENALTY;
 
     setGameState((prev) => ({
       ...prev,
-      money: Math.max(0, prev.money + moneyChange),
-      health: Math.max(0, prev.health + healthChange),
       answers: {
         ...prev.answers,
         [questionId]: answer,
@@ -233,13 +230,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
     return {
       isCorrect,
-      moneyChange,
-      healthChange,
       explanation: question.explanation,
     };
   };
 
-  const completeState = (state: MalaysianState) => {
+  const completeState = useCallback((state: MalaysianState) => {
     setGameState((prev) => ({
       ...prev,
       completedStates: [...new Set([...prev.completedStates, state])],
@@ -248,7 +243,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       currentQuestionIndex: 0,
       showSuccessModal: true,
     }));
-  };
+  }, []);
 
   const clearStateAnswers = (state: MalaysianState) => {
     // Clear all answers for questions belonging to this state
@@ -316,6 +311,82 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  // Timer management functions
+  const startStateTimer = useCallback((state: MalaysianState) => {
+    const duration = getStateTimer(state);
+    if (duration === null) {
+      // No timer for this state
+      setGameState((prev) => ({ ...prev, stateTimer: null }));
+      return;
+    }
+
+    setGameState((prev) => ({
+      ...prev,
+      stateTimer: {
+        startTime: Date.now(),
+        duration,
+        isPaused: false,
+        pausedDuration: 0,
+      },
+    }));
+  }, []);
+
+  const pauseStateTimer = useCallback(() => {
+    setGameState((prev) => {
+      if (!prev.stateTimer || prev.stateTimer.isPaused) return prev;
+      return {
+        ...prev,
+        stateTimer: {
+          ...prev.stateTimer,
+          isPaused: true,
+          pausedAt: Date.now(),
+        },
+      };
+    });
+  }, []);
+
+  const resumeStateTimer = useCallback(() => {
+    setGameState((prev) => {
+      if (!prev.stateTimer || !prev.stateTimer.isPaused || !prev.stateTimer.pausedAt) {
+        return prev;
+      }
+
+      const pauseDuration = Date.now() - prev.stateTimer.pausedAt;
+
+      return {
+        ...prev,
+        stateTimer: {
+          ...prev.stateTimer,
+          isPaused: false,
+          pausedAt: undefined,
+          pausedDuration: prev.stateTimer.pausedDuration + pauseDuration,
+        },
+      };
+    });
+  }, []);
+
+  const getTimeRemaining = useCallback((): number | null => {
+    const timer = gameState.stateTimer;
+    if (!timer) return null;
+
+    const now = Date.now();
+    const elapsed = timer.isPaused && timer.pausedAt
+      ? timer.pausedAt - timer.startTime - timer.pausedDuration
+      : now - timer.startTime - timer.pausedDuration;
+
+    const remaining = timer.duration - Math.floor(elapsed / 1000);
+    return Math.max(0, remaining);
+  }, [gameState.stateTimer]);
+
+  const isTimerExpired = useCallback((): boolean => {
+    const remaining = getTimeRemaining();
+    return remaining !== null && remaining <= 0;
+  }, [getTimeRemaining]);
+
+  const clearStateTimer = useCallback(() => {
+    setGameState((prev) => ({ ...prev, stateTimer: null }));
+  }, []);
+
   const value: GameContextType = useMemo(
     () => ({
       gameState,
@@ -331,6 +402,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setShowSuccessModal,
       setAllowFontScaling,
       setPlayerProfile,
+      startStateTimer,
+      pauseStateTimer,
+      resumeStateTimer,
+      getTimeRemaining,
+      isTimerExpired,
+      clearStateTimer,
       saveError,
       isLoading,
     }),
@@ -348,6 +425,12 @@ export function GameProvider({ children }: { children: ReactNode }) {
       setShowSuccessModal,
       setAllowFontScaling,
       setPlayerProfile,
+      startStateTimer,
+      pauseStateTimer,
+      resumeStateTimer,
+      getTimeRemaining,
+      isTimerExpired,
+      clearStateTimer,
     ]
   );
 

@@ -40,7 +40,11 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "statusBar": {
+        "translucent": true,
+        "backgroundColor": "transparent"
+      }
     },
     "web": {
       "output": "static",
@@ -54,9 +58,9 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#1a237e",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#1a237e"
           }
         }
       ],

@@ -25,8 +25,6 @@ interface FeedbackOverlayProps {
   visible: boolean;
   isCorrect: boolean;
   explanation?: string;
-  moneyChange?: number;
-  healthChange?: number;
   onDismiss: () => void;
 }
 
@@ -34,7 +32,7 @@ interface FeedbackOverlayProps {
  * FeedbackOverlay Component
  * Shows immediate visual feedback after answering a question
  * - ✓ BETUL! (green celebration) for correct answers
- * - ✗ TIDAK TEPAT (red shake) for wrong answers
+ * - ✗ CUBA LAGI! (red shake) for wrong answers
  * - Displays explanation text if provided
  * - Auto-dismisses after 2 seconds
  */
@@ -42,8 +40,6 @@ export default function FeedbackOverlay({
   visible,
   isCorrect,
   explanation,
-  moneyChange,
-  healthChange,
   onDismiss,
 }: FeedbackOverlayProps) {
   const { width } = useWindowDimensions();
@@ -53,7 +49,6 @@ export default function FeedbackOverlay({
   // Responsive sizing (4-tier system)
   const iconSize = getResponsiveSizeScaled(60, width); // Auto-scales across device tiers
   const feedbackTextSize = getResponsiveFontSize('question', width); // 16px phone → 24px tablet-lg
-  const changeTextSize = getResponsiveFontSize('answer', width); // 14px phone → 18px tablet-lg
   const explanationTextSize = getResponsiveFontSize('answer', width);
   
   // Animation values
@@ -158,32 +153,6 @@ export default function FeedbackOverlay({
             minimumFontScale={0.8}>
             {isCorrect ? 'BETUL!' : 'CUBA LAGI!'}
           </Text>
-
-          {/* Resource Changes (Money & Health) */}
-          {!isCorrect && (moneyChange !== undefined || healthChange !== undefined) && (
-            <View style={styles.changesContainer}>
-              {moneyChange !== undefined && moneyChange !== 0 && (
-                <Text
-                  style={[styles.changeText, { fontSize: changeTextSize }]}
-                  allowFontScaling={allowScaling}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.85}>
-                  💰 {moneyChange > 0 ? '+' : ''}RM{moneyChange}
-                </Text>
-              )}
-              {healthChange !== undefined && healthChange !== 0 && (
-                <Text
-                  style={[styles.changeText, { fontSize: changeTextSize }]}
-                  allowFontScaling={allowScaling}
-                  numberOfLines={1}
-                  adjustsFontSizeToFit
-                  minimumFontScale={0.85}>
-                  ❤️ {healthChange > 0 ? '+' : ''}{healthChange}%
-                </Text>
-              )}
-            </View>
-          )}
         </Animated.View>
 
         {/* Explanation Text */}
@@ -194,7 +163,13 @@ export default function FeedbackOverlay({
               showsVerticalScrollIndicator={true}
               bounces={false}>
               <Text
-                style={[styles.explanationText, { fontSize: explanationTextSize }]}
+                style={[
+                  styles.explanationText,
+                  {
+                    fontSize: explanationTextSize,
+                    lineHeight: explanationTextSize * Typography.lineHeight.relaxed,
+                  },
+                ]}
                 allowFontScaling={allowScaling}>
                 {explanation}
               </Text>
@@ -251,19 +226,6 @@ const styles = StyleSheet.create({
   feedbackTextWrong: {
     color: '#f44336',
   },
-  changesContainer: {
-    flexDirection: 'row',
-    gap: 16,
-    marginTop: 12,
-    justifyContent: 'center',
-  },
-  changeText: {
-    fontFamily: Typography.fontFamily,
-    // fontSize set dynamically based on screen width
-    fontWeight: Typography.fontWeight.bold,
-    color: '#ff9800', // Orange for negative changes
-    ...getTextShadowStyle(Shadows.text.medium),
-  },
   explanationContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
     borderRadius: BorderRadius.small,
@@ -275,10 +237,9 @@ const styles = StyleSheet.create({
     maxHeight: 168, // Container padding (16*2) subtracted from maxHeight
   },
   explanationText: {
+    // Dynamic: fontSize, lineHeight
     fontFamily: Typography.fontFamily,
-    // fontSize set dynamically based on screen width
     color: Colors.textPrimary,
     textAlign: 'center',
-    lineHeight: Typography.lineHeight.relaxed * 16, // Base lineHeight for explanation
   },
 });

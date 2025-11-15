@@ -59,7 +59,8 @@ export default function MalaysiaMapSVG({ onStateSelect }: MalaysiaMapSVGProps) {
   const borneoOffsetY = useMemo(() => -(mapHeight * 0.08), [mapHeight]); // ~8% of map height (was fixed -40)
 
   const handleStatePressIn = (state: MalaysianState) => {
-    playSound("click", { volume: 0.3 }); // Very subtle preview sound on touch
+    // Removed preview click sound to prevent double-click on state selection
+    // Only play sound on final selection (handleStatePress)
     setPressedState(state);
   };
 

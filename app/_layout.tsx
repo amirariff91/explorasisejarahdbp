@@ -13,6 +13,15 @@ export const unstable_settings = {
   anchor: '(game)',
 };
 
+// Custom theme with transparent background to prevent white line at top
+const CustomTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: 'transparent',
+  },
+};
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
   const fontsLoaded = useAppFonts();
@@ -27,14 +36,14 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : CustomTheme}>
       <Stack
         screenOptions={{
           headerShown: false,
         }}>
         <Stack.Screen name="(game)" />
       </Stack>
-      <StatusBar style="auto" />
+      <StatusBar style="light" translucent backgroundColor="transparent" />
     </ThemeProvider>
   );
 }

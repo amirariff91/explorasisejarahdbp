@@ -153,7 +153,10 @@ export default function CongratsOverlay({
     if (!reward) return null;
 
     return typeof reward === 'string' ? (
-      <Text style={styles.rewardText} allowFontScaling={allowFontScaling}>
+      <Text
+        style={[styles.rewardText, { fontSize: getResponsiveFontSize('answer', width) }]}
+        allowFontScaling={allowFontScaling}
+      >
         {reward}
       </Text>
     ) : (
@@ -202,15 +205,18 @@ export default function CongratsOverlay({
         />
 
         <View style={styles.content}>
-          <Text
-            style={[
-              styles.title,
-              { fontSize: getResponsiveFontSize('stateLabel', width) },
-            ]}
-            allowFontScaling={allowFontScaling}
-          >
-            {title}
-          </Text>
+          {/* Only show title text if it's NOT "TAHNIAH" (already in background PNG) */}
+          {title !== 'TAHNIAH' && (
+            <Text
+              style={[
+                styles.title,
+                { fontSize: getResponsiveFontSize('stateLabel', width) },
+              ]}
+              allowFontScaling={allowFontScaling}
+            >
+              {title}
+            </Text>
+          )}
 
           {renderReward()}
 
@@ -224,7 +230,10 @@ export default function CongratsOverlay({
               <Text
                 style={[
                   styles.buttonText,
-                  { fontSize: getResponsiveFontSize('answer', width) },
+                  {
+                    fontSize: getResponsiveFontSize('answer', width),
+                    paddingHorizontal: getResponsiveSizeScaled(12, width),
+                  },
                 ]}
                 allowFontScaling={allowFontScaling}
                 numberOfLines={1}
@@ -245,7 +254,10 @@ export default function CongratsOverlay({
                 style={[
                   styles.buttonText,
                   styles.secondaryButtonText,
-                  { fontSize: getResponsiveFontSize('answer', width) },
+                  {
+                    fontSize: getResponsiveFontSize('answer', width),
+                    paddingHorizontal: getResponsiveSizeScaled(12, width),
+                  },
                 ]}
                 allowFontScaling={allowFontScaling}
                 numberOfLines={1}
@@ -298,8 +310,8 @@ const styles = StyleSheet.create({
     ...getTextShadowStyle(Shadows.text.medium),
   },
   rewardText: {
+    // Dynamic: fontSize
     fontFamily: Typography.fontFamily,
-    fontSize: 18,
     fontWeight: Typography.fontWeight.semiBold,
     color: Colors.textLight,
     textAlign: 'center',
@@ -329,11 +341,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   buttonText: {
+    // Dynamic: paddingHorizontal
     fontFamily: Typography.fontFamily,
     fontWeight: Typography.fontWeight.bold,
     color: Colors.textLight,
     ...getTextShadowStyle(Shadows.text.medium),
-    paddingHorizontal: 12,
     textAlign: 'center',
   },
   secondaryButtonText: {

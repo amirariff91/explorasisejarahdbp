@@ -4,6 +4,7 @@ import {
   getQuestionOffsets,
   isLandscapeMode,
   getQuestionBoardSize,
+  getResponsiveSizeScaled,
   TouchTargets,
 } from '@/constants/layout';
 import {
@@ -192,7 +193,10 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                       <Text
                         style={[
                           styles.optionText,
-                          { fontSize: getResponsiveFontSize('answer', width) },
+                          {
+                            fontSize: getResponsiveFontSize('answer', width),
+                            paddingHorizontal: getResponsiveSizeScaled(12, width),
+                          },
                         ]}
                         numberOfLines={3}
                         adjustsFontSizeToFit
@@ -233,7 +237,10 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                         <Text
                           style={[
                             styles.optionText,
-                            { fontSize: getResponsiveFontSize('answer', width) },
+                            {
+                              fontSize: getResponsiveFontSize('answer', width),
+                              paddingHorizontal: getResponsiveSizeScaled(12, width),
+                            },
                           ]}
                           numberOfLines={3}
                           adjustsFontSizeToFit
@@ -345,11 +352,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   optionText: {
+    // Dynamic: paddingHorizontal
     fontFamily: Typography.fontFamily,
     color: Colors.textLight,
     textAlign: 'center',
     fontWeight: Typography.fontWeight.semiBold,
-    paddingHorizontal: 12,  // Increased from 8 for better text space
   },
 
   // Footer: Next Button (Outside board)

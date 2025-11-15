@@ -39,7 +39,7 @@ export const kelantanQuestions: Question[] = [
     options: [
       'Dilahirkan di Raub, Pahang',
       'Perdana Menteri ke-3',
-      'Bersekolah di Sekolah Menengah Air Putih, Kuantan, Pahang',
+      'Bersekolah di SM Air Putih, Kuantan',
       'Dilahirkan di Temerloh, Pahang',
       'Menjadi Perdana Menteri pada 10 Ogos 2019',
       'Menteri Ekonomi',
@@ -50,7 +50,7 @@ export const kelantanQuestions: Question[] = [
     correctAnswers: [
       'Dilahirkan di Temerloh, Pahang',
       'Pernah berkhidmat sebagai peguam',
-      'Bersekolah di Sekolah Menengah Air Putih, Kuantan, Pahang',
+      'Bersekolah di SM Air Putih, Kuantan',
     ],
     explanation: 'Dato\' Seri Ismail Sabri dilahirkan di Temerloh (Pahang), pernah berkhidmat sebagai peguam, dan bersekolah di Sekolah Menengah Air Putih, Kuantan.',
   },

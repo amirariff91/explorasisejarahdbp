@@ -1,66 +1,51 @@
 import type { Question } from '@/types';
 
 /**
- * Perlis Questions - State-specific content about the smallest state in Malaysia
- * Focus: Geography, natural attractions, border significance, and local history
+ * Perlis Questions - Melaka Founding (Spec-aligned)
+ * Topic: The founding of the Melaka Sultanate by Parameswara
+ * Focus: Historical facts about how and when Melaka was established
+ * Question Type: 4 fill-blank questions
+ * Timer: None
  */
 export const perlisQuestions: Question[] = [
   {
-    id: 'perlis_1',
-    state: 'perlis',
-    type: 'trueFalse',
-    question: 'Perlis adalah negeri terkecil di Malaysia?',
-    correctAnswer: true,
-    explanation: 'Perlis adalah negeri terkecil di Malaysia dengan keluasan 821 km persegi, tetapi kaya dengan sejarah dan keindahan semula jadi.',
-  },
-  {
-    id: 'perlis_2',
-    state: 'perlis',
-    type: 'multipleChoice',
-    question: 'Apakah nama gua terkenal di Perlis yang mempunyai terowong sepanjang 370 meter?',
-    options: ['Gua Tempurung', 'Gua Kelam', 'Gua Niah', 'Batu Caves'],
-    correctAnswer: 'Gua Kelam',
-    explanation: 'Gua Kelam adalah tarikan pelancong utama di Perlis dengan terowong gua sepanjang 370 meter yang menghubungkan Kaki Bukit dengan Wan Tangga.',
-    timeLimit: 60,
-  },
-  {
-    id: 'perlis_3',
+    id: 'perlis-1',
     state: 'perlis',
     type: 'fillBlank',
-    question: 'Ibu negeri Perlis ialah: K_NG_R',
-    correctAnswer: 'KANGAR',
-    acceptableAnswers: ['kangar', 'Kangar'],
+    question: 'Kesultanan Melaka diasaskan oleh seorang putera dari Palembang bernama _______.',
+    correctAnswer: 'Parameswara',
+    acceptableAnswers: ['Parameswara', 'parameswara', 'PARAMESWARA'],
     caseSensitive: false,
-    explanation: 'Kangar adalah ibu negeri Perlis dan merupakan bandar terkecil yang menjadi ibu negeri di Malaysia.',
-    timeLimit: 45,
+    explanation: 'Parameswara (juga dikenali sebagai Iskandar Shah) adalah pengasas Kesultanan Melaka pada tahun 1400. Beliau melarikan diri dari Palembang, Sumatera sebelum mendirikan Melaka.',
   },
   {
-    id: 'perlis_4',
+    id: 'perlis-2',
     state: 'perlis',
-    type: 'multipleChoice',
-    question: 'Bandar manakah di Perlis yang terletak di sempadan Malaysia-Thailand?',
-    options: ['Kangar', 'Padang Besar', 'Arau', 'Kuala Perlis'],
-    correctAnswer: 'Padang Besar',
-    explanation: 'Padang Besar adalah bandar sempadan yang menghubungkan Malaysia dengan Thailand, terkenal sebagai pusat membeli-belah dan pintu masuk penting.',
-    timeLimit: 60,
+    type: 'fillBlank',
+    question: 'Melaka diasaskan pada tahun _______ Masihi.',
+    correctAnswer: '1400',
+    acceptableAnswers: ['1400'],
+    caseSensitive: false,
+    explanation: 'Kesultanan Melaka diasaskan pada tahun 1400 Masihi oleh Parameswara. Tarikh ini menandakan permulaan salah satu empayar perdagangan terhebat di Asia Tenggara.',
   },
   {
-    id: 'perlis_5',
+    id: 'perlis-3',
     state: 'perlis',
-    type: 'trueFalse',
-    question: 'Perlis mempunyai sistem beraja sendiri dengan gelaran Raja?',
-    correctAnswer: true,
-    explanation: 'Perlis mempunyai Raja sebagai ketua negeri. Gelaran penuh ialah Raja Perlis, berbeza dengan negeri lain yang menggunakan gelaran Sultan.',
-    timeLimit: 45,
+    type: 'fillBlank',
+    question: 'Nama "Melaka" diambil daripada nama pokok _______ yang menaungi Parameswara semasa beliau berehat.',
+    correctAnswer: 'Melaka',
+    acceptableAnswers: ['Melaka', 'melaka', 'MELAKA'],
+    caseSensitive: false,
+    explanation: 'Menurut legenda, Parameswara berehat di bawah pokok Melaka (Phyllanthus emblica) ketika menyaksikan seekor pelanduk menendang anjing pemburuannya. Beliau teruja dengan kejadian itu dan menamakan tempat tersebut Melaka.',
   },
   {
-    id: 'perlis_6',
+    id: 'perlis-4',
     state: 'perlis',
-    type: 'multipleChoice',
-    question: 'Perlis pernah berada di bawah pemerintahan negeri manakah sebelum menjadi negeri yang berasingan?',
-    options: ['Perak', 'Kedah', 'Selangor', 'Kelantan'],
-    correctAnswer: 'Kedah',
-    explanation: 'Perlis dahulunya merupakan sebahagian daripada Kedah sebelum dipisahkan oleh British pada tahun 1843 dan dijadikan negeri yang berasingan.',
-    timeLimit: 60,
+    type: 'fillBlank',
+    question: 'Melaka terletak di lokasi strategik iaitu Selat _______, yang menjadikannya pusat perdagangan penting.',
+    correctAnswer: 'Melaka',
+    acceptableAnswers: ['Melaka', 'melaka', 'MELAKA'],
+    caseSensitive: false,
+    explanation: 'Selat Melaka menghubungkan Lautan Hindi dengan Laut China Selatan. Lokasi strategik ini menjadikan Melaka sebagai pusat perdagangan antarabangsa yang penting, menghubungkan pedagang dari China, India, Arab, dan Eropah.',
   },
 ];

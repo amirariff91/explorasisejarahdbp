@@ -59,7 +59,7 @@ export default function StateSelectionScreen() {
     playAmbient('ambient-map', 0.2); // Subtle tropical ambience
 
     return () => {
-      stopMusic(1000); // Fade out when leaving map
+      // No stopMusic needed - next screen's playMusic() will handle transition
       stopAllAmbient();
     };
   }, []);
@@ -179,32 +179,6 @@ export default function StateSelectionScreen() {
         <View
           style={[styles.topBarRight, width < 375 && styles.topBarRightCompact]}
         >
-          <View
-            style={[styles.statItemCompact, width < 375 && styles.statItemTiny]}
-          >
-            <Text
-              style={[
-                styles.statTextCompact,
-                width < 375 && styles.statTextTiny,
-              ]}
-              allowFontScaling={allowScaling}
-            >
-              💰 RM{gameState.money}
-            </Text>
-          </View>
-          <View
-            style={[styles.statItemCompact, width < 375 && styles.statItemTiny]}
-          >
-            <Text
-              style={[
-                styles.statTextCompact,
-                width < 375 && styles.statTextTiny,
-              ]}
-              allowFontScaling={allowScaling}
-            >
-              ❤️ {gameState.health}%
-            </Text>
-          </View>
           <View
             style={[styles.statItemCompact, width < 375 && styles.statItemTiny]}
           >

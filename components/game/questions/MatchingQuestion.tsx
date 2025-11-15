@@ -1,4 +1,4 @@
-import { ButtonSizes, EdgeMargins, getQuestionBoardSize, TouchTargets } from '@/constants/layout';
+import { ButtonSizes, EdgeMargins, getQuestionBoardSize, getResponsiveSizeScaled, TouchTargets } from '@/constants/layout';
 import { Colors, getResponsiveFontSize, Opacity, Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
 import type { MatchingQuestion as MQQuestion } from '@/types';
@@ -37,18 +37,19 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     boardPaddingTop: 25,
     boardPaddingBottom: 15,
     boardPaddingHorizontal: 30,
-    questionAreaHeight: 170,  // Increased to 170 for better text overflow handling
-    gridAreaTop: 12, // Reduced from 15 to compensate
-    gridContainer: { gap: 16 }, // Reduced from 20 for better spacing
+    questionAreaHeight: 150,  // Optimized for larger 'singleBoardMC' board - gives more space to grid
+    gridAreaTop: 12,
+    gridContainer: { gap: 16 },
     gridRow: { gap: 16 },
     footerContainer: { marginBottom: 30, marginRight: 30 },
   };
 
   // Use new responsive board sizing system (auto-scales by device tier)
-  const boardSize = getQuestionBoardSize('compact', width);
+  // Using 'singleBoardMC' board (680×380 base) for adequate width for 3×3 grid with long text
+  const boardSize = getQuestionBoardSize('singleBoardMC', width);
 
-  // Responsive board sizing - Allow board to reach its base dimensions
-  const maxBoardWidth = width * (width < 1000 ? 0.80 : 0.85);  // 80% phone, 85% tablet
+  // Responsive board sizing - Allow larger board to use available space
+  const maxBoardWidth = width * (width < 1000 ? 0.90 : 0.92);  // 90% phone, 92% tablet
   const maxBoardHeight = height * 0.85; // Allow adequate height for larger screens
   const aspectRatio = boardSize.width / boardSize.height;
 
@@ -72,12 +73,17 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
       if (prev.includes(option)) {
         // Deselect
         const newSelected = prev.filter((item) => item !== option);
-        setShowNext(newSelected.length > 0);
+        setShowNext(newSelected.length === 3);
         return newSelected;
       } else {
+        // Only allow selection if less than 3 already selected
+        if (prev.length >= 3) {
+          // Already have 3 selections, don't allow more
+          return prev;
+        }
         // Select
         const newSelected = [...prev, option];
-        setShowNext(true);
+        setShowNext(newSelected.length === 3);
         return newSelected;
       }
     });
@@ -89,23 +95,26 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     onAnswer(selectedOptions);
   };
 
-  // Calculate button dimensions based on board width (with 10% size increase)
+  // Calculate button dimensions based on board width
   const buttonAreaWidth = boardWidth - (offsets.boardPaddingHorizontal * 2);
   const horizontalGap = offsets.gridRow.gap;
   const baseButtonWidth = (buttonAreaWidth - horizontalGap * 2) / 3;
 
-  // Increase button size by 10%
-  const buttonWidth = baseButtonWidth * 1.1;
+  // Use calculated width without increase to prevent overflow
+  const buttonWidth = baseButtonWidth;
 
-  // Clamp button width with min/max bounds (min increased for better text display)
-  const clampedButtonWidth = Math.max(160, Math.min(buttonWidth, 260));
+  // Clamp button width with min/max bounds for text readability
+  const clampedButtonWidth = Math.max(140, Math.min(buttonWidth, 240));
 
   // Calculate height based on jawapan-button aspect ratio
   const buttonAspectRatio = 184 / 626; // jawapan-button.png aspect ratio
   const clampedButtonHeight = clampedButtonWidth * buttonAspectRatio;
 
-  // Font size scales with button size (minimum 14px for WCAG accessibility)
-  const fontSize = Math.max(14, Math.floor(clampedButtonWidth / 14));
+  // Font size using theme system (responsive across 4 tiers: 12→18px)
+  const fontSize = getResponsiveFontSize('gridCell', width);
+
+  // Responsive padding for grid cells - optimized to maximize text space
+  const cellPadding = getResponsiveSizeScaled(8, width);
 
   return (
     <View style={styles.container}>
@@ -147,11 +156,22 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
                   lineHeight: getResponsiveFontSize('answer', width) * Typography.lineHeight.tight,
                 },
               ]}
-              numberOfLines={3}
+              numberOfLines={2}
               adjustsFontSizeToFit
               minimumFontScale={0.9}
               allowFontScaling={allowScaling}>
               {question.question}
+            </Text>
+            <Text
+              style={[
+                styles.instructionText,
+                {
+                  fontSize: getResponsiveFontSize('clue', width),
+                  color: selectedOptions.length === 3 ? Colors.success : Colors.textSecondary,
+                },
+              ]}
+              allowFontScaling={allowScaling}>
+              Pilih 3 jawapan yang betul ({selectedOptions.length}/3)
             </Text>
           </View>
 
@@ -182,13 +202,14 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
                         accessibilityState={{ selected: isSelected }}>
                         <ImageBackground
                           source={ASSETS.games.dbpSejarah.jawapanButton.default}
-                          style={styles.gridCellBg}
+                          style={[styles.gridCellBg, { padding: cellPadding }]}
                           resizeMode="stretch">
                           <Text
                             style={[styles.gridCellText, { fontSize }]}
-                            numberOfLines={4}
+                            numberOfLines={5}
                             adjustsFontSizeToFit
                             minimumFontScale={0.9}
+                            ellipsizeMode="tail"
                             allowFontScaling={allowScaling}>
                             {isSelected && '✓ '}
                             {option}
@@ -297,17 +318,23 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.95 }],
   },
   gridCellBg: {
+    // Dynamic: padding
     width: '100%',
     height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 6,  // Increased from 4 for better text space
   },
   gridCellText: {
     fontFamily: Typography.fontFamily,
     color: Colors.textLight,
     textAlign: 'center',
     fontWeight: Typography.fontWeight.semiBold,
+  },
+  instructionText: {
+    fontFamily: Typography.fontFamily,
+    textAlign: 'center',
+    fontWeight: Typography.fontWeight.semiBold,
+    marginTop: 4,
   },
 
   // Footer: Next Button (Outside board)

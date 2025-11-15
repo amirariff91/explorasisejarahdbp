@@ -19,8 +19,8 @@ interface StatusBarProps {
 
 /**
  * StatusBar Component - Top game HUD (Landscape Optimized)
- * Shows: Health bar (left), Money (right), Current State (center)
- * Figma: HEALTH 1, DUIT 1, BG-NATION 1
+ * Shows: Current State (center)
+ * Figma: BG-NATION 1
  * Optimized for landscape orientation with horizontal layout and dead zones
  */
 export default function StatusBar({ state }: StatusBarProps) {
@@ -60,35 +60,6 @@ export default function StatusBar({ state }: StatusBarProps) {
 
   return (
     <View style={[styles.container, { paddingHorizontal: edgeMargin, paddingTop: insets.top + Spacing.sm }]}>
-      {/* Health Bar - Left */}
-      <View style={styles.statusItem}>
-        <Image
-          source={ASSETS.shared.ui.healthBar}
-          style={[
-            styles.barImage,
-            {
-              width: isLandscape
-                ? statusBarSizes.healthBar.landscape.width
-                : statusBarSizes.healthBar.portrait.width,
-            },
-          ]}
-          contentFit="contain"
-        />
-        <Text
-          style={[
-            styles.statusText,
-            // Use unified responsive typography scale for compact HUD text
-            { fontSize: getResponsiveFontSize('answer', width) },
-          ]}
-          allowFontScaling={allowScaling}
-          numberOfLines={1}
-          adjustsFontSizeToFit={true}
-          minimumFontScale={0.75}
-          ellipsizeMode="clip">
-          ❤️ {gameState.health}%
-        </Text>
-      </View>
-
       {/* State Name - Center */}
       <View style={styles.stateContainer}>
         <Image
@@ -106,7 +77,7 @@ export default function StatusBar({ state }: StatusBarProps) {
           style={[
             styles.stateName,
             {
-              fontSize: isLandscape ? 32 : 28, // Figma spec: 32px for state names
+              fontSize: getResponsiveFontSize('stateLabel', width), // Responsive: 24→38px across 4 tiers
             },
           ]}
           allowFontScaling={allowScaling}
@@ -117,35 +88,6 @@ export default function StatusBar({ state }: StatusBarProps) {
           {stateDisplayNames[state]}
         </Text>
       </View>
-
-      {/* Money Bar - Right */}
-      <View style={styles.statusItem}>
-        <Image
-          source={ASSETS.shared.ui.duitBar}
-          style={[
-            styles.barImage,
-            {
-              width: isLandscape
-                ? statusBarSizes.moneyBar.landscape.width
-                : statusBarSizes.moneyBar.portrait.width,
-            },
-          ]}
-          contentFit="contain"
-        />
-        <Text
-          style={[
-            styles.statusText,
-            // Use unified responsive typography scale for compact HUD text
-            { fontSize: getResponsiveFontSize('answer', width) },
-          ]}
-          allowFontScaling={allowScaling}
-          numberOfLines={1}
-          adjustsFontSizeToFit={true}
-          minimumFontScale={0.75}
-          ellipsizeMode="clip">
-          💰 RM{gameState.money}
-        </Text>
-      </View>
     </View>
   );
 }
@@ -154,25 +96,10 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     // paddingTop set dynamically with safe area insets
     paddingBottom: Spacing.sm,
     // paddingHorizontal set dynamically for dead zones
-  },
-  statusItem: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  barImage: {
-    height: 50,
-  },
-  statusText: {
-    position: 'absolute',
-    fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
-    color: Colors.textLight,
-    ...getTextShadowStyle(Shadows.text.medium),
   },
   stateContainer: {
     position: 'relative',

@@ -48,12 +48,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: 'transparent',
   },
   text: {
     marginTop: 20,
     fontSize: 18,
     fontFamily: Typography.fontFamily,
-    color: '#333',
+    color: '#ffffff',
   },
 });

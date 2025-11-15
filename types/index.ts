@@ -17,6 +17,7 @@ export type {
   Question,
   AnswerValue,
   GameState,
+  StateTimerState,
   StateInfo,
   AnswerResult,
   GameProgress,

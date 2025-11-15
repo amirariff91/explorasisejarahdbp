@@ -1,18 +1,18 @@
 /**
  * Centralized Asset Manifest
- * 
+ *
  * Single source of truth for all game assets. Import assets from this file
  * instead of using direct require() statements in components.
- * 
+ *
  * Benefits:
  * - Type-safe asset references
  * - Easy to swap asset sources
  * - Platform-specific optimizations
  * - Better code organization
- * 
+ *
  * Usage:
  *   import { ASSETS } from '@/constants/assets';
- *   <Image source={ASSETS.shared.ui.healthBar} />
+ *   <Image source={ASSETS.shared.ui.star} />
  */
 
 import type { AssetManifest } from '@/types/assets';
@@ -71,12 +71,6 @@ export const ASSETS: AssetManifest = {
     },
 
     ui: {
-      // Health meter bar (Figma Frame 2:194)
-      healthBar: require('@/assets/images/game/ui-elements/health-bar.png'),
-      
-      // Money/currency bar (Figma Frame 2:195)
-      duitBar: require('@/assets/images/game/ui-elements/duit-bar.png'),
-      
       // State name badge background (Figma Frame 2:184)
       bgNation: require('@/assets/images/game/ui-elements/bg-nation.png'),
       
@@ -184,8 +178,6 @@ export const ASSET_PRELOAD_CONFIG = {
     ASSETS.shared.backgrounds.main,
     ASSETS.branding.logoDbp,
     ASSETS.branding.titleMasthead,
-    ASSETS.shared.ui.healthBar,
-    ASSETS.shared.ui.duitBar,
   ],
   
   preload: [
@@ -237,9 +229,9 @@ export const BrandingAssets = ASSETS.branding;
 
 /**
  * Type-safe asset accessor
- * 
+ *
  * Example usage:
- *   const healthBar = getAsset('shared', 'ui', 'healthBar');
+ *   const star = getAsset('shared', 'ui', 'star');
  */
 export function getAsset(...path: string[]): any {
   let current: any = ASSETS;
