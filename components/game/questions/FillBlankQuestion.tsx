@@ -1,8 +1,8 @@
 import LandscapeLayout from '@/components/game/LandscapeLayout';
-import { isLandscapeMode, getQuestionBoardSize, getResponsiveSizeScaled, TouchTargets, getEdgeMargin, getColumnGap } from '@/constants/layout';
+import { isLandscapeMode, getQuestionBoardSize, getDeviceSize, getResponsiveSizeScaled, TouchTargets, getEdgeMargin, getColumnGap } from '@/constants/layout';
 import { Colors, getResponsiveFontSize, Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
-import type { FillBlankQuestion as FBQuestion } from '@/types';
+import type { FillBlankQuestion as FBQuestion, MalaysianState } from '@/types';
 import { playSound } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
@@ -30,12 +30,31 @@ interface Props {
  */
 export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const [answer, setAnswer] = useState('');
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width); // Use consistent landscape detection
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
+  const isPhone = getDeviceSize(width) === 'phone';
+  const isJohor = question.state === 'johor';
+
   // Use new responsive board sizing system (auto-scales by device tier)
-  const boardSize = getQuestionBoardSize('standard', width);
+  const baseBoardSize = getQuestionBoardSize('standard', width);
+
+  // Large board states: 40% larger board on phones, 40% additional boost on tablets
+  const largeBoardStates: MalaysianState[] = ['perlis', 'perak', 'kedah'];
+  const isLargeBoardPhone = isPhone && largeBoardStates.includes(question.state);
+  const isLargeBoardTablet = !isPhone && largeBoardStates.includes(question.state);
+  const phoneBoardMultiplier = isLargeBoardPhone ? 1.4 : 1.0;
+  const tabletBoardMultiplier = isLargeBoardTablet ? 1.4 : 1.0;
+
+  // All states except Johor: 40% larger board on tablets only
+  const boardSizeMultiplier = !isJohor && !isPhone ? 1.4 : 1.0;
+
+  const boardSize = {
+    width: baseBoardSize.width * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier,
+    height: baseBoardSize.height * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier,
+  };
+
   const boardScale = 1.25;  // Slightly larger for fill-blank questions
   const scaledBoardWidth = boardSize.width * boardScale;
   const scaledBoardHeight = boardSize.height * boardScale;
@@ -44,9 +63,24 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const totalFlex = 40 + 58;
   const leftFlexRatio = 40 / totalFlex;
   const availableWidth = width - edgeMargin * 2 - columnGap;
-  const maxBoardWidth = availableWidth * leftFlexRatio;
-  const boardWidth = Math.min(scaledBoardWidth, maxBoardWidth);
-  const boardHeight = (scaledBoardHeight / scaledBoardWidth) * boardWidth;
+  // Perlis/Perak/Kedah: use larger screen width to allow bigger board
+  const maxBoardWidth = isLargeBoardTablet
+    ? width * 0.50  // Tablets: 50% width
+    : isLargeBoardPhone
+      ? width * 0.55  // Phones: 55% width
+      : availableWidth * leftFlexRatio;
+  let boardWidth = Math.min(scaledBoardWidth, maxBoardWidth);
+  let boardHeight = (scaledBoardHeight / scaledBoardWidth) * boardWidth;
+
+  // Final safety check: ensure board fits within screen bounds
+  // Perlis/Perak/Kedah tablets: allow up to 52% width to accommodate larger board
+  const maxWidthPercent = isLargeBoardTablet ? 0.52 : 0.45;
+  boardWidth = Math.min(boardWidth, width * maxWidthPercent);
+  boardHeight = Math.min(boardHeight, height * 0.88);
+
+  // Ensure minimum size for usability
+  boardWidth = Math.max(boardWidth, 250);
+  boardHeight = Math.max(boardHeight, 180);
 
   const handleSubmit = async () => {
     if (answer.trim()) {

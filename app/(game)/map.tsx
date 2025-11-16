@@ -1,7 +1,7 @@
 import MalaysiaMapSVG from "@/components/game/MalaysiaMapSVG";
-import { BorderRadius, Colors, Shadows, Typography, getComponentShadowStyle } from "@/constants/theme";
+import { BorderRadius, Colors, Shadows, Typography, getComponentShadowStyle, getResponsiveFontSize } from "@/constants/theme";
 import { useGameContext } from "@/contexts/GameContext";
-import { getQuestionBoardSize } from "@/constants/layout";
+import { getMapBoardSize } from "@/constants/layout";
 import type { MalaysianState } from "@/types";
 import { playAmbient, playMusic, playSound, stopAllAmbient, stopMusic } from "@/utils/audio";
 import { useRouter } from "expo-router";
@@ -40,7 +40,15 @@ const LAYOUT_CONFIG = {
 export default function StateSelectionScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
-  const { gameState, isLoading, saveError, setCurrentState } = useGameContext();
+  const {
+    gameState,
+    isLoading,
+    saveError,
+    setCurrentState,
+    clearStateAnswers,
+    setQuestionIndexForState,
+    clearStateTimer,
+  } = useGameContext();
   const insets = useSafeAreaInsets();
   const allowScaling = gameState.allowFontScaling;
 
@@ -82,6 +90,7 @@ export default function StateSelectionScreen() {
     (state: MalaysianState) => {
       playSound('click'); // Soft, pleasant feedback for state selection
       setCurrentState(state);
+      clearStateTimer(); // Prevent stale timers from previous states
 
       const proceed = () => {
         if (state === 'johor') {
@@ -98,7 +107,15 @@ export default function StateSelectionScreen() {
           'Anda telah melengkapkan negeri ini. Ulang kuiz?',
           [
             { text: 'Tidak', style: 'cancel' },
-            { text: 'Ya', onPress: proceed },
+            {
+              text: 'Ya',
+              onPress: () => {
+                // Reset previous run so quiz doesn't auto-complete on replay
+                clearStateAnswers(state);
+                setQuestionIndexForState(state, 0);
+                proceed();
+              },
+            },
           ],
           { cancelable: true }
         );
@@ -106,7 +123,7 @@ export default function StateSelectionScreen() {
         proceed();
       }
     },
-    [router, setCurrentState, gameState.completedStates],
+    [router, setCurrentState, clearStateTimer, clearStateAnswers, setQuestionIndexForState, gameState.completedStates],
   );
 
   const handleTutorial = useCallback(() => {
@@ -264,13 +281,19 @@ export default function StateSelectionScreen() {
             source={ASSETS.shared.backgrounds.board}
             style={[
               styles.mapBoard,
-              getQuestionBoardSize('map', width),
+              getMapBoardSize(width),
             ]}
             resizeMode="contain"
           >
             {/* Map Title Header */}
             <View style={styles.mapTitleContainer}>
-              <Text style={styles.mapTitleText} allowFontScaling={allowScaling}>
+              <Text
+                style={[
+                  styles.mapTitleText,
+                  { fontSize: getResponsiveFontSize('mapTitle', width) }
+                ]}
+                allowFontScaling={allowScaling}
+              >
                 PETA MALAYSIA
               </Text>
             </View>
@@ -323,7 +346,7 @@ const styles = StyleSheet.create({
   },
   mapTitleText: {
     fontFamily: Typography.fontFamily,
-    fontSize: 18,
+    // fontSize applied inline via getResponsiveFontSize('mapTitle', width)
     fontWeight: Typography.fontWeight.bold,
     color: Colors.textLight,
     textAlign: "center",

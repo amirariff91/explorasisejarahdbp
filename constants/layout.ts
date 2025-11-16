@@ -37,9 +37,13 @@ export const ScaleFactors = {
 } as const;
 
 // Edge Margins (Dead Zones for thumb grips)
+// Now responsive - scales with device size for better adaptation
 export const EdgeMargins = {
-  landscape: 40, // px - Wider margins for landscape mode
-  portrait: 30, // px - Standard margins for portrait mode
+  landscape: 40, // px - Base margin for phone landscape (backward compatibility)
+  portrait: 30, // px - Base margin for portrait (backward compatibility)
+  // Percentage-based margins for better scaling across devices
+  landscapePercent: 0.03, // 3% of screen width
+  portraitPercent: 0.04, // 4% of screen width
 } as const;
 
 // Spacing Scale (4px base unit)
@@ -446,8 +450,31 @@ export const QuestionOffsets = {
 } as const;
 
 // Helper Functions
+/**
+ * Get Edge Margin (Legacy - Fixed Pixels)
+ * @deprecated Use getResponsiveEdgeMargin for better scaling across devices
+ */
 export const getEdgeMargin = (isLandscape: boolean): number => {
   return isLandscape ? EdgeMargins.landscape : EdgeMargins.portrait;
+};
+
+/**
+ * Get Responsive Edge Margin
+ * Returns percentage-based margin that scales with screen width
+ *
+ * @param isLandscape - Whether device is in landscape orientation
+ * @param screenWidth - Current screen width in pixels
+ * @returns Edge margin in pixels (percentage of screen width)
+ *
+ * @example
+ * getResponsiveEdgeMargin(true, 1194)  // ~36px (3% of 1194)
+ * getResponsiveEdgeMargin(true, 667)   // ~20px (3% of 667)
+ */
+export const getResponsiveEdgeMargin = (isLandscape: boolean, screenWidth: number): number => {
+  const percent = isLandscape ? EdgeMargins.landscapePercent : EdgeMargins.portraitPercent;
+  const margin = Math.round(screenWidth * percent);
+  // Ensure minimum margin for usability (at least 20px)
+  return Math.max(margin, 20);
 };
 
 export const getColumnGap = (isLandscape: boolean): number => {
@@ -546,6 +573,34 @@ export const getQuestionBoardSize = (
   return {
     width: Math.round(base.width * scale),
     height: Math.round(base.height * scale),
+  };
+};
+
+/**
+ * Get Responsive Map Board Size
+ * Special scaling: 30% larger on tablets compared to standard scaling
+ *
+ * @param width - Screen width in pixels
+ * @returns Scaled map board dimensions { width, height }
+ *
+ * @example
+ * getMapBoardSize(667)  // { width: 600, height: 450 } (phone: unchanged)
+ * getMapBoardSize(1024) // { width: 936, height: 702 } (tablet-sm: 1.2 × 1.3)
+ * getMapBoardSize(1200) // { width: 1170, height: 878 } (tablet-md: 1.5 × 1.3)
+ * getMapBoardSize(1366) // { width: 1404, height: 1053 } (tablet-lg: 1.8 × 1.3)
+ */
+export const getMapBoardSize = (width: number): { width: number; height: number } => {
+  const base = QuestionBoardBase.map;
+  const deviceSize = getDeviceSize(width);
+  const baseScale = ScaleFactors[deviceSize];
+
+  // Apply 30% additional scaling on tablets only
+  const tabletMultiplier = deviceSize === 'phone' ? 1.0 : 1.3;
+  const finalScale = baseScale * tabletMultiplier;
+
+  return {
+    width: Math.round(base.width * finalScale),
+    height: Math.round(base.height * finalScale),
   };
 };
 

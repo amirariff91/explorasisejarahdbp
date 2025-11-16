@@ -15,24 +15,33 @@ export default function GameLayout() {
     initializeAudio();
   }, []);
 
-  // Lock screen orientation to landscape
+  // Lock screen orientation to landscape (both directions for better device support)
   useEffect(() => {
     const lockOrientation = async () => {
       try {
         await ScreenOrientation.lockAsync(
-          ScreenOrientation.OrientationLock.LANDSCAPE_LEFT
+          ScreenOrientation.OrientationLock.LANDSCAPE
         );
+        if (__DEV__) {
+          console.log('Screen orientation locked to landscape');
+        }
       } catch (error) {
-        console.warn('Failed to lock screen orientation:', error);
+        // Non-blocking: orientation lock is a UX enhancement, not critical
+        if (__DEV__) {
+          console.warn('Failed to lock screen orientation (this is normal on some simulators):', error);
+        }
       }
     };
 
+    // Execute async but don't await - don't block app startup
     lockOrientation();
 
     return () => {
       // Unlock orientation when component unmounts
       ScreenOrientation.unlockAsync().catch((error) => {
-        console.warn('Failed to unlock screen orientation:', error);
+        if (__DEV__) {
+          console.warn('Failed to unlock screen orientation:', error);
+        }
       });
     };
   }, []);

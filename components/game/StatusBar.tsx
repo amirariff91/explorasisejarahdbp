@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
+import type { ViewStyle } from 'react-native';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useGameContext } from '@/contexts/GameContext';
@@ -10,7 +11,7 @@ import {
   getTextShadowStyle,
   Shadows,
 } from '@/constants/theme';
-import { isLandscapeMode, getEdgeMargin, UIElements, Spacing } from '@/constants/layout';
+import { isLandscapeMode, getEdgeMargin, getDeviceSize, UIElements, Spacing } from '@/constants/layout';
 import { ASSETS } from '@/constants/assets';
 
 interface StatusBarProps {
@@ -28,9 +29,12 @@ export default function StatusBar({ state }: StatusBarProps) {
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const isLandscape = isLandscapeMode(width);
+  const isPhone = getDeviceSize(width) === 'phone';
+  const isJohor = state === 'johor';
   const edgeMargin = getEdgeMargin(isLandscape);
   const statusBarSizes = UIElements.statusBar;
   const allowScaling = gameState.allowFontScaling;
+  const topOffset = insets.top + Spacing.sm;
 
   const stateDisplayNames: Record<MalaysianState, string> = {
     perlis: 'PERLIS',
@@ -53,13 +57,30 @@ export default function StatusBar({ state }: StatusBarProps) {
     ? statusBarSizes.stateIndicator.landscape
     : statusBarSizes.stateIndicator.portrait;
   const stateIndicatorScale = 1.3;
+
+  // All states except Johor: 20% larger badge on tablets only
+  const badgeEnhancement = !isJohor && !isPhone ? 1.2 : 1.0;
+
   const scaledStateIndicator = {
-    width: baseStateIndicatorSize.width * stateIndicatorScale,
-    height: baseStateIndicatorSize.height * stateIndicatorScale,
+    width: baseStateIndicatorSize.width * stateIndicatorScale * badgeEnhancement,
+    height: baseStateIndicatorSize.height * stateIndicatorScale * badgeEnhancement,
   };
 
+  const containerDynamicStyle: ViewStyle = isPhone
+    ? {
+        position: 'absolute',
+        top: topOffset,
+        left: edgeMargin,
+        right: edgeMargin,
+        paddingTop: 0,
+        zIndex: 25,
+      }
+    : {
+        paddingTop: topOffset,
+      };
+
   return (
-    <View style={[styles.container, { paddingHorizontal: edgeMargin, paddingTop: insets.top + Spacing.sm }]}>
+    <View style={[styles.container, { paddingHorizontal: edgeMargin }, containerDynamicStyle]}>
       {/* State Name - Center */}
       <View style={styles.stateContainer}>
         <Image

@@ -8,6 +8,7 @@ import {
   useRef,
   type ReactNode,
 } from 'react';
+import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { debounce } from '@/utils/debounce';
 import { getStateTimer } from '@/constants/stateTimers';
@@ -62,6 +63,31 @@ const initialGameState: GameState = {
   stateTimer: null,
   allowFontScaling: false,
 };
+
+// Simple loading screen component
+function LoadingScreen({ message }: { message: string }) {
+  return (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#8B4513" />
+      <Text style={styles.loadingText}>{message}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF8DC',
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#8B4513',
+    fontWeight: '600',
+  },
+});
 
 export function GameProvider({ children }: { children: ReactNode }) {
   const [gameState, setGameState] = useState<GameState>(initialGameState);
@@ -242,6 +268,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       currentState: state,
       currentQuestionIndex: 0,
       showSuccessModal: true,
+      // Clear any running timer when state is completed to avoid reuse
+      stateTimer: null,
     }));
   }, []);
 
@@ -433,6 +461,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
       clearStateTimer,
     ]
   );
+
+  // Don't render children until game state is loaded from SecureStore
+  if (isLoading) {
+    return <LoadingScreen message="Memuatkan data permainan..." />;
+  }
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }

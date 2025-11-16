@@ -4,6 +4,7 @@ import {
   getQuestionOffsets,
   isLandscapeMode,
   getQuestionBoardSize,
+  getDeviceSize,
   getResponsiveSizeScaled,
   TouchTargets,
 } from '@/constants/layout';
@@ -52,8 +53,20 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const [showNext, setShowNext] = useState(false);
   const { width, height } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
+  const isPhone = getDeviceSize(width) === 'phone';
   const allowScaling = gameState.allowFontScaling;
-  const offsets = getQuestionOffsets('multipleChoiceSingle', isLandscape) as {
+  const isJohor = question.state === 'johor';
+  const isSabah = question.state === 'sabah';
+  const isSarawak = question.state === 'sarawak';
+  const isMelaka = question.state === 'melaka';
+  const isSelangor = question.state === 'selangor';
+  const isBorneoPhone = isPhone && (isSabah || isSarawak);
+  const isTightPhone = isPhone && (isSabah || isSarawak || isMelaka || isSelangor);
+  const forceWrap = isTightPhone;
+  const questionMaxWidth = forceWrap ? '72%' : '85%';
+  const baseQuestionFontSize = getResponsiveFontSize('question', width);
+  const questionFontSize = forceWrap ? Math.round(baseQuestionFontSize * 1.08) : baseQuestionFontSize;
+  const baseOffsets = getQuestionOffsets('multipleChoiceSingle', isLandscape) as {
     boardPaddingTop: number;
     boardPaddingBottom: number;
     boardPaddingHorizontal: number;
@@ -63,14 +76,42 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
     optionRow: { gap: number };
     footerContainer: { marginBottom: number; marginRight: number };
   };
+
+  // Slightly tighter layout on phones for Sabah, Sarawak & Melaka so buttons stay on the board
+  const offsets = isTightPhone
+    ? {
+        ...baseOffsets,
+        boardPaddingBottom: Math.min(baseOffsets.boardPaddingBottom, 12),
+        questionAreaHeight: Math.min(baseOffsets.questionAreaHeight, 135),
+        answerAreaTop: Math.min(baseOffsets.answerAreaTop, 12),
+        optionsContainer: { ...baseOffsets.optionsContainer, gap: Math.min(baseOffsets.optionsContainer.gap, 12) },
+        optionRow: { ...baseOffsets.optionRow, gap: Math.min(baseOffsets.optionRow.gap, 8) },
+      }
+    : baseOffsets;
   // Use new responsive board sizing system (auto-scales by device tier)
-  const boardSize = getQuestionBoardSize('singleBoardMC', width);
+  const baseBoardSize = getQuestionBoardSize('singleBoardMC', width);
+
+  // Large board states: 40% larger board on phones, 40% additional boost on tablets
+  const largeBoardStates = ['perlis', 'perak', 'kedah'] as const;
+  const isLargeBoardPhone = isPhone && largeBoardStates.includes(question.state as any);
+  const isLargeBoardTablet = !isPhone && largeBoardStates.includes(question.state as any);
+  const phoneBoardMultiplier = isLargeBoardPhone ? 1.4 : 1.0;
+  const tabletBoardMultiplier = isLargeBoardTablet ? 1.4 : 1.0;
+
+  // All states except Johor: 40% larger board on tablets only
+  const boardSizeMultiplier = !isJohor && !isPhone ? 1.4 : 1.0;
+
+  const boardSize = {
+    width: baseBoardSize.width * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier,
+    height: baseBoardSize.height * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier,
+  };
 
   // Responsive board sizing - Allow board to reach its base dimensions
   const maxBoardWidth = width * 0.90;
   const maxBoardHeight = height * 0.88;
   const aspectRatio = boardSize.width / boardSize.height;
 
+  // Safe bounds checking to prevent extreme values
   let boardWidth = Math.min(boardSize.width, maxBoardWidth);
   let boardHeight = boardWidth / aspectRatio;
 
@@ -79,19 +120,46 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
     boardHeight = maxBoardHeight;
     boardWidth = boardHeight * aspectRatio;
   }
+
+  // Final safety check: ensure board fits within screen bounds
+  boardWidth = Math.min(boardWidth, width * 0.95);
+  boardHeight = Math.min(boardHeight, height * 0.95);
+
+  // Ensure minimum size for usability
+  boardWidth = Math.max(boardWidth, 300);
+  boardHeight = Math.max(boardHeight, 200);
   const nextButtonSize = isLandscape ? ButtonSizes.next.landscape : ButtonSizes.next.portrait;
 
   // Calculate button dimensions based on board width
   const buttonAreaWidth = boardWidth - (offsets.boardPaddingHorizontal * 2);
   const horizontalGap = offsets.optionRow.gap;
-  const buttonWidth = (buttonAreaWidth - horizontalGap) / 2;
+  const baseButtonWidth = (buttonAreaWidth - horizontalGap) / 2;
 
-  // Clamp button width with min/max bounds
-  const clampedButtonWidth = Math.max(140, Math.min(buttonWidth, 260)); // Optimized for 680×380 board
+  // Apply 20% increase on tablets only
+  const tabletMultiplier = isPhone ? 1.0 : 1.2;
+  const buttonWidth = baseButtonWidth * tabletMultiplier;
+
+  // Clamp button width with min/max bounds (adjusted for tablets)
+  const buttonWidthMin = isTightPhone ? 130 : 140;
+  const buttonWidthMax = isTightPhone ? 230 : (isPhone ? 260 : 312); // 260 * 1.2 = 312 for tablets
+  const clampedButtonWidth = Math.max(buttonWidthMin, Math.min(buttonWidth, buttonWidthMax));
 
   // Maintain button aspect ratio
   const buttonAspectRatio = 184 / 626; // jawapan-button.png aspect ratio
   const clampedButtonHeight = clampedButtonWidth * buttonAspectRatio;
+  // Slight upward shift for Sabah/Sarawak/Melaka on phones to keep answers centered on the board
+  const answerYOffset = isTightPhone ? -boardHeight * 0.1 : 0;
+
+  // Force long prompts into two lines on tight phone layouts
+  const wrapQuestionText = (text: string): string => {
+    if (!forceWrap) return text;
+    if (text.includes('\n')) return text;
+    const words = text.split(' ');
+    if (words.length < 4) return text;
+    const mid = Math.floor(words.length / 2);
+    return `${words.slice(0, mid).join(' ')}\n${words.slice(mid).join(' ')}`;
+  };
+  const displayQuestion = wrapQuestionText(question.question);
 
   // Animation values for each button
   const buttonScales = [
@@ -147,25 +215,25 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
           ]}
           resizeMode="contain">
           {/* Question Section - Top */}
-          <View style={[styles.questionSection, { height: offsets.questionAreaHeight, marginBottom: offsets.answerAreaTop }]}>
+          <View style={[styles.questionSection, { height: offsets.questionAreaHeight, marginBottom: offsets.answerAreaTop, maxWidth: questionMaxWidth }]}>
             <Text
               style={[
                 styles.questionText,
                 {
-                  fontSize: getResponsiveFontSize('question', width),
-                  lineHeight: getResponsiveFontSize('question', width) * Typography.lineHeight.normal,
+                  fontSize: questionFontSize,
+                  lineHeight: questionFontSize * Typography.lineHeight.normal,
                 },
               ]}
-              numberOfLines={7}
-              adjustsFontSizeToFit
-              minimumFontScale={0.9}
+              numberOfLines={forceWrap ? 2 : 7}
+              adjustsFontSizeToFit={forceWrap}
+              minimumFontScale={forceWrap ? 0.9 : 0.9}
               allowFontScaling={allowScaling}>
-              {question.question}
+              {displayQuestion}
             </Text>
           </View>
 
           {/* Answers Section - Bottom */}
-          <View style={styles.answersSection}>
+          <View style={[styles.answersSection, { transform: [{ translateY: answerYOffset }] }]}>
             <View style={[styles.optionsContainer, { gap: offsets.optionsContainer.gap }]}>
               <View style={[styles.optionRow, { gap: offsets.optionRow.gap }]}>
                 {question.options.slice(0, 2).map((option, btnIndex) => (

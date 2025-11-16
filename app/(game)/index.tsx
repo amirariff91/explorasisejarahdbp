@@ -73,23 +73,7 @@ export default function Homepage() {
 
   // Play welcome background music and ambient on mount with synchronized SFX
   useEffect(() => {
-    // Logo reveal sound when component mounts
-    const logoTimer = setTimeout(() => {
-      playSound('logo-reveal'); // Magical whoosh for logo appearance
-    }, 500);
-
-    // Title drop sound when title appears
-    const titleTimer = setTimeout(() => {
-      playSound('title-drop'); // Resonant gong for majestic title reveal
-    }, 1500);
-
-    // Background music starts with fade-in
-    const bgmTimer = setTimeout(() => {
-      playMusic('bgm-title', true, 3000); // Dedicated title theme with 3s fade-in
-      playAmbient('ambient-map', 0.1); // Very subtle tropical ambience (10% volume)
-    }, 2000); // Delay music slightly to let SFX shine
-
-    // Start gentle breathing animation for play button (kid-friendly)
+    // Start gentle breathing animation for play button immediately (kid-friendly)
     Animated.loop(
       Animated.sequence([
         Animated.timing(buttonScale, {
@@ -107,10 +91,30 @@ export default function Homepage() {
       ])
     ).start();
 
+    // Defer audio playback until after render is complete to prevent blocking
+    const audioInitTimer = setTimeout(() => {
+      // Logo reveal sound when component mounts
+      const logoTimer = setTimeout(() => {
+        playSound('logo-reveal'); // Magical whoosh for logo appearance
+      }, 500);
+
+      // Title drop sound when title appears
+      const titleTimer = setTimeout(() => {
+        playSound('title-drop'); // Resonant gong for majestic title reveal
+      }, 1500);
+
+      // Background music starts with fade-in
+      const bgmTimer = setTimeout(() => {
+        playMusic('bgm-title', true, 3000); // Dedicated title theme with 3s fade-in
+        playAmbient('ambient-map', 0.1); // Very subtle tropical ambience (10% volume)
+      }, 2000); // Delay music slightly to let SFX shine
+
+      // Store timers in refs so we can clear them later
+      return { logoTimer, titleTimer, bgmTimer };
+    }, 100); // Small delay to ensure render completes first
+
     return () => {
-      clearTimeout(logoTimer);
-      clearTimeout(titleTimer);
-      clearTimeout(bgmTimer);
+      clearTimeout(audioInitTimer);
       // No stopMusic needed - next screen's playMusic() will handle transition
       stopAllAmbient();
     };

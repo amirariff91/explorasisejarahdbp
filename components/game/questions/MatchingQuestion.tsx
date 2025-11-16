@@ -1,4 +1,4 @@
-import { ButtonSizes, EdgeMargins, getQuestionBoardSize, getResponsiveSizeScaled, TouchTargets } from '@/constants/layout';
+import { ButtonSizes, EdgeMargins, getQuestionBoardSize, getDeviceSize, getResponsiveSizeScaled, TouchTargets } from '@/constants/layout';
 import { Colors, getResponsiveFontSize, Opacity, Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
 import type { MatchingQuestion as MQQuestion } from '@/types';
@@ -32,6 +32,9 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [showNext, setShowNext] = useState(false);
   const { width, height } = useWindowDimensions();
+  const isPhone = getDeviceSize(width) === 'phone';
+  const isJohor = question.state === 'johor';
+
   // Simple responsive offsets for Matching questions
   const offsets = {
     boardPaddingTop: 25,
@@ -46,7 +49,15 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
 
   // Use new responsive board sizing system (auto-scales by device tier)
   // Using 'singleBoardMC' board (680×380 base) for adequate width for 3×3 grid with long text
-  const boardSize = getQuestionBoardSize('singleBoardMC', width);
+  const baseBoardSize = getQuestionBoardSize('singleBoardMC', width);
+
+  // All states except Johor: 40% larger board on tablets only
+  const boardSizeMultiplier = !isJohor && !isPhone ? 1.4 : 1.0;
+
+  const boardSize = {
+    width: baseBoardSize.width * boardSizeMultiplier,
+    height: baseBoardSize.height * boardSizeMultiplier,
+  };
 
   // Responsive board sizing - Allow larger board to use available space
   const maxBoardWidth = width * (width < 1000 ? 0.90 : 0.92);  // 90% phone, 92% tablet
@@ -61,6 +72,14 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     boardHeight = maxBoardHeight;
     boardWidth = boardHeight * aspectRatio;
   }
+
+  // Final safety check: ensure board fits within screen bounds
+  boardWidth = Math.min(boardWidth, width * 0.95);
+  boardHeight = Math.min(boardHeight, height * 0.95);
+
+  // Ensure minimum size for usability
+  boardWidth = Math.max(boardWidth, 300);
+  boardHeight = Math.max(boardHeight, 200);
 
   // Responsive button sizing (phone <1000px, tablet ≥1000px)
   const nextButtonSize = width < 1000 ? ButtonSizes.next.phone : ButtonSizes.next.tablet;
@@ -100,11 +119,13 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const horizontalGap = offsets.gridRow.gap;
   const baseButtonWidth = (buttonAreaWidth - horizontalGap * 2) / 3;
 
-  // Use calculated width without increase to prevent overflow
-  const buttonWidth = baseButtonWidth;
+  // Apply 20% increase on tablets only
+  const tabletMultiplier = isPhone ? 1.0 : 1.2;
+  const buttonWidth = baseButtonWidth * tabletMultiplier;
 
-  // Clamp button width with min/max bounds for text readability
-  const clampedButtonWidth = Math.max(140, Math.min(buttonWidth, 240));
+  // Clamp button width with min/max bounds for text readability (adjusted for tablets)
+  const buttonWidthMax = isPhone ? 240 : 288; // 240 * 1.2 = 288 for tablets
+  const clampedButtonWidth = Math.max(140, Math.min(buttonWidth, buttonWidthMax));
 
   // Calculate height based on jawapan-button aspect ratio
   const buttonAspectRatio = 184 / 626; // jawapan-button.png aspect ratio

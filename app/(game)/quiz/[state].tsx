@@ -39,6 +39,7 @@ export default function QuizScreen() {
     setCurrentState,
     setQuestionIndexForState,
     startStateTimer,
+    clearStateTimer,
     pauseStateTimer,
     resumeStateTimer,
     isTimerExpired,
@@ -110,18 +111,21 @@ export default function QuizScreen() {
 
   // Start state timer when quiz begins (only for states with timers)
   useEffect(() => {
-    if (state && questions.length > 0 && !gameState.stateTimer) {
+    if (state && questions.length > 0) {
+      // Always reset any stale timer from previous states before starting
+      clearStateTimer();
       startStateTimer(state);
     }
-  }, [state, questions.length, startStateTimer, gameState.stateTimer]);
+  }, [state, questions.length, startStateTimer, clearStateTimer]);
 
   // Handle state completion when all questions are answered
   // Guard by verifying every question has a recorded answer
   useEffect(() => {
     if (!state || questions.length === 0 || !isMountedRef.current) return;
-    // All questions must have an answer recorded in GameContext
-    const allAnswered = questions.every((q) => gameState.answers[q.id] !== undefined);
-    if (allAnswered && !hasCompletedRef.current) {
+    const answeredCount = questions.filter((q) => gameState.answers[q.id] !== undefined).length;
+    const allAnswered = answeredCount === questions.length;
+    // Require at least one recorded answer to avoid auto-complete on clean starts
+    if (allAnswered && answeredCount > 0 && !hasCompletedRef.current) {
       hasCompletedRef.current = true;
       completeState(state);
     }
@@ -276,6 +280,7 @@ export default function QuizScreen() {
   const handleSuccessContinue = () => {
     if (!isMountedRef.current) return;
     setShowSuccessModal(false);
+    clearStateTimer();
     router.back(); // Return to map
   };
 
@@ -289,6 +294,7 @@ export default function QuizScreen() {
     hasCompletedRef.current = false; // Allow completion detection again after restart
     // Restart timer for states with timers
     if (state) {
+      clearStateTimer();
       startStateTimer(state);
     }
   };

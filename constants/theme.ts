@@ -171,6 +171,7 @@ export const TypographyScale = {
     answer: 14,
     gridCell: 12,
     clue: 12,
+    mapTitle: 18,      // Map title (unchanged on phones)
   },
   'tablet-sm': {
     stateLabel: 28,    // 24 × 1.2 ≈ 28
@@ -178,6 +179,7 @@ export const TypographyScale = {
     answer: 15,        // 14 × 1.2 ≈ 15
     gridCell: 14,      // 12 × 1.2 ≈ 14
     clue: 14,          // 12 × 1.2 ≈ 14
+    mapTitle: 22,      // 18 × 1.2 ≈ 22
   },
   'tablet-md': {
     stateLabel: 32,    // 24 × 1.5 ≈ 32
@@ -185,6 +187,7 @@ export const TypographyScale = {
     answer: 16,        // 14 × 1.5 ≈ 16
     gridCell: 16,      // 12 × 1.5 ≈ 16
     clue: 16,          // 12 × 1.5 ≈ 16
+    mapTitle: 27,      // 18 × 1.5 = 27
   },
   'tablet-lg': {
     stateLabel: 38,    // 24 × 1.8 ≈ 38
@@ -192,6 +195,7 @@ export const TypographyScale = {
     answer: 18,        // 14 × 1.8 ≈ 18
     gridCell: 18,      // 12 × 1.8 ≈ 18
     clue: 18,          // 12 × 1.8 ≈ 18
+    mapTitle: 32,      // 18 × 1.8 ≈ 32
   },
 } as const;
 

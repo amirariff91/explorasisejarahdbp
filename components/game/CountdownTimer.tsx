@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, useWindowDimensions, Animated } from 'react-native';
+import { getDeviceSize } from '@/constants/layout';
 import { useGameContext } from '@/contexts/GameContext';
 import { formatTime, getTimerColor } from '@/constants/stateTimers';
 import { getResponsiveSizeScaled } from '@/constants/layout';
@@ -16,6 +17,7 @@ export default function CountdownTimer({
 }: CountdownTimerProps) {
   const { gameState, getTimeRemaining, isTimerExpired } = useGameContext();
   const { width } = useWindowDimensions();
+  const isPhone = getDeviceSize(width) === 'phone';
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [pulseAnim] = useState(new Animated.Value(1));
 
@@ -80,14 +82,22 @@ export default function CountdownTimer({
 
   // Responsive sizing
   const fontSize = getResponsiveFontSize('stateLabel', width);
-  const containerPadding = getResponsiveSizeScaled(12, width);
-  const borderRadius = getResponsiveSizeScaled(8, width);
-  const iconSize = getResponsiveSizeScaled(20, width);
+  const containerPadding = getResponsiveSizeScaled(isPhone ? 10 : 12, width);
+  const borderRadius = getResponsiveSizeScaled(isPhone ? 14 : 10, width);
+  const iconSize = getResponsiveSizeScaled(isPhone ? 18 : 20, width);
+  const topOffset = isPhone ? 12 : 16;
+  const rightOffset = isPhone ? width * 0.10 : 18;
 
   return (
     <Animated.View
       style={[
         styles.container,
+        isPhone && {
+          position: 'absolute',
+          top: topOffset,
+          right: rightOffset,
+          zIndex: 30,
+        },
         {
           paddingHorizontal: containerPadding,
           paddingVertical: containerPadding * 0.6,
@@ -127,9 +137,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    backgroundColor: 'rgba(0, 0, 0, 0.65)',
     borderWidth: 2,
     gap: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.35,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 6,
   },
   icon: {
     color: '#FFFFFF',

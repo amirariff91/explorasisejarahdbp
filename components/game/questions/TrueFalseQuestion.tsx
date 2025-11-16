@@ -1,4 +1,4 @@
-import { ButtonSizes, EdgeMargins, getQuestionBoardSize, TouchTargets } from '@/constants/layout';
+import { ButtonSizes, EdgeMargins, getQuestionBoardSize, getDeviceSize, TouchTargets } from '@/constants/layout';
 import {
   Colors,
   getResponsiveFontSize,
@@ -42,6 +42,9 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   const { gameState } = useGameContext();
   const { width, height } = useWindowDimensions();
   const allowScaling = gameState.allowFontScaling;
+  const isPhone = getDeviceSize(width) === 'phone';
+  const isJohor = question.state === 'johor';
+
   // Simple responsive offsets for True/False questions
   const offsets = {
     boardPaddingTop: 25,
@@ -53,7 +56,15 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   };
 
   // Use new responsive board sizing system (auto-scales by device tier)
-  const boardSize = getQuestionBoardSize('standard', width);
+  const baseBoardSize = getQuestionBoardSize('standard', width);
+
+  // All states except Johor: 40% larger board on tablets only
+  const boardSizeMultiplier = !isJohor && !isPhone ? 1.4 : 1.0;
+
+  const boardSize = {
+    width: baseBoardSize.width * boardSizeMultiplier,
+    height: baseBoardSize.height * boardSizeMultiplier,
+  };
 
   // Constrain to viewport (90% width, 88% height)
   const maxBoardWidth = width * 0.90;
@@ -68,6 +79,14 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
     boardHeight = maxBoardHeight;
     boardWidth = boardHeight * aspectRatio;
   }
+
+  // Final safety check: ensure board fits within screen bounds
+  boardWidth = Math.min(boardWidth, width * 0.95);
+  boardHeight = Math.min(boardHeight, height * 0.95);
+
+  // Ensure minimum size for usability
+  boardWidth = Math.max(boardWidth, 300);
+  boardHeight = Math.max(boardHeight, 200);
 
   // Use new trueFalse button sizes (kid-friendly, larger)
   const buttonSize = width < 1000 ? ButtonSizes.trueFalse.phone : ButtonSizes.trueFalse.tablet;
