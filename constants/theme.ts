@@ -18,8 +18,12 @@ export const Colors = {
   backgroundOverlay: 'rgba(0, 0, 0, 0.7)', // Modal overlays
   backgroundOverlayDark: 'rgba(23, 23, 23, 0.81)', // Success modal
   cardBackground: '#fff',
+  background: '#fff', // General background (alias for cardBackground)
   semiTransparentCard: 'rgba(255, 255, 255, 0.8)',
   loginPanel: '#1E8EEA', // Login panel background (bright blue)
+
+  // Border Colors
+  border: '#E0E0E0', // Light gray border for cards, checkboxes, inputs
 
   // Text Colors
   textPrimary: '#000',

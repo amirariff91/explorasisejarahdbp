@@ -144,9 +144,39 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const buttonWidthMax = isTightPhone ? 230 : (isPhone ? 260 : 312); // 260 * 1.2 = 312 for tablets
   const clampedButtonWidth = Math.max(buttonWidthMin, Math.min(buttonWidth, buttonWidthMax));
 
-  // Maintain button aspect ratio
+  // Maintain button aspect ratio, but give enough height
+  // for multi-line text without pushing buttons off the board.
   const buttonAspectRatio = 184 / 626; // jawapan-button.png aspect ratio
-  const clampedButtonHeight = clampedButtonWidth * buttonAspectRatio;
+  const baseButtonHeight = clampedButtonWidth * buttonAspectRatio;
+
+  // Font size for answer text (used in height calculation)
+  const answerFontSize = getResponsiveFontSize('answer', width);
+
+  // Minimum height required to comfortably fit up to 3 lines of text
+  // inside the button (with padding).
+  const answerHorizontalPadding = getResponsiveSizeScaled(12, width);
+  const minAnswerHeight =
+    answerFontSize * Typography.lineHeight.tight * 3 +
+    answerHorizontalPadding * 2;
+
+  // Available vertical space for the 2×2 grid (answers) inside the board.
+  const availableAnswerAreaHeight =
+    boardHeight -
+    offsets.boardPaddingTop -
+    offsets.boardPaddingBottom -
+    offsets.questionAreaHeight -
+    offsets.answerAreaTop;
+
+  // Two rows: include gap between rows.
+  const totalAnswerRowGaps = offsets.optionsContainer.gap + offsets.optionRow.gap;
+  const maxHeightPerAnswerFromBoard =
+    (availableAnswerAreaHeight - totalAnswerRowGaps) / 2;
+
+  let clampedButtonHeight = Math.max(baseButtonHeight, minAnswerHeight);
+
+  if (Number.isFinite(maxHeightPerAnswerFromBoard) && maxHeightPerAnswerFromBoard > 0) {
+    clampedButtonHeight = Math.min(clampedButtonHeight, maxHeightPerAnswerFromBoard);
+  }
   // Slight upward shift for Sabah/Sarawak/Melaka on phones to keep answers centered on the board
   const answerYOffset = isTightPhone ? -boardHeight * 0.1 : 0;
 
@@ -262,8 +292,9 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                         style={[
                           styles.optionText,
                           {
-                            fontSize: getResponsiveFontSize('answer', width),
-                            paddingHorizontal: getResponsiveSizeScaled(12, width),
+                            fontSize: answerFontSize,
+                            paddingHorizontal: answerHorizontalPadding,
+                            lineHeight: answerFontSize * Typography.lineHeight.tight,
                           },
                         ]}
                         numberOfLines={3}
@@ -306,8 +337,9 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                           style={[
                             styles.optionText,
                             {
-                              fontSize: getResponsiveFontSize('answer', width),
-                              paddingHorizontal: getResponsiveSizeScaled(12, width),
+                              fontSize: answerFontSize,
+                              paddingHorizontal: answerHorizontalPadding,
+                              lineHeight: answerFontSize * Typography.lineHeight.tight,
                             },
                           ]}
                           numberOfLines={3}

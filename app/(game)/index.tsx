@@ -73,6 +73,9 @@ export default function Homepage() {
 
   // Play welcome background music and ambient on mount with synchronized SFX
   useEffect(() => {
+    // Ensure any previous ambient layers are cleared before starting title audio
+    stopAllAmbient();
+
     // Start gentle breathing animation for play button immediately (kid-friendly)
     Animated.loop(
       Animated.sequence([
@@ -115,7 +118,8 @@ export default function Homepage() {
 
     return () => {
       clearTimeout(audioInitTimer);
-      // No stopMusic needed - next screen's playMusic() will handle transition
+      // Fade out title music and clear any ambient when leaving the homepage
+      stopMusic(500);
       stopAllAmbient();
     };
   }, [buttonScale]);

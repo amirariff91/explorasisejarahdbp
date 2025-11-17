@@ -36,6 +36,8 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const allowScaling = gameState.allowFontScaling;
   const isPhone = getDeviceSize(width) === 'phone';
   const isJohor = question.state === 'johor';
+  const LEFT_SECTION_FLEX = 48;
+  const RIGHT_SECTION_FLEX = 52;
 
   // Use new responsive board sizing system (auto-scales by device tier)
   const baseBoardSize = getQuestionBoardSize('standard', width);
@@ -60,8 +62,8 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const scaledBoardHeight = boardSize.height * boardScale;
   const edgeMargin = getEdgeMargin(isLandscape);
   const columnGap = getColumnGap(isLandscape);
-  const totalFlex = 40 + 58;
-  const leftFlexRatio = 40 / totalFlex;
+  const totalFlex = LEFT_SECTION_FLEX + RIGHT_SECTION_FLEX;
+  const leftFlexRatio = LEFT_SECTION_FLEX / totalFlex;
   const availableWidth = width - edgeMargin * 2 - columnGap;
   // Perlis/Perak/Kedah: use larger screen width to allow bigger board
   const maxBoardWidth = isLargeBoardTablet
@@ -189,8 +191,8 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
     <LandscapeLayout
       leftSection={leftSection}
       rightSection={rightSection}
-      leftWidth={40}
-      rightWidth={58}
+      leftWidth={LEFT_SECTION_FLEX}
+      rightWidth={RIGHT_SECTION_FLEX}
     />
   );
 }

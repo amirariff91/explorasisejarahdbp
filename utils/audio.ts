@@ -56,6 +56,18 @@ let currentMusicName: MusicSound | null = null;
 let lastClickTime = 0;
 const CLICK_DEBOUNCE_MS = 150; // Prevent click sounds within 150ms of each other
 
+// Fade operation tracking (prevents overlapping fades)
+let activeFadeTimers: Set<NodeJS.Timeout> = new Set();
+let shouldAbortFade = false;
+
+// Music operation mutex (prevents concurrent playMusic/stopMusic calls)
+let musicOperationInProgress = false;
+
+// Player loading state tracking (prevents duplicate player creation)
+const loadingSounds = new Set<SoundType>();
+const loadingMusic = new Set<MusicSound>();
+const loadingAmbient = new Set<AmbientSound>();
+
 // Debug mode (enabled in development only)
 const DEBUG_AUDIO = __DEV__;
 
@@ -68,7 +80,7 @@ export async function initializeAudio() {
     await setAudioModeAsync({
       playsInSilentMode: true, // Play even when device is on silent (iOS & Android)
     });
-    
+
     if (DEBUG_AUDIO) {
       console.log('[Audio] ✅ Audio system initialized successfully');
     }
@@ -78,6 +90,47 @@ export async function initializeAudio() {
     }
     // Fail silently - audio initialization errors should not crash the app
   }
+}
+
+/**
+ * Abort all active fade operations
+ * Internal helper to prevent overlapping fades
+ */
+function abortActiveFades() {
+  shouldAbortFade = true;
+  activeFadeTimers.forEach(timer => clearTimeout(timer));
+  activeFadeTimers.clear();
+
+  if (DEBUG_AUDIO && activeFadeTimers.size > 0) {
+    console.log('[Audio] 🛑 Aborted active fade operations');
+  }
+}
+
+/**
+ * Acquire music operation lock (mutex pattern)
+ * Waits for any ongoing music operation to complete
+ */
+async function acquireMusicLock(): Promise<void> {
+  let attempts = 0;
+  const maxAttempts = 50; // Max 2.5 seconds wait (50 * 50ms)
+
+  while (musicOperationInProgress && attempts < maxAttempts) {
+    await new Promise(resolve => setTimeout(resolve, 50));
+    attempts++;
+  }
+
+  if (attempts >= maxAttempts && DEBUG_AUDIO) {
+    console.warn('[Audio] ⚠️ Music lock timeout after 2.5s, proceeding anyway');
+  }
+
+  musicOperationInProgress = true;
+}
+
+/**
+ * Release music operation lock
+ */
+function releaseMusicLock() {
+  musicOperationInProgress = false;
 }
 
 /**
@@ -96,15 +149,18 @@ export async function playSound(
     const { volume = 1.0, shouldLoop = false } = options || {};
 
     // Debounce click sounds to prevent rapid-fire duplicates
+    // FIX: Set lastClickTime before check to prevent race condition
     if (soundName === 'click') {
       const now = Date.now();
-      if (now - lastClickTime < CLICK_DEBOUNCE_MS) {
+      const timeSinceLastClick = now - lastClickTime;
+      lastClickTime = now; // Set first (atomic)
+
+      if (timeSinceLastClick < CLICK_DEBOUNCE_MS) {
         if (DEBUG_AUDIO) {
-          console.log(`[Audio] ⏭️  Click debounced (${now - lastClickTime}ms since last click)`);
+          console.log(`[Audio] ⏭️  Click debounced (${timeSinceLastClick}ms since last click)`);
         }
         return; // Skip this click
       }
-      lastClickTime = now;
     }
 
     if (DEBUG_AUDIO) {
@@ -115,12 +171,38 @@ export async function playSound(
     let player = soundCache.get(soundName);
 
     if (!player) {
-      // Load sound for the first time
-      player = createAudioPlayer(SOUNDS[soundName]);
-      soundCache.set(soundName, player);
-      
-      if (DEBUG_AUDIO) {
-        console.log(`[Audio] 📥 Loaded and cached: ${soundName}`);
+      // FIX: Check if player is currently being loaded by another call
+      if (loadingSounds.has(soundName)) {
+        if (DEBUG_AUDIO) {
+          console.log(`[Audio] ⏳ Waiting for ${soundName} to finish loading...`);
+        }
+
+        // Wait for other load to complete (max 2 seconds)
+        let attempts = 0;
+        while (!soundCache.has(soundName) && attempts < 40) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+          attempts++;
+        }
+
+        player = soundCache.get(soundName);
+        if (!player) {
+          throw new Error(`Failed to load ${soundName} after waiting`);
+        }
+      } else {
+        // Mark as loading to prevent concurrent creation
+        loadingSounds.add(soundName);
+
+        try {
+          // Load sound for the first time
+          player = createAudioPlayer(SOUNDS[soundName]);
+          soundCache.set(soundName, player);
+
+          if (DEBUG_AUDIO) {
+            console.log(`[Audio] 📥 Loaded and cached: ${soundName}`);
+          }
+        } finally {
+          loadingSounds.delete(soundName);
+        }
       }
     }
 
@@ -214,18 +296,28 @@ export async function playMusic(
   loop = true,
   fadeInDuration = 0
 ): Promise<void> {
+  // FIX: Acquire mutex lock to prevent concurrent music operations
+  await acquireMusicLock();
+
   try {
     if (DEBUG_AUDIO) {
       console.log(`[Audio] 🎵 Playing music: ${musicName} (loop: ${loop}, fade: ${fadeInDuration}ms)`);
     }
 
+    // FIX: Abort any ongoing fade operations before starting new music
+    abortActiveFades();
+    shouldAbortFade = false; // Reset abort flag
+
     // Stop current music if different track
-    // IMPORTANT: await stopMusic to prevent overlap during transitions
     if (currentMusic && currentMusicName !== musicName) {
       if (DEBUG_AUDIO) {
         console.log(`[Audio] 🔄 Switching from ${currentMusicName} to ${musicName}`);
       }
-      await stopMusic(1000); // Wait for fade-out to complete before starting new track
+      // Note: stopMusic also acquires lock, but we're already locked
+      // Temporarily release lock for stopMusic, then reacquire
+      releaseMusicLock();
+      await stopMusic(1000);
+      await acquireMusicLock();
     }
 
     // Check if this music is already playing
@@ -239,47 +331,99 @@ export async function playMusic(
     // Get or create music player
     let player = musicCache.get(musicName);
     if (!player) {
-      player = createAudioPlayer(MUSIC[musicName]);
-      musicCache.set(musicName, player);
-      
-      if (DEBUG_AUDIO) {
-        console.log(`[Audio] 📥 Loaded and cached music: ${musicName}`);
+      // FIX: Check if player is currently being loaded
+      if (loadingMusic.has(musicName)) {
+        if (DEBUG_AUDIO) {
+          console.log(`[Audio] ⏳ Waiting for ${musicName} to finish loading...`);
+        }
+
+        let attempts = 0;
+        while (!musicCache.has(musicName) && attempts < 40) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+          attempts++;
+        }
+
+        player = musicCache.get(musicName);
+        if (!player) {
+          throw new Error(`Failed to load ${musicName} after waiting`);
+        }
+      } else {
+        loadingMusic.add(musicName);
+
+        try {
+          player = createAudioPlayer(MUSIC[musicName]);
+          musicCache.set(musicName, player);
+
+          if (DEBUG_AUDIO) {
+            console.log(`[Audio] 📥 Loaded and cached music: ${musicName}`);
+          }
+        } finally {
+          loadingMusic.delete(musicName);
+        }
       }
     }
 
+    // FIX: Set global state immediately (before fade) to prevent race conditions
+    const previousMusic = currentMusic;
+    currentMusic = player;
+    currentMusicName = musicName;
+
     // Configure playback
     player.loop = loop;
-    
+
     // Handle fade-in
     if (fadeInDuration > 0) {
       player.volume = 0;
       player.play();
-      
+
       // Gradual volume increase
       const steps = 20;
       const stepDuration = fadeInDuration / steps;
       const volumeIncrement = 1.0 / steps;
-      
+
       for (let i = 0; i < steps; i++) {
+        // FIX: Check if fade was aborted
+        if (shouldAbortFade) {
+          if (DEBUG_AUDIO) {
+            console.log(`[Audio] 🛑 Fade-in aborted for ${musicName}`);
+          }
+          break;
+        }
+
+        const timer = setTimeout(() => {
+          activeFadeTimers.delete(timer);
+        }, stepDuration) as NodeJS.Timeout;
+        activeFadeTimers.add(timer);
+
         await new Promise(resolve => setTimeout(resolve, stepDuration));
-        player.volume = Math.min(1.0, (i + 1) * volumeIncrement);
+
+        // FIX: Validate we weren't superseded during fade
+        if (currentMusicName === musicName && currentMusic === player) {
+          player.volume = Math.min(1.0, (i + 1) * volumeIncrement);
+        } else {
+          if (DEBUG_AUDIO) {
+            console.log(`[Audio] 🔄 Music superseded during fade-in, stopping`);
+          }
+          player.pause();
+          break;
+        }
       }
-      
-      if (DEBUG_AUDIO) {
+
+      if (DEBUG_AUDIO && !shouldAbortFade) {
         console.log(`[Audio] 📈 Fade-in complete for ${musicName}`);
       }
     } else {
       player.volume = 1.0;
       player.play();
     }
-
-    currentMusic = player;
-    currentMusicName = musicName;
   } catch (error) {
     if (DEBUG_AUDIO) {
       console.error(`[Audio] ❌ Failed to play music ${musicName}:`, error);
     }
     // Fail silently
+  } finally {
+    // FIX: Always release mutex lock
+    releaseMusicLock();
   }
 }
 
@@ -288,6 +432,9 @@ export async function playMusic(
  * @param fadeOutDuration - Fade-out duration in ms (0 = immediate stop)
  */
 export async function stopMusic(fadeOutDuration = 0): Promise<void> {
+  // FIX: Acquire mutex lock to prevent concurrent music operations
+  await acquireMusicLock();
+
   try {
     if (!currentMusic) return;
 
@@ -295,37 +442,64 @@ export async function stopMusic(fadeOutDuration = 0): Promise<void> {
       console.log(`[Audio] 🛑 Stopping music: ${currentMusicName} (fade: ${fadeOutDuration}ms)`);
     }
 
+    // Store reference to music being stopped (in case it changes during fade)
+    const musicToStop = currentMusic;
+    const musicNameToStop = currentMusicName;
+
     if (fadeOutDuration > 0) {
       // Gradual volume decrease
       const steps = 20;
       const stepDuration = fadeOutDuration / steps;
-      const currentVolume = currentMusic.volume;
+      const currentVolume = musicToStop.volume;
       const volumeDecrement = currentVolume / steps;
-      
+
       for (let i = 0; i < steps; i++) {
+        // FIX: Check if fade was aborted
+        if (shouldAbortFade) {
+          if (DEBUG_AUDIO) {
+            console.log(`[Audio] 🛑 Fade-out aborted for ${musicNameToStop}`);
+          }
+          break;
+        }
+
+        const timer = setTimeout(() => {
+          activeFadeTimers.delete(timer);
+        }, stepDuration) as NodeJS.Timeout;
+        activeFadeTimers.add(timer);
+
         await new Promise(resolve => setTimeout(resolve, stepDuration));
-        if (currentMusic) {
-          currentMusic.volume = Math.max(0, currentVolume - (i + 1) * volumeDecrement);
+
+        // Only modify volume if this is still the current music
+        if (musicToStop && currentMusic === musicToStop) {
+          musicToStop.volume = Math.max(0, currentVolume - (i + 1) * volumeDecrement);
+        } else {
+          if (DEBUG_AUDIO) {
+            console.log(`[Audio] 🔄 Music changed during fade-out, aborting`);
+          }
+          break;
         }
       }
-      
-      if (DEBUG_AUDIO) {
+
+      if (DEBUG_AUDIO && !shouldAbortFade) {
         console.log(`[Audio] 📉 Fade-out complete`);
       }
     }
 
-    if (currentMusic) {
-      currentMusic.pause();
-      currentMusic.seekTo(0);
+    // Only stop if this is still the current music
+    if (currentMusic === musicToStop) {
+      musicToStop.pause();
+      musicToStop.seekTo(0);
+      currentMusic = null;
+      currentMusicName = null;
     }
-
-    currentMusic = null;
-    currentMusicName = null;
   } catch (error) {
     if (DEBUG_AUDIO) {
       console.error(`[Audio] ❌ Failed to stop music:`, error);
     }
     // Fail silently
+  } finally {
+    // FIX: Always release mutex lock
+    releaseMusicLock();
   }
 }
 
@@ -337,9 +511,34 @@ export async function stopMusic(fadeOutDuration = 0): Promise<void> {
 export async function playAmbient(ambientName: AmbientSound, volume = 0.3): Promise<void> {
   try {
     let player = ambientCache.get(ambientName);
+
     if (!player) {
-      player = createAudioPlayer(AMBIENT[ambientName]);
-      ambientCache.set(ambientName, player);
+      // FIX: Check if player is currently being loaded
+      if (loadingAmbient.has(ambientName)) {
+        if (DEBUG_AUDIO) {
+          console.log(`[Audio] ⏳ Waiting for ${ambientName} to finish loading...`);
+        }
+
+        let attempts = 0;
+        while (!ambientCache.has(ambientName) && attempts < 40) {
+          await new Promise(resolve => setTimeout(resolve, 50));
+          attempts++;
+        }
+
+        player = ambientCache.get(ambientName);
+        if (!player) {
+          throw new Error(`Failed to load ${ambientName} after waiting`);
+        }
+      } else {
+        loadingAmbient.add(ambientName);
+
+        try {
+          player = createAudioPlayer(AMBIENT[ambientName]);
+          ambientCache.set(ambientName, player);
+        } finally {
+          loadingAmbient.delete(ambientName);
+        }
+      }
     }
 
     player.volume = volume;
@@ -405,6 +604,9 @@ export async function playQuestionTransitionSound(): Promise<void> {
  */
 export async function unloadAllAudio(): Promise<void> {
   try {
+    // FIX: Abort all active fades and clear timers
+    abortActiveFades();
+
     // Stop and clear all audio
     await stopMusic();
     await stopAllAmbient();
@@ -420,8 +622,17 @@ export async function unloadAllAudio(): Promise<void> {
     musicCache.clear();
     ambientCache.clear();
 
+    // FIX: Clear loading state trackers
+    loadingSounds.clear();
+    loadingMusic.clear();
+    loadingAmbient.clear();
+
     currentMusic = null;
     currentMusicName = null;
+
+    // FIX: Reset fade state
+    shouldAbortFade = false;
+    activeFadeTimers.clear();
   } catch (error) {
     // Fail silently
   }

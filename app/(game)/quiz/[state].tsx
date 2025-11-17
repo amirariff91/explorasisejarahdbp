@@ -134,11 +134,15 @@ export default function QuizScreen() {
 
   // Play quiz background music on mount
   useEffect(() => {
+    // Clear any previous ambient layers (e.g., from map or tutorial) before starting quiz ambience
+    stopAllAmbient();
+
     playMusic('bgm-quiz', true, 2000); // Fade in quiz theme
     playAmbient('ambient-quiz-soft', 0.15); // Very subtle concentration ambience
 
     return () => {
-      // No stopMusic needed - next screen's playMusic() will handle transition
+      // Fade out quiz (or success) music and clear all ambient when leaving the quiz
+      stopMusic(500);
       stopAllAmbient();
     };
   }, []);
@@ -251,6 +255,8 @@ export default function QuizScreen() {
         resumeStateTimer();
       }
 
+      const isLastQuestion = currentQuestionIndex === questions.length - 1;
+
       setCurrentQuestionIndex((prevIndex) => {
         const nextIndex = prevIndex + 1;
 
@@ -267,6 +273,15 @@ export default function QuizScreen() {
           return prevIndex;
         }
       });
+
+      // Fallback: if we've just answered the last question and
+      // completion hasn't been registered yet, mark the state complete.
+      // This guards against any edge cases where the answers-based
+      // completion effect doesn't fire (e.g., persisted state mismatch).
+      if (isLastQuestion && state && !hasCompletedRef.current) {
+        hasCompletedRef.current = true;
+        completeState(state);
+      }
 
       answerTimerRef.current = null;
     }, 2000); // Increased from 1000ms to 2000ms to show feedback

@@ -28,6 +28,8 @@ import {
   ButtonSizes,
   getQuestionOffsets,
   getQuestionBoardSize,
+  getResponsiveSizeScaled,
+  TouchTargets,
 } from '@/constants/layout';
 import StatusBar from '@/components/game/StatusBar';
 import MenuButton from '@/components/game/MenuButton';
@@ -59,6 +61,20 @@ export default function JohorCrossword() {
   const { gameState, completeState, setShowSuccessModal } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
 
+  // Responsive font sizes
+  const clueFontSize = getResponsiveFontSize('clue', width);
+  const clueNumberSize = clueFontSize + 1; // Slightly larger for numbers
+  const titleSize = getResponsiveFontSize('answer', width); // For "MENEGAK"/"MENDATAR"
+  const hintSize = clueFontSize - 1; // Smaller for hints
+
+  // Responsive spacing
+  const itemPaddingV = getResponsiveSizeScaled(10, width);
+  const itemPaddingH = getResponsiveSizeScaled(12, width);
+  const itemMargin = getResponsiveSizeScaled(8, width);
+  const boardPaddingV = getResponsiveSizeScaled(22, width);
+  const contentGap = getResponsiveSizeScaled(12, width);
+  const boardContentWidth = getResponsiveSizeScaled(130, width);
+
   const [activeClueId, setActiveClueId] = useState<string | null>(INITIAL_ACTIVE_CLUE_ID);
   const [visitedClues, setVisitedClues] = useState<Record<string, boolean>>(() => {
     if (!INITIAL_ACTIVE_CLUE_ID) {
@@ -68,6 +84,7 @@ export default function JohorCrossword() {
   });
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackExplanation, setFeedbackExplanation] = useState<string | undefined>(undefined);
+  const [showHint, setShowHint] = useState(true);
 
   const wordMap = useMemo(() => {
     const entries = PUZZLE.words.map((word: CrosswordPuzzleWord) => [word.id, word] as const);
@@ -161,6 +178,10 @@ export default function JohorCrossword() {
     return ids;
   }, [visitedClues, clueMap]);
 
+  const visitedCount = useMemo(() => {
+    return Object.values(visitedClues).filter(Boolean).length;
+  }, [visitedClues]);
+
   const crosswordOffsets = getQuestionOffsets('crossword', isLandscape) as {
     containerPadding: { paddingTop: number; paddingBottom: number };
     columnGap: number;
@@ -208,21 +229,8 @@ export default function JohorCrossword() {
   const gridWidth = tileSize * PUZZLE.gridSize.cols;
   const gridHeight = tileSize * PUZZLE.gridSize.rows;
 
-  // Responsive clue board sizing using new question board system
-  const baseClueBoardSize = getQuestionBoardSize('clue', width);
-  const clueBoardScale = isLandscape ? 1.9 : 1.6;
-  const scaledClueWidth = baseClueBoardSize.width * clueBoardScale;
-  const scaledClueHeight = baseClueBoardSize.height * clueBoardScale;
-
-  const maxClueWidth = isLandscape ? clueColumnWidth : width * 0.9;
-  const safeScaledClueWidth = scaledClueWidth || 1;
-  const clueWidth = Math.min(scaledClueWidth, maxClueWidth);
-  const clueHeight = scaledClueHeight * (clueWidth / safeScaledClueWidth);
-
-  const clueBoardSize = {
-    width: clueWidth,
-    height: clueHeight,
-  };
+  // Responsive clue board sizing using responsive helper (no manual scaling)
+  const clueBoardSize = getQuestionBoardSize('clue', width);
 
   const handleSelectWord = (wordId?: string) => {
     if (!wordId) {
@@ -242,6 +250,7 @@ export default function JohorCrossword() {
 
   const handleSelectClue = (clue: CrosswordPuzzleClue) => {
     playSound('click');
+    setShowHint(false);
     setActiveClueId(clue.id);
     setVisitedClues((prev) => {
       if (prev[clue.id]) {
@@ -252,11 +261,11 @@ export default function JohorCrossword() {
   };
 
   const handleCheck = () => {
-    const visitedCount = Object.values(visitedClues).filter(Boolean).length;
-
     if (visitedCount < totalClueCount) {
       playSound('click'); // Incomplete check sound
-      setFeedbackExplanation('Sila semak semua petunjuk MENEGAK dan MENDATAR terlebih dahulu.');
+      setFeedbackExplanation(
+        `Sila semak semua petunjuk MENEGAK dan MENDATAR terlebih dahulu. (Petunjuk diterokai: ${visitedCount}/${totalClueCount})`
+      );
       setFeedbackVisible(true);
       return;
     }
@@ -287,11 +296,15 @@ export default function JohorCrossword() {
 
   // Play crossword background music and ambient sounds on mount
   useEffect(() => {
+    // Clear any previous ambient layers (e.g., from map or tutorial) before starting crossword ambience
+    stopAllAmbient();
+
     playMusic('bgm-quiz', true, 2000); // Reuse quiz music for crossword
     playAmbient('ambient-quiz-soft', 0.15); // Subtle concentration ambience
 
     return () => {
-      // No stopMusic needed - next screen's playMusic() will handle transition
+      // Fade out crossword (or success) music and clear all ambient when leaving the crossword
+      stopMusic(500);
       stopAllAmbient();
     };
   }, []);
@@ -323,22 +336,18 @@ export default function JohorCrossword() {
               : Spacing.sectionGap.portrait,
           },
         ]}>
-        {/* Title Ribbon */}
-        <View style={styles.titleContainer}>
-          <Text
-            style={[
-              styles.title,
-              {
-                // Use stateLabel tier and bump slightly for prominent crossword title
-                fontSize: getResponsiveFontSize('stateLabel', width) + 4,
-              },
-            ]}
-            allowFontScaling={allowScaling}
-            adjustsFontSizeToFit
-            numberOfLines={1}>
-            JOHOR
-          </Text>
-        </View>
+        {showHint && (
+          <View style={styles.hintContainer}>
+            <Text
+              style={styles.hintText}
+              allowFontScaling={allowScaling}
+              adjustsFontSizeToFit
+              numberOfLines={3}
+              minimumFontScale={0.85}>
+              Tip: Tekan petunjuk atau kotak huruf untuk sorot jawapan. Semak semua petunjuk MENEGAK dan MENDATAR untuk tamat.
+            </Text>
+          </View>
+        )}
 
         {/* Three Column Layout */}
         <View
@@ -359,6 +368,16 @@ export default function JohorCrossword() {
               boardWidth={clueBoardSize.width}
               boardHeight={clueBoardSize.height}
               onSelect={handleSelectClue}
+              titleSize={titleSize}
+              hintSize={hintSize}
+              clueFontSize={clueFontSize}
+              clueNumberSize={clueNumberSize}
+              boardContentWidth={boardContentWidth}
+              boardPaddingV={boardPaddingV}
+              contentGap={contentGap}
+              itemPaddingV={itemPaddingV}
+              itemPaddingH={itemPaddingH}
+              itemMargin={itemMargin}
             />
           </View>
 
@@ -393,7 +412,7 @@ export default function JohorCrossword() {
                           onPress={() => handleSelectWord(selectableWordId)}
                           accessibilityRole="button"
                           accessibilityLabel={`Petak huruf ${cell.letter}`}
-                          hitSlop={4}>
+                          hitSlop={TouchTargets.hitSlop}>
                           <ImageBackground
                             source={ASSETS.games.dbpSejarah.crosswordBox}
                             style={styles.tileBackground}
@@ -432,6 +451,16 @@ export default function JohorCrossword() {
               boardWidth={clueBoardSize.width}
               boardHeight={clueBoardSize.height}
               onSelect={handleSelectClue}
+              titleSize={titleSize}
+              hintSize={hintSize}
+              clueFontSize={clueFontSize}
+              clueNumberSize={clueNumberSize}
+              boardContentWidth={boardContentWidth}
+              boardPaddingV={boardPaddingV}
+              contentGap={contentGap}
+              itemPaddingV={itemPaddingV}
+              itemPaddingH={itemPaddingH}
+              itemMargin={itemMargin}
             />
           </View>
         </View>
@@ -439,6 +468,21 @@ export default function JohorCrossword() {
 
       {/* Floating Controls */}
       <MenuButton />
+
+      <Text
+        style={[
+          styles.progressText,
+          {
+            bottom: insets.bottom + 28,
+            left: Math.max(insets.left, 16),
+          },
+        ]}
+        allowFontScaling={allowScaling}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}>
+        Petunjuk diterokai: {visitedCount}/{totalClueCount}
+      </Text>
 
       <Pressable
         style={({ pressed }) => [
@@ -486,6 +530,18 @@ interface ClueBoardProps {
   boardWidth: number;
   boardHeight: number;
   onSelect: (clue: CrosswordPuzzleClue) => void;
+  // Responsive font sizes
+  titleSize: number;
+  hintSize: number;
+  clueFontSize: number;
+  clueNumberSize: number;
+  // Responsive spacing
+  boardContentWidth: number;
+  boardPaddingV: number;
+  contentGap: number;
+  itemPaddingV: number;
+  itemPaddingH: number;
+  itemMargin: number;
 }
 
 function ClueBoard({
@@ -497,9 +553,23 @@ function ClueBoard({
   boardWidth,
   boardHeight,
   onSelect,
+  // Responsive font sizes
+  titleSize,
+  hintSize,
+  clueFontSize,
+  clueNumberSize,
+  // Responsive spacing
+  boardContentWidth,
+  boardPaddingV,
+  contentGap,
+  itemPaddingV,
+  itemPaddingH,
+  itemMargin,
 }: ClueBoardProps) {
   const scrollRef = useRef<ScrollView | null>(null);
   const itemLayoutRef = useRef<Record<string, number>>({});
+  const isAcross = title === 'MENDATAR';
+  const isDown = title === 'MENEGAK';
 
   useEffect(() => {
     if (!activeClueId) return;
@@ -520,14 +590,35 @@ function ClueBoard({
         },
       ]}
       resizeMode="contain">
-      <View style={styles.clueBoardContent}>
+      <View
+        style={[
+          styles.clueBoardContent,
+          {
+            width: boardContentWidth,
+            paddingVertical: boardPaddingV,
+            gap: contentGap,
+          },
+        ]}>
         <Text
-          style={styles.clueTitle}
+          style={[
+            styles.clueTitle,
+            { fontSize: titleSize },
+            isDown && styles.clueTitleDown,
+            isAcross && styles.clueTitleAcross,
+          ]}
           allowFontScaling={allowScaling}
           numberOfLines={1}
           adjustsFontSizeToFit
           minimumFontScale={0.8}>
           {title}
+        </Text>
+        <Text
+          style={[styles.clueHint, { fontSize: hintSize }]}
+          allowFontScaling={allowScaling}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.8}>
+          Leret untuk lihat semua petunjuk
         </Text>
         <ScrollView
           ref={scrollRef}
@@ -549,15 +640,24 @@ function ClueBoard({
                     scrollRef.current.scrollTo({ y: offset, animated: true });
                   }
                 }}
-                style={[styles.clueItem, isActive && styles.clueItemActive, isVisited && styles.clueItemVisited]}
+                style={[
+                  styles.clueItem,
+                  {
+                    paddingVertical: itemPaddingV,
+                    paddingHorizontal: itemPaddingH,
+                    marginBottom: itemMargin,
+                  },
+                  isActive && styles.clueItemActive,
+                  isVisited && styles.clueItemVisited,
+                ]}
                 accessibilityRole="button"
                 accessibilityLabel={`Petunjuk ${clue.number}. ${clue.text}`}
                 accessibilityState={{ selected: isActive }}>
-                <Text style={styles.clueNumber} allowFontScaling={allowScaling}>
+                <Text style={[styles.clueNumber, { fontSize: clueNumberSize }]} allowFontScaling={allowScaling}>
                   {clue.number}.
                 </Text>
                 <Text
-                  style={[styles.clueText, isActive && styles.clueTextActive]}
+                  style={[styles.clueText, { fontSize: clueFontSize }, isActive && styles.clueTextActive]}
                   allowFontScaling={allowScaling}
                   adjustsFontSizeToFit
                   numberOfLines={3}
@@ -593,9 +693,23 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     color: Colors.textPrimary,
     letterSpacing: 2,
+  },
+  hintContainer: {
+    marginBottom: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: Colors.semiTransparentCard,
+    borderRadius: BorderRadius.medium,
+    ...getComponentShadowStyle(Shadows.component.small),
+  },
+  hintText: {
+    fontFamily: Typography.fontFamily,
+    fontSize: 13,
+    color: Colors.textSecondary,
+    textAlign: 'center',
   },
   contentRow: {
     flex: 1,
@@ -645,7 +759,7 @@ const styles = StyleSheet.create({
   },
   tileLetter: {
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     fontSize: 20,
     color: Colors.textPrimary,
   },
@@ -660,17 +774,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   clueBoardContent: {
-    width: '72%',
-    paddingVertical: 22,
-    gap: 12,
+    // Width, padding, and gap applied inline with responsive values
   },
   clueTitle: {
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     color: Colors.textPrimary,
-    fontSize: 16,
+    // fontSize applied inline with responsive value
     textAlign: 'center',
     marginBottom: 12,
+  },
+  clueTitleAcross: {
+    color: Colors.secondary,
+  },
+  clueTitleDown: {
+    color: Colors.primary,
+  },
+  clueHint: {
+    fontFamily: Typography.fontFamily,
+    // fontSize applied inline with responsive value
+    color: Colors.textTertiary,
+    textAlign: 'center',
+    marginBottom: 6,
   },
   clueScroll: {
     maxHeight: '80%',
@@ -678,10 +803,8 @@ const styles = StyleSheet.create({
   clueItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    // Padding and margin applied inline with responsive values
     borderRadius: BorderRadius.medium,
-    marginBottom: 8,
     backgroundColor: 'transparent',
   },
   clueItemVisited: {
@@ -692,20 +815,37 @@ const styles = StyleSheet.create({
   },
   clueNumber: {
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
-    fontSize: 14,
-    color: Colors.textPrimary,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
+    // fontSize applied inline with responsive value
+    color: '#4A3020', // Dark brown for better contrast on light background
     marginRight: 8,
+    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 2,
   },
   clueText: {
     flex: 1,
     fontFamily: Typography.fontFamily,
-    fontSize: 13,
-    color: Colors.textPrimary,
+    // fontSize applied inline with responsive value
+    color: '#4A3020', // Dark brown for better contrast on light background
     lineHeight: Typography.lineHeight.tight,
+    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 2,
   },
   clueTextActive: {
     color: Colors.textLight,
+  },
+  progressText: {
+    position: 'absolute',
+    fontFamily: Typography.fontFamily,
+    fontSize: 13,
+    color: Colors.textPrimary,
+    backgroundColor: Colors.semiTransparentCard,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: BorderRadius.medium,
+    ...getComponentShadowStyle(Shadows.component.small),
   },
   nextButton: {
     position: 'absolute',

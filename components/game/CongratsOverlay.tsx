@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     color: Colors.gold,
     letterSpacing: 1.5,
     ...getTextShadowStyle(Shadows.text.medium),
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   buttonText: {
     // Dynamic: paddingHorizontal
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     color: Colors.textLight,
     ...getTextShadowStyle(Shadows.text.medium),
     textAlign: 'center',

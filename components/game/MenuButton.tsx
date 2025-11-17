@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   },
   menuTitle: {
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     color: Colors.textPrimary,
     marginBottom: 20,
   },
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
   menuItemText: {
     // Dynamic: fontSize
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     color: Colors.textLight,
   },
   menuItemSecondary: {

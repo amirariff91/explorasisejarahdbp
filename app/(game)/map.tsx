@@ -5,7 +5,8 @@ import { getMapBoardSize } from "@/constants/layout";
 import type { MalaysianState } from "@/types";
 import { playAmbient, playMusic, playSound, stopAllAmbient, stopMusic } from "@/utils/audio";
 import { useRouter } from "expo-router";
-import { useCallback, useEffect, useState } from "react";
+import { useFocusEffect } from "@react-navigation/native";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
     ActivityIndicator,
     ImageBackground,
@@ -16,7 +17,6 @@ import {
     useWindowDimensions,
     type LayoutChangeEvent,
 } from "react-native";
-import { Alert } from "react-native";
 import { ASSETS, ASSET_PRELOAD_CONFIG } from "@/constants/assets";
 import { preloadAssets } from "@/utils/preload-assets";
 import { getQuestionsForState } from "@/data/questions";
@@ -60,14 +60,20 @@ export default function StateSelectionScreen() {
   }, [gameState.playerProfile, isLoading, router]);
 
   const [isPreloading, setIsPreloading] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
+  const isNavigatingRef = useRef(false); // Synchronous lock to prevent race conditions
 
   // Play background music and ambient sounds on mount
   useEffect(() => {
+    // Clear any previous ambient layers to avoid stacking with map ambience
+    stopAllAmbient();
+
     playMusic('bgm-map', true, 2000); // Fade in map theme
     playAmbient('ambient-map', 0.2); // Subtle tropical ambience
 
     return () => {
-      // No stopMusic needed - next screen's playMusic() will handle transition
+      // Fade out map music and clear ambient when leaving the map
+      stopMusic(500);
       stopAllAmbient();
     };
   }, []);
@@ -80,6 +86,31 @@ export default function StateSelectionScreen() {
       .finally(() => setIsPreloading(false));
   }, []);
 
+  // Reset navigation lock on mount (useFocusEffect only runs on focus changes, not initial mount)
+  useEffect(() => {
+    isNavigatingRef.current = false;
+    setIsNavigating(false);
+    if (__DEV__) {
+      console.log('[Map] Component mounted - navigation lock reset');
+    }
+  }, []);
+
+  // Reset navigation lock when screen gains focus (after returning from quiz/crossword)
+  useFocusEffect(
+    useCallback(() => {
+      isNavigatingRef.current = false;
+      setIsNavigating(false);
+
+      if (__DEV__) {
+        console.log('[Map] Screen focused - navigation lock reset');
+      }
+
+      return () => {
+        // Cleanup when screen loses focus (if needed)
+      };
+    }, [])
+  );
+
   // Measure actual rendered heights for accurate spacing
   const [topBarHeight, setTopBarHeight] = useState(
     LAYOUT_CONFIG.minTopBarHeight,
@@ -88,42 +119,57 @@ export default function StateSelectionScreen() {
   // Memoize callback to prevent recreating function on every render
   const handleStateSelect = useCallback(
     (state: MalaysianState) => {
+      if (__DEV__) {
+        console.log('[Map] handleStateSelect called for:', state, 'isNavigatingRef:', isNavigatingRef.current);
+      }
+
+      // GUARD: Prevent multiple simultaneous navigations (using ref for synchronous check)
+      if (isNavigatingRef.current) {
+        if (__DEV__) {
+          console.log('[Map] Navigation already in progress (ref locked), ignoring tap on:', state);
+        }
+        return;
+      }
+
+      isNavigatingRef.current = true; // Lock navigation SYNCHRONOUSLY (no race condition)
+      setIsNavigating(true); // Update state for visual feedback (opacity)
+
       playSound('click'); // Soft, pleasant feedback for state selection
       setCurrentState(state);
       clearStateTimer(); // Prevent stale timers from previous states
 
       const proceed = () => {
-        if (state === 'johor') {
-          router.push(`/crossword/${state}`);
-        } else {
-          router.push(`/quiz/${state}`);
+        try {
+          if (__DEV__) {
+            console.log('[Map] Navigating to state:', state);
+          }
+
+          if (state === 'johor') {
+            router.push(`/crossword/${state}`);
+          } else {
+            router.push(`/quiz/${state}`);
+          }
+          // Note: Lock resets when screen regains focus via useFocusEffect hook
+        } catch (error) {
+          console.error('[Map] Navigation failed:', error);
+          isNavigatingRef.current = false; // Unlock ref on error
+          setIsNavigating(false); // Unlock state on error
         }
       };
 
+      // Auto-reset completed states without confirmation (improved UX, removes Alert.alert issues)
       const alreadyCompleted = gameState.completedStates.includes(state);
       if (alreadyCompleted) {
-        Alert.alert(
-          'Ulang Kuiz',
-          'Anda telah melengkapkan negeri ini. Ulang kuiz?',
-          [
-            { text: 'Tidak', style: 'cancel' },
-            {
-              text: 'Ya',
-              onPress: () => {
-                // Reset previous run so quiz doesn't auto-complete on replay
-                clearStateAnswers(state);
-                setQuestionIndexForState(state, 0);
-                proceed();
-              },
-            },
-          ],
-          { cancelable: true }
-        );
-      } else {
-        proceed();
+        if (__DEV__) {
+          console.log('[Map] State already completed, auto-resetting:', state);
+        }
+        clearStateAnswers(state);
+        setQuestionIndexForState(state, 0);
       }
+
+      proceed();
     },
-    [router, setCurrentState, clearStateTimer, clearStateAnswers, setQuestionIndexForState, gameState.completedStates],
+    [router, isNavigating, setCurrentState, clearStateTimer, clearStateAnswers, setQuestionIndexForState, gameState.completedStates],
   );
 
   const handleTutorial = useCallback(() => {
@@ -278,7 +324,7 @@ export default function StateSelectionScreen() {
         {/* Map Board Container */}
         <View style={styles.mapBoardContainer}>
           <ImageBackground
-            source={ASSETS.shared.backgrounds.board}
+            source={ASSETS.games.dbpSejarah.soalanBoard}
             style={[
               styles.mapBoard,
               getMapBoardSize(width),
@@ -300,7 +346,8 @@ export default function StateSelectionScreen() {
 
             {/* Map View Container */}
             <View style={styles.mapViewContainer}>
-              <MalaysiaMapSVG onStateSelect={handleStateSelect} />
+              {__DEV__ && console.log('[Map] Rendering MalaysiaMapSVG with disabled:', isNavigating)}
+              <MalaysiaMapSVG onStateSelect={handleStateSelect} disabled={isNavigating} />
             </View>
           </ImageBackground>
         </View>
@@ -347,7 +394,6 @@ const styles = StyleSheet.create({
   mapTitleText: {
     fontFamily: Typography.fontFamily,
     // fontSize applied inline via getResponsiveFontSize('mapTitle', width)
-    fontWeight: Typography.fontWeight.bold,
     color: Colors.textLight,
     textAlign: "center",
     letterSpacing: 1,

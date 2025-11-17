@@ -1,5 +1,5 @@
 import { ButtonSizes, EdgeMargins, getQuestionBoardSize, getDeviceSize, getResponsiveSizeScaled, TouchTargets } from '@/constants/layout';
-import { Colors, getResponsiveFontSize, Opacity, Typography } from '@/constants/theme';
+import { Colors, getResponsiveFontSize, Typography } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
 import type { MatchingQuestion as MQQuestion } from '@/types';
 import { playSound } from '@/utils/audio';
@@ -7,6 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
 import { useState } from 'react';
 import {
+  FlatList,
   ImageBackground,
   Pressable,
   StyleSheet,
@@ -15,6 +16,7 @@ import {
   View,
 } from 'react-native';
 import { ASSETS } from '@/constants/assets';
+import CheckboxCard from './CheckboxCard';
 
 interface Props {
   question: MQQuestion;
@@ -22,9 +24,9 @@ interface Props {
 }
 
 /**
- * Matching Question - Single Board Layout
- * Question title/instructions at top of board
- * 3x3 grid of JAWAPAN boxes at bottom of board (9 options)
+ * Matching Question - Vertical Checkbox List Layout
+ * Question title/instructions at top in board
+ * Scrollable list of checkbox items below
  */
 export default function MatchingQuestion({ question, onAnswer }: Props) {
   const { gameState } = useGameContext();
@@ -32,56 +34,51 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [showNext, setShowNext] = useState(false);
   const { width, height } = useWindowDimensions();
-  const isPhone = getDeviceSize(width) === 'phone';
-  const isJohor = question.state === 'johor';
 
-  // Simple responsive offsets for Matching questions
-  const offsets = {
-    boardPaddingTop: 25,
-    boardPaddingBottom: 15,
-    boardPaddingHorizontal: 30,
-    questionAreaHeight: 150,  // Optimized for larger 'singleBoardMC' board - gives more space to grid
-    gridAreaTop: 12,
-    gridContainer: { gap: 16 },
-    gridRow: { gap: 16 },
-    footerContainer: { marginBottom: 30, marginRight: 30 },
-  };
-
-  // Use new responsive board sizing system (auto-scales by device tier)
-  // Using 'singleBoardMC' board (680×380 base) for adequate width for 3×3 grid with long text
+  // Use singleBoardMC for taller board to accommodate vertical list
   const baseBoardSize = getQuestionBoardSize('singleBoardMC', width);
-
-  // All states except Johor: 40% larger board on tablets only
-  const boardSizeMultiplier = !isJohor && !isPhone ? 1.4 : 1.0;
+  const boardSizeMultiplier = 1.0; // Can adjust per state if needed
 
   const boardSize = {
     width: baseBoardSize.width * boardSizeMultiplier,
     height: baseBoardSize.height * boardSizeMultiplier,
   };
 
-  // Responsive board sizing - Allow larger board to use available space
-  const maxBoardWidth = width * (width < 1000 ? 0.90 : 0.92);  // 90% phone, 92% tablet
-  const maxBoardHeight = height * 0.85; // Allow adequate height for larger screens
+  // Calculate final board dimensions with safety checks
+  const maxBoardWidth = width * 0.92;
+  const maxBoardHeight = height * 0.88;
   const aspectRatio = boardSize.width / boardSize.height;
 
   let boardWidth = Math.min(boardSize.width, maxBoardWidth);
   let boardHeight = boardWidth / aspectRatio;
 
-  // Check if height exceeds limit, recalculate if needed
   if (boardHeight > maxBoardHeight) {
     boardHeight = maxBoardHeight;
     boardWidth = boardHeight * aspectRatio;
   }
 
-  // Final safety check: ensure board fits within screen bounds
-  boardWidth = Math.min(boardWidth, width * 0.95);
-  boardHeight = Math.min(boardHeight, height * 0.95);
-
   // Ensure minimum size for usability
   boardWidth = Math.max(boardWidth, 300);
   boardHeight = Math.max(boardHeight, 200);
 
-  // Responsive button sizing (phone <1000px, tablet ≥1000px)
+  // Board layout offsets - Account for decorative border on soalan-board.png
+  // The board image has ornamental borders (~40px top, ~60px bottom, ~45px sides in original 1140×849px)
+  // Use percentage-based padding to match actual decorative border proportions
+  const offsets = {
+    boardPaddingTop: Math.round(boardHeight * 0.05),        // 5% of height (~19px phone → 34px tablet-lg)
+    boardPaddingBottom: Math.round(boardHeight * 0.075),    // 7.5% of height (~29px phone → 51px tablet-lg)
+    boardPaddingHorizontal: Math.round(boardWidth * 0.04),  // 4% of width (matches ~45px border at 1140px)
+    questionAreaHeight: Math.round(boardHeight * 0.24),     // 24% of height (91px phone → 164px tablet-lg)
+    listAreaTop: Math.round(boardHeight * 0.02),            // 2% of height (~8px phone → 14px tablet-lg)
+  };
+
+  // Calculate internal dimensions for question and list sections
+  const questionSectionHeight = offsets.questionAreaHeight;
+  const availableListHeight = boardHeight - offsets.boardPaddingTop - offsets.boardPaddingBottom - questionSectionHeight - offsets.listAreaTop;
+
+  // Responsive sizing
+  const listGap = 4;  // Fixed 4px gap between checkboxes (reduced from responsive 8-14px)
+  const listPaddingHorizontal = getResponsiveSizeScaled(16, width);
   const nextButtonSize = width < 1000 ? ButtonSizes.next.phone : ButtonSizes.next.tablet;
 
   const handleToggleOption = async (option: string) => {
@@ -114,147 +111,99 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     onAnswer(selectedOptions);
   };
 
-  // Calculate button dimensions based on board width
-  const buttonAreaWidth = boardWidth - (offsets.boardPaddingHorizontal * 2);
-  const horizontalGap = offsets.gridRow.gap;
-  const baseButtonWidth = (buttonAreaWidth - horizontalGap * 2) / 3;
-
-  // Apply 20% increase on tablets only
-  const tabletMultiplier = isPhone ? 1.0 : 1.2;
-  const buttonWidth = baseButtonWidth * tabletMultiplier;
-
-  // Clamp button width with min/max bounds for text readability (adjusted for tablets)
-  const buttonWidthMax = isPhone ? 240 : 288; // 240 * 1.2 = 288 for tablets
-  const clampedButtonWidth = Math.max(140, Math.min(buttonWidth, buttonWidthMax));
-
-  // Calculate height based on jawapan-button aspect ratio
-  const buttonAspectRatio = 184 / 626; // jawapan-button.png aspect ratio
-  const clampedButtonHeight = clampedButtonWidth * buttonAspectRatio;
-
-  // Font size using theme system (responsive across 4 tiers: 12→18px)
-  const fontSize = getResponsiveFontSize('gridCell', width);
-
-  // Responsive padding for grid cells - optimized to maximize text space
-  const cellPadding = getResponsiveSizeScaled(8, width);
-
   return (
     <View style={styles.container}>
-      <View style={styles.boardContainer}>
-        <ImageBackground
-          source={ASSETS.games.dbpSejarah.soalanBoard}
-          style={[
-            styles.board,
-            {
-              width: boardWidth,
-              height: boardHeight,
-              paddingTop: offsets.boardPaddingTop,
-              paddingBottom: offsets.boardPaddingBottom,
-              paddingHorizontal: offsets.boardPaddingHorizontal,
-            },
-          ]}
-          resizeMode="contain">
-          {/* Question Section - Top */}
-          <View style={[styles.questionSection, { height: offsets.questionAreaHeight, marginBottom: offsets.gridAreaTop }]}>
-            <Text
-              style={[
-                styles.titleText,
-                {
-                  fontSize: getResponsiveFontSize('question', width),
-                  lineHeight: getResponsiveFontSize('question', width) * Typography.lineHeight.normal,
-                },
-              ]}
-              numberOfLines={2}
-              adjustsFontSizeToFit
-              minimumFontScale={0.9}
-              allowFontScaling={allowScaling}>
-              {question.title}
-            </Text>
-            <Text
-              style={[
-                styles.questionText,
-                {
-                  fontSize: getResponsiveFontSize('answer', width),
-                  lineHeight: getResponsiveFontSize('answer', width) * Typography.lineHeight.tight,
-                },
-              ]}
-              numberOfLines={2}
-              adjustsFontSizeToFit
-              minimumFontScale={0.9}
-              allowFontScaling={allowScaling}>
-              {question.question}
-            </Text>
-            <Text
-              style={[
-                styles.instructionText,
-                {
-                  fontSize: getResponsiveFontSize('clue', width),
-                  color: selectedOptions.length === 3 ? Colors.success : Colors.textSecondary,
-                },
-              ]}
-              allowFontScaling={allowScaling}>
-              Pilih 3 jawapan yang betul ({selectedOptions.length}/3)
-            </Text>
-          </View>
-
-          {/* Grid Section - Bottom */}
-          <View style={styles.gridSection}>
-            <View style={[styles.grid, { gap: offsets.gridContainer.gap }]}>
-              {[0, 1, 2].map((row) => (
-                <View key={row} style={[styles.gridRow, { gap: offsets.gridRow.gap }]}>
-                  {question.options.slice(row * 3, row * 3 + 3).map((option, col) => {
-                    const isSelected = selectedOptions.includes(option);
-                    return (
-                      <Pressable
-                        key={col}
-                        style={({ pressed }) => [
-                          styles.gridCell,
-                          {
-                            width: clampedButtonWidth,
-                            height: clampedButtonHeight,
-                            transform: [{ scale: pressed ? 0.92 : 1 }],
-                          },
-                          isSelected && styles.gridCellSelected,
-                        ]}
-                        onPress={() => handleToggleOption(option)}
-                        hitSlop={TouchTargets.hitSlop}
-                        pressRetentionOffset={TouchTargets.hitSlop}
-                        accessibilityRole="button"
-                        accessibilityLabel={`Pilihan ${row * 3 + col + 1}: ${option}`}
-                        accessibilityState={{ selected: isSelected }}>
-                        <ImageBackground
-                          source={ASSETS.games.dbpSejarah.jawapanButton.default}
-                          style={[styles.gridCellBg, { padding: cellPadding }]}
-                          resizeMode="stretch">
-                          <Text
-                            style={[styles.gridCellText, { fontSize }]}
-                            numberOfLines={5}
-                            adjustsFontSizeToFit
-                            minimumFontScale={0.9}
-                            ellipsizeMode="tail"
-                            allowFontScaling={allowScaling}>
-                            {isSelected && '✓ '}
-                            {option}
-                          </Text>
-                        </ImageBackground>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              ))}
-            </View>
-          </View>
-        </ImageBackground>
-      </View>
-
-      {/* Next Button - Outside board, bottom-right */}
-      {showNext && (
-        <View style={[
-          styles.footer,
+      {/* Question Board - Contains Everything */}
+      <ImageBackground
+        source={ASSETS.games.dbpSejarah.soalanBoard}
+        style={[
+          styles.questionBoard,
           {
-            bottom: offsets.footerContainer.marginBottom,
-            right: offsets.footerContainer.marginRight,
+            width: boardWidth,
+            height: boardHeight,
+            paddingTop: offsets.boardPaddingTop,
+            paddingBottom: offsets.boardPaddingBottom,
+            paddingHorizontal: offsets.boardPaddingHorizontal,
           },
-        ]}>
+        ]}
+        resizeMode="contain">
+        {/* Question Section - Fixed Height at Top */}
+        <View style={[styles.questionSection, { height: questionSectionHeight }]}>
+          <Text
+            style={[
+              styles.titleText,
+              {
+                fontSize: getResponsiveFontSize('question', width),
+                lineHeight: getResponsiveFontSize('question', width) * Typography.lineHeight.tight,
+              },
+            ]}
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.85}
+            allowFontScaling={allowScaling}>
+            {question.title}
+          </Text>
+          <Text
+            style={[
+              styles.questionText,
+              {
+                fontSize: getResponsiveFontSize('answer', width),
+                lineHeight: getResponsiveFontSize('answer', width) * Typography.lineHeight.tight,
+                marginTop: 6,
+              },
+            ]}
+            numberOfLines={2}
+            adjustsFontSizeToFit
+            minimumFontScale={0.85}
+            allowFontScaling={allowScaling}>
+            {question.question}
+          </Text>
+          <Text
+            style={[
+              styles.instructionText,
+              {
+                fontSize: getResponsiveFontSize('clue', width),
+                color: selectedOptions.length === 3 ? Colors.success : Colors.textSecondary,
+                marginTop: 8,
+              },
+            ]}
+            allowFontScaling={allowScaling}>
+            Pilih 3 jawapan yang betul ({selectedOptions.length}/3)
+          </Text>
+        </View>
+
+        {/* Checkbox List - Scrollable Section Below */}
+        <View
+          style={[
+            styles.listContainer,
+            {
+              height: availableListHeight,
+              marginTop: offsets.listAreaTop,
+            },
+          ]}>
+          <FlatList
+            data={question.options}
+            keyExtractor={(item, index) => `option-${index}`}
+            renderItem={({ item, index }) => (
+              <CheckboxCard
+                option={item}
+                isSelected={selectedOptions.includes(item)}
+                isDisabled={selectedOptions.length >= 3 && !selectedOptions.includes(item)}
+                onPress={() => handleToggleOption(item)}
+                index={index}
+                allowFontScaling={allowScaling}
+              />
+            )}
+            ItemSeparatorComponent={() => <View style={{ height: listGap }} />}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 20 }}
+          />
+        </View>
+      </ImageBackground>
+
+      {/* Next Button - Bottom Right */}
+      {showNext && (
+        <View style={styles.footer}>
           <Pressable
             style={({ pressed }) => [
               styles.nextButton,
@@ -281,86 +230,50 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
 }
 
 const styles = StyleSheet.create({
-  // Container
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: EdgeMargins.landscape,
   },
-  boardContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  board: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+
+  // Question Board - Contains Everything
+  questionBoard: {
+    alignSelf: 'center',
   },
 
-  // Question Section (Top of board)
+  // Question Section - Fixed Height at Top
   questionSection: {
-    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
   },
   titleText: {
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
   },
   questionText: {
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
-    // lineHeight calculated dynamically inline
-  },
-
-  // Grid Section (Bottom of board)
-  gridSection: {
-    width: '100%',
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  grid: {
-    alignItems: 'center',
-  },
-  gridRow: {
-    flexDirection: 'row',
-  },
-  gridCell: {
-    position: 'relative',
-  },
-  gridCellSelected: {
-    opacity: Opacity.selected,
-    transform: [{ scale: 0.95 }],
-  },
-  gridCellBg: {
-    // Dynamic: padding
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  gridCellText: {
-    fontFamily: Typography.fontFamily,
-    color: Colors.textLight,
-    textAlign: 'center',
-    fontWeight: Typography.fontWeight.semiBold,
   },
   instructionText: {
     fontFamily: Typography.fontFamily,
     textAlign: 'center',
     fontWeight: Typography.fontWeight.semiBold,
-    marginTop: 4,
   },
 
-  // Footer: Next Button (Outside board)
+  // List Container - Scrollable Section
+  listContainer: {
+    width: '100%',
+  },
+
+  // Footer: Next Button
   footer: {
     position: 'absolute',
+    bottom: 30,
+    right: 30,
     zIndex: 20,
   },
   nextButton: {

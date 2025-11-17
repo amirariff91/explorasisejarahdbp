@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   stateName: {
     position: 'absolute',
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight, Android falls back to system font with bold
     color: Colors.textLight,
     textAlign: 'center',
     ...getTextShadowStyle(Shadows.text.subtle),

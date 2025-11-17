@@ -100,8 +100,8 @@ export const QuestionBoardBase = {
   },
   // Map Board (State selection map container)
   map: {
-    width: 600,
-    height: 450,
+    width: 680,
+    height: 510,
   },
 } as const;
 
@@ -578,29 +578,25 @@ export const getQuestionBoardSize = (
 
 /**
  * Get Responsive Map Board Size
- * Special scaling: 30% larger on tablets compared to standard scaling
+ * Uses standard 4-tier scaling (same as other question boards)
  *
  * @param width - Screen width in pixels
  * @returns Scaled map board dimensions { width, height }
  *
  * @example
- * getMapBoardSize(667)  // { width: 600, height: 450 } (phone: unchanged)
- * getMapBoardSize(1024) // { width: 936, height: 702 } (tablet-sm: 1.2 × 1.3)
- * getMapBoardSize(1200) // { width: 1170, height: 878 } (tablet-md: 1.5 × 1.3)
- * getMapBoardSize(1366) // { width: 1404, height: 1053 } (tablet-lg: 1.8 × 1.3)
+ * getMapBoardSize(667)  // { width: 680, height: 510 } (phone: 1.0×)
+ * getMapBoardSize(820)  // { width: 816, height: 612 } (tablet-sm: 1.2×)
+ * getMapBoardSize(1080) // { width: 1020, height: 765 } (tablet-md: 1.5×)
+ * getMapBoardSize(1366) // { width: 1224, height: 918 } (tablet-lg: 1.8×)
  */
 export const getMapBoardSize = (width: number): { width: number; height: number } => {
   const base = QuestionBoardBase.map;
   const deviceSize = getDeviceSize(width);
-  const baseScale = ScaleFactors[deviceSize];
-
-  // Apply 30% additional scaling on tablets only
-  const tabletMultiplier = deviceSize === 'phone' ? 1.0 : 1.3;
-  const finalScale = baseScale * tabletMultiplier;
+  const scale = ScaleFactors[deviceSize];
 
   return {
-    width: Math.round(base.width * finalScale),
-    height: Math.round(base.height * finalScale),
+    width: Math.round(base.width * scale),
+    height: Math.round(base.height * scale),
   };
 };
 

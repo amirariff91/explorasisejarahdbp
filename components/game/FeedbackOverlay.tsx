@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   feedbackText: {
     fontFamily: Typography.fontFamily,
     // fontSize set dynamically based on screen width
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     ...getTextShadowStyle(Shadows.text.strong),
   },
   feedbackTextCorrect: {

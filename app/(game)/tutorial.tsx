@@ -2,7 +2,7 @@ import { Spacing, getQuestionBoardSize, getResponsiveSizeScaled } from "@/consta
 import { Colors, getResponsiveFontSize } from "@/constants/theme";
 import { ASSETS, ASSET_PRELOAD_CONFIG } from "@/constants/assets";
 import { useGameContext } from "@/contexts/GameContext";
-import { playMusic, playSound, stopMusic } from "@/utils/audio";
+import { playMusic, playSound, stopMusic, stopAllAmbient } from "@/utils/audio";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useEffect, useState, useRef } from "react";
@@ -59,9 +59,17 @@ export default function TutorialScreen() {
 
   // Play tutorial background music on mount
   useEffect(() => {
+    // Stop any ambient layers from previous screens to prevent overlapping background audio
+    stopAllAmbient();
+
+    // Start dedicated tutorial background music with a gentle fade-in
     playMusic('bgm-tutorial', true, 2000); // Fade in over 2 seconds
 
-    // No cleanup needed - next screen's playMusic() will handle transition
+    // Fade out tutorial music and clear ambient when leaving tutorial to avoid double background tracks
+    return () => {
+      stopMusic(500);
+      stopAllAmbient();
+    };
   }, []);
 
   // Preload commonly used UI assets during tutorial
@@ -369,7 +377,7 @@ const styles = StyleSheet.create({
     fontFamily: "Galindo",
     color: Colors.textPrimary,
     textAlign: "center",
-    fontWeight: "bold",
+    fontWeight: "normal", // Changed from bold - Galindo only has 400 Regular weight
     // fontSize, lineHeight, marginBottom set inline dynamically
   },
 

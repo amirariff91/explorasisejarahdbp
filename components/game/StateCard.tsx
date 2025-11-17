@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   stateName: {
     // Dynamic: fontSize
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     color: Colors.textLight,
     textAlign: 'center',
     ...getTextShadowStyle(Shadows.text.subtle),
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
   recommendedText: {
     // Dynamic: fontSize
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     color: Colors.textLight,
   },
 });
