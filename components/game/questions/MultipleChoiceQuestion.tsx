@@ -172,7 +172,9 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const maxHeightPerAnswerFromBoard =
     (availableAnswerAreaHeight - totalAnswerRowGaps) / 2;
 
-  let clampedButtonHeight = Math.max(baseButtonHeight, minAnswerHeight);
+  const phoneHeightTrim = isPhone ? 0.9 : 1.0; // reduce answer box height 10% on phones
+
+  let clampedButtonHeight = Math.max(baseButtonHeight, minAnswerHeight) * phoneHeightTrim;
 
   if (Number.isFinite(maxHeightPerAnswerFromBoard) && maxHeightPerAnswerFromBoard > 0) {
     clampedButtonHeight = Math.min(clampedButtonHeight, maxHeightPerAnswerFromBoard);

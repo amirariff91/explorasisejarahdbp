@@ -172,8 +172,8 @@ export const ButtonSizes = {
     phone: { width: 140, height: 72 },     // Larger for kids!
     tablet: { width: 220, height: 85 },    // Close to Figma
   },
-  // OK Button (submit fill-in-the-blank)
-  ok: {
+  // TERUSKAN Button (submit fill-in-the-blank)
+  teruskan: {
     phone: { width: 100, height: 75 },
     tablet: { width: 110, height: 80 },
     // Backward compatibility
@@ -223,8 +223,8 @@ export const UIElements = {
   // StatusBar elements
   statusBar: {
     stateIndicator: {
-      landscape: { width: 240, height: 55 },
-      portrait: { width: 200, height: 70 },
+      landscape: { width: 280, height: 70 },
+      portrait: { width: 230, height: 85 },
     },
   },
   // Success Modal elements
@@ -343,14 +343,14 @@ export const QuestionOffsets = {
       questionContent: { width: '82%', paddingVertical: 32, paddingHorizontal: 0, gap: 16 },
       inputSection: { marginTop: 0, marginRight: 0 },
       inputContainer: { marginTop: 0, paddingHorizontal: 24 },
-      okButton: { marginTop: 28 }, // gap between input and OK button
+      teruskanButton: { marginTop: 28 }, // gap between input and TERUSKAN button
     },
     portrait: {
       questionSection: { marginTop: 0, marginLeft: 0 },
       questionContent: { width: '82%', paddingVertical: 32, paddingHorizontal: 0, gap: 16 },
       inputSection: { marginTop: 0, marginRight: 0 },
       inputContainer: { marginTop: 0, paddingHorizontal: 20 },
-      okButton: { marginTop: 24 },
+      teruskanButton: { marginTop: 24 },
     },
   },
   matching: {
@@ -570,9 +570,12 @@ export const getQuestionBoardSize = (
 ): { width: number; height: number } => {
   const base = QuestionBoardBase[type];
   const scale = getScaleFactor(width);
+  const deviceSize = getDeviceSize(width);
+  const tabletBoardBoost = deviceSize === 'phone' ? 1.0 : 1.3; // Tablets: 30% larger boards
+  const boardAssetBoost = deviceSize === 'phone' ? 0.9 : 1.04; // Phones: reduce 10%, others keep +4%
   return {
-    width: Math.round(base.width * scale),
-    height: Math.round(base.height * scale),
+    width: Math.round(base.width * scale * tabletBoardBoost * boardAssetBoost),
+    height: Math.round(base.height * scale * tabletBoardBoost * boardAssetBoost),
   };
 };
 

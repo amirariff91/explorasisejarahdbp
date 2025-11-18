@@ -61,12 +61,12 @@ export const ASSETS: AssetManifest = {
         disabled: require('@/assets/images/game/buttons/next-button.png'), // Placeholder
       },
 
-      // OK/confirm button (Figma Frame 1:22)
-      ok: {
-        default: require('@/assets/images/game/buttons/ok-button.png'),
+      // TERUSKAN/confirm button (Figma Frame 1:22)
+      teruskan: {
+        default: require('@/assets/images/game/buttons/teruskan-button.png'),
         // TODO: Add state variants when generated
-        pressed: require('@/assets/images/game/buttons/ok-button.png'), // Placeholder
-        disabled: require('@/assets/images/game/buttons/ok-button.png'), // Placeholder
+        pressed: require('@/assets/images/game/buttons/teruskan-button.png'), // Placeholder
+        disabled: require('@/assets/images/game/buttons/teruskan-button.png'), // Placeholder
       },
     },
 
@@ -183,7 +183,7 @@ export const ASSET_PRELOAD_CONFIG = {
   preload: [
     ASSETS.shared.buttons.menu.default,
     ASSETS.shared.buttons.next.default,
-    ASSETS.shared.buttons.ok.default,
+    ASSETS.shared.buttons.teruskan.default,
     ASSETS.shared.ui.bgNation,
     ASSETS.shared.ui.star,
     ASSETS.shared.ui.flare,

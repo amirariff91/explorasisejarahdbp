@@ -124,7 +124,13 @@ export default function TutorialScreen() {
   };
 
   const edgeMargin = getResponsiveSizeScaled(40, width);
-  const boardSize = getQuestionBoardSize('standard', width); // Use larger 'standard' board (480×300 base)
+  const boardSize = (() => {
+    const base = getQuestionBoardSize('standard', width); // Use larger 'standard' board (480×300 base)
+    const isPhone = width < 1000; // Aligns with device breakpoints (phone < 1000px)
+    return isPhone
+      ? { width: base.width * 1.1, height: base.height * 1.1 } // 10% larger on phones
+      : base;
+  })();
   const verticalPadding = getResponsiveSizeScaled(boardSize.height * 0.12, width); // 12% of board height
   const horizontalPadding = getResponsiveSizeScaled(boardSize.width * 0.10, width); // 10% of board width
 
@@ -237,26 +243,7 @@ export default function TutorialScreen() {
           </ImageBackground>
         </Animated.View>
 
-        {/* Step Indicators */}
-        <View style={[styles.stepIndicatorContainer, {
-          marginTop: getResponsiveSizeScaled(Spacing.lg, width),
-          gap: getResponsiveSizeScaled(10, width),
-        }]}>
-          {tutorialSteps.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.stepDot,
-                {
-                  width: getResponsiveSizeScaled(10, width),
-                  height: getResponsiveSizeScaled(10, width),
-                  borderRadius: getResponsiveSizeScaled(5, width),
-                },
-                index === currentStep && styles.stepDotActive,
-              ]}
-            />
-          ))}
-        </View>
+        {/* Step Indicators removed per request */}
 
         {/* Navigation Buttons Container */}
         <View style={[styles.buttonContainer, {
@@ -288,26 +275,46 @@ export default function TutorialScreen() {
           {/* Next/Start Button */}
           <Animated.View style={buttonAnimatedStyle}>
             <Pressable
-              style={[
-                styles.nextButton,
-                {
-                  width: getResponsiveSizeScaled(115, width),
-                  height: getResponsiveSizeScaled(80, width),
-                },
-              ]}
               onPress={handleNext}
               accessibilityRole="button"
               accessibilityLabel={currentStep === tutorialSteps.length - 1 ? "Mula permainan" : "Seterusnya"}
             >
-              <Image
-                source={
-                  currentStep === tutorialSteps.length - 1
-                    ? ASSETS.shared.buttons.ok.default
-                    : ASSETS.shared.buttons.next.default
-                }
-                style={styles.nextButtonImage}
-                contentFit="contain"
-              />
+              {currentStep === tutorialSteps.length - 1 ? (
+                <View style={[styles.teruskanTextButton, {
+                  paddingVertical: getResponsiveSizeScaled(14, width),
+                  paddingHorizontal: getResponsiveSizeScaled(28, width),
+                  borderRadius: getResponsiveSizeScaled(12, width),
+                  minWidth: getResponsiveSizeScaled(120, width),
+                  minHeight: getResponsiveSizeScaled(50, width),
+                }]}>
+                  <Text
+                    style={[
+                      styles.teruskanButtonText,
+                      { fontSize: getResponsiveFontSize('answer', width) }
+                    ]}
+                    allowFontScaling={allowScaling}
+                    adjustsFontSizeToFit={true}
+                    minimumFontScale={0.8}
+                    numberOfLines={1}
+                  >
+                    TERUSKAN
+                  </Text>
+                </View>
+              ) : (
+                <View style={[
+                  styles.nextButton,
+                  {
+                    width: getResponsiveSizeScaled(115, width),
+                    height: getResponsiveSizeScaled(80, width),
+                  },
+                ]}>
+                  <Image
+                    source={ASSETS.shared.buttons.next.default}
+                    style={styles.nextButtonImage}
+                    contentFit="contain"
+                  />
+                </View>
+              )}
             </Pressable>
           </Animated.View>
         </View>
@@ -390,21 +397,6 @@ const styles = StyleSheet.create({
     // fontSize, lineHeight set inline dynamically
   },
 
-  // Step Indicators
-  stepIndicatorContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    // marginTop, gap set inline dynamically
-  },
-  stepDot: {
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    // width, height, borderRadius set inline dynamically
-  },
-  stepDotActive: {
-    backgroundColor: Colors.textPrimary,
-  },
-
   // Button Container (Horizontal Layout)
   buttonContainer: {
     flexDirection: "row",
@@ -433,5 +425,20 @@ const styles = StyleSheet.create({
   nextButtonImage: {
     width: "75%",
     height: "75%",
+  },
+
+  // TERUSKAN Text Button
+  teruskanTextButton: {
+    backgroundColor: '#4CAF50',
+    alignItems: "center",
+    justifyContent: "center",
+    // paddingVertical, paddingHorizontal, borderRadius set inline dynamically
+  },
+  teruskanButtonText: {
+    fontFamily: "Galindo",
+    color: '#FFFFFF',
+    textAlign: "center",
+    fontWeight: "normal",
+    // fontSize set inline dynamically
   },
 });

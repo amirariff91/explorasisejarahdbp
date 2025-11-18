@@ -212,8 +212,8 @@ export default function JohorCrossword() {
   const clueColumnWidth = columnsWidth * clueColumnShare;
 
   // Responsive grid sizing constrained to center column
-  const gridMaxWidth = isLandscape ? centerColumnWidth : width * 0.78;
-  const gridMaxHeight = height * (isLandscape ? 0.58 : 0.42);
+  const gridMaxWidth = isLandscape ? centerColumnWidth * 0.9 : width * 0.72;
+  const gridMaxHeight = height * (isLandscape ? 0.55 : 0.46);
 
   const baseTileSize = Math.min(
     gridMaxWidth / PUZZLE.gridSize.cols,
@@ -230,7 +230,11 @@ export default function JohorCrossword() {
   const gridHeight = tileSize * PUZZLE.gridSize.rows;
 
   // Responsive clue board sizing using responsive helper (no manual scaling)
-  const clueBoardSize = getQuestionBoardSize('clue', width);
+  const clueBoardSize = {
+    ...getQuestionBoardSize('clue', width),
+    width: getQuestionBoardSize('clue', width).width * (isLandscape ? 1.05 : 1.1),
+    height: getQuestionBoardSize('clue', width).height * (isLandscape ? 1.05 : 1.1),
+  };
 
   const handleSelectWord = (wordId?: string) => {
     if (!wordId) {
@@ -570,6 +574,7 @@ function ClueBoard({
   const itemLayoutRef = useRef<Record<string, number>>({});
   const isAcross = title === 'MENDATAR';
   const isDown = title === 'MENEGAK';
+  const titleColor = isAcross ? '#0a87b8' : '#1d9c3a';
 
   useEffect(() => {
     if (!activeClueId) return;
@@ -592,26 +597,36 @@ function ClueBoard({
       resizeMode="contain">
       <View
         style={[
-          styles.clueBoardContent,
+      styles.clueBoardContent,
+      {
+        width: boardContentWidth,
+        paddingVertical: boardPaddingV,
+        gap: contentGap,
+      },
+    ]}>
+      <Text
+        style={[
+          styles.clueTitle,
           {
-            width: boardContentWidth,
-            paddingVertical: boardPaddingV,
-            gap: contentGap,
+            fontSize: titleSize,
+            color: Colors.textLight,
+            backgroundColor: titleColor,
+            paddingHorizontal: 14,
+            paddingVertical: 8,
+            borderRadius: 14,
+            overflow: 'hidden',
+            textAlign: 'center',
+            textShadowColor: 'rgba(0,0,0,0.35)',
+            textShadowOffset: { width: 0, height: 2 },
+            textShadowRadius: 3,
           },
-        ]}>
-        <Text
-          style={[
-            styles.clueTitle,
-            { fontSize: titleSize },
-            isDown && styles.clueTitleDown,
-            isAcross && styles.clueTitleAcross,
-          ]}
-          allowFontScaling={allowScaling}
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.8}>
-          {title}
-        </Text>
+        ]}
+        allowFontScaling={allowScaling}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}>
+        {title}
+      </Text>
         <Text
           style={[styles.clueHint, { fontSize: hintSize }]}
           allowFontScaling={allowScaling}
@@ -779,16 +794,9 @@ const styles = StyleSheet.create({
   clueTitle: {
     fontFamily: Typography.fontFamily,
     fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
-    color: Colors.textPrimary,
-    // fontSize applied inline with responsive value
+    // color and sizing applied inline
     textAlign: 'center',
     marginBottom: 12,
-  },
-  clueTitleAcross: {
-    color: Colors.secondary,
-  },
-  clueTitleDown: {
-    color: Colors.primary,
   },
   clueHint: {
     fontFamily: Typography.fontFamily,

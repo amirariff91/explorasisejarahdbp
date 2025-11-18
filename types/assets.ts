@@ -58,7 +58,7 @@ export interface IconAssets {
 export interface ButtonAssets {
   menu: ButtonAsset;
   next: ButtonAsset;
-  ok: ButtonAsset;
+  teruskan: ButtonAsset;
 }
 
 /**

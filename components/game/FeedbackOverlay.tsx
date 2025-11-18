@@ -10,7 +10,7 @@ import { getResponsiveSizeScaled } from '@/constants/layout';
 import { playRandomFeedback } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
 import { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { ScrollView, StyleSheet, Text, View, useWindowDimensions, Pressable, TouchableWithoutFeedback } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -34,7 +34,7 @@ interface FeedbackOverlayProps {
  * - ✓ BETUL! (green celebration) for correct answers
  * - ✗ CUBA LAGI! (red shake) for wrong answers
  * - Displays explanation text if provided
- * - Auto-dismisses after 2 seconds
+ * - User can dismiss by tapping the close button or anywhere on the overlay
  */
 export default function FeedbackOverlay({
   visible,
@@ -45,12 +45,14 @@ export default function FeedbackOverlay({
   const { width } = useWindowDimensions();
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
-  
-  // Responsive sizing (4-tier system)
-  const iconSize = getResponsiveSizeScaled(60, width); // Auto-scales across device tiers
-  const feedbackTextSize = getResponsiveFontSize('question', width); // 16px phone → 24px tablet-lg
+
+  // Simple responsive sizing
+  const iconSize = getResponsiveSizeScaled(60, width);
+  const feedbackTextSize = getResponsiveFontSize('question', width);
   const explanationTextSize = getResponsiveFontSize('answer', width);
-  
+  const closeButtonSize = getResponsiveSizeScaled(40, width);
+  const closeIconSize = getResponsiveFontSize('question', width);
+
   // Animation values
   const scale = useSharedValue(0);
   const opacity = useSharedValue(0);
@@ -92,13 +94,6 @@ export default function FeedbackOverlay({
 
       // Fade in explanation text after icon animation
       explainOpacity.value = withTiming(1, { duration: 400, easing: Easing.out(Easing.ease) });
-
-      // Auto-dismiss after 2 seconds
-      const timer = setTimeout(() => {
-        onDismiss();
-      }, 2000);
-
-      return () => clearTimeout(timer);
     } else {
       // Reset animations when hidden
       scale.value = 0;
@@ -125,59 +120,87 @@ export default function FeedbackOverlay({
   if (!visible) return null;
 
   return (
-    <Animated.View style={[styles.overlay, overlayAnimatedStyle]}>
-      <View style={styles.container}>
-        {/* Feedback Icon & Text */}
-        <Animated.View style={[styles.iconContainer, iconAnimatedStyle]}>
-          <Text 
-            style={[
-              styles.icon, 
-              { fontSize: iconSize },
-              isCorrect ? styles.iconCorrect : styles.iconWrong
-            ]}
-            allowFontScaling={allowScaling}
-            numberOfLines={1}
-            adjustsFontSizeToFit
-            minimumFontScale={0.8}>
-            {isCorrect ? '✓' : '✗'}
-          </Text>
+    <TouchableWithoutFeedback onPress={onDismiss}>
+      <Animated.View style={[styles.overlay, overlayAnimatedStyle]}>
+        {/* Close Button */}
+        <Pressable
+          onPress={onDismiss}
+          style={[
+            styles.closeButton,
+            {
+              width: closeButtonSize,
+              height: closeButtonSize,
+              top: getResponsiveSizeScaled(20, width),
+              right: getResponsiveSizeScaled(20, width),
+            },
+          ]}
+          hitSlop={8}>
           <Text
             style={[
-              styles.feedbackText,
-              { fontSize: feedbackTextSize },
-              isCorrect ? styles.feedbackTextCorrect : styles.feedbackTextWrong,
+              styles.closeIcon,
+              { fontSize: closeIconSize },
             ]}
-            allowFontScaling={allowScaling}
-            numberOfLines={1}
-            adjustsFontSizeToFit
-            minimumFontScale={0.8}>
-            {isCorrect ? 'BETUL!' : 'CUBA LAGI!'}
+            allowFontScaling={allowScaling}>
+            ✕
           </Text>
-        </Animated.View>
+        </Pressable>
 
-        {/* Explanation Text */}
-        {explanation && (
-          <Animated.View style={[styles.explanationContainer, explanationAnimatedStyle]}>
-            <ScrollView
-              style={styles.explanationScroll}
-              showsVerticalScrollIndicator={true}
-              bounces={false}>
+        {/* Content Container - Stop propagation for scrolling */}
+        <TouchableWithoutFeedback>
+          <View style={styles.container}>
+            {/* Feedback Icon & Text */}
+            <Animated.View style={[styles.iconContainer, iconAnimatedStyle]}>
               <Text
                 style={[
-                  styles.explanationText,
-                  {
-                    fontSize: explanationTextSize,
-                    lineHeight: explanationTextSize * Typography.lineHeight.relaxed,
-                  },
+                  styles.icon,
+                  { fontSize: iconSize },
+                  isCorrect ? styles.iconCorrect : styles.iconWrong
                 ]}
-                allowFontScaling={allowScaling}>
-                {explanation}
+                allowFontScaling={allowScaling}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}>
+                {isCorrect ? '✓' : '✗'}
               </Text>
-            </ScrollView>
-          </Animated.View>
-        )}
-      </View>
-    </Animated.View>
+              <Text
+                style={[
+                  styles.feedbackText,
+                  { fontSize: feedbackTextSize },
+                  isCorrect ? styles.feedbackTextCorrect : styles.feedbackTextWrong,
+                ]}
+                allowFontScaling={allowScaling}
+                numberOfLines={1}
+                adjustsFontSizeToFit
+                minimumFontScale={0.8}>
+                {isCorrect ? 'BETUL!' : 'CUBA LAGI!'}
+              </Text>
+            </Animated.View>
+
+            {/* Explanation Text */}
+            {explanation && (
+              <Animated.View style={[styles.explanationContainer, explanationAnimatedStyle]}>
+                <ScrollView
+                  style={styles.explanationScroll}
+                  showsVerticalScrollIndicator={true}
+                  bounces={false}>
+                  <Text
+                    style={[
+                      styles.explanationText,
+                      {
+                        fontSize: explanationTextSize,
+                        lineHeight: explanationTextSize * Typography.lineHeight.relaxed,
+                      },
+                    ]}
+                    allowFontScaling={allowScaling}>
+                    {explanation}
+                  </Text>
+                </ScrollView>
+              </Animated.View>
+            )}
+          </View>
+        </TouchableWithoutFeedback>
+      </Animated.View>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -241,5 +264,19 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
+  },
+  closeButton: {
+    position: 'absolute',
+    // Dynamic: top, right, width, height
+    zIndex: 10000,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  closeIcon: {
+    // Dynamic: fontSize
+    color: '#f44336', // Red color matching wrong answer
+    fontWeight: 'bold',
   },
 });

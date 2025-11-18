@@ -5,7 +5,6 @@ import { useGameContext } from '@/contexts/GameContext';
 import type { FillBlankQuestion as FBQuestion, MalaysianState } from '@/types';
 import { playSound } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
-import { Image } from 'expo-image';
 import { useState } from 'react';
 import {
   ImageBackground,
@@ -26,7 +25,7 @@ interface Props {
 /**
  * Fill in the Blank Question - Landscape Optimized (Figma Screen 9)
  * Left: Question board (45% width)
- * Right: Input field + OK button (50% width)
+ * Right: Input field + TERUSKAN button (50% width)
  */
 export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const [answer, setAnswer] = useState('');
@@ -51,10 +50,11 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
 
   // All states except Johor: 40% larger board on tablets only
   const boardSizeMultiplier = !isJohor && !isPhone ? 1.4 : 1.0;
+  const perakTabletBoardBoost = !isPhone && question.state === 'perak' ? 1.3 : 1.0;
 
   const boardSize = {
-    width: baseBoardSize.width * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier,
-    height: baseBoardSize.height * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier,
+    width: baseBoardSize.width * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier * perakTabletBoardBoost,
+    height: baseBoardSize.height * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier * perakTabletBoardBoost,
   };
 
   const boardScale = 1.25;  // Slightly larger for fill-blank questions
@@ -92,9 +92,31 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
     }
   };
 
+  const shouldOffsetDown = isPhone && question.state === 'perlis';
+  const verticalOffset = shouldOffsetDown ? height * 0.1 : 0;
+  const inputOffsetY = (() => {
+    if (!isPhone) {
+      // Tablets: raise Perak input slightly for better balance
+      if (question.state === 'perak') return -height * 0.05;
+      return 0;
+    }
+    if (question.state === 'perak') return height * 0.05; // Slightly lower on phones for Perak
+    return -height * 0.05; // Default lift on phones
+  })();
+  const teruskanOffsetY = (() => {
+    if (question.state === 'kedah') return height * 0.05; // 5% down for Kedah
+    if (!isPhone && question.state === 'perak') return height * 0.05; // Lower OK on tablets for Perak
+    if (isPhone) return height * 0.05;
+    return 0;
+  })();
+  const boardOffsetY =
+    isPhone && (question.state === 'perak' || question.state === 'kedah')
+      ? height * 0.05
+      : 0;
+
   // Left Section: Question Board
   const leftSection = (
-    <View style={styles.questionSection}>
+    <View style={[styles.questionSection, { transform: [{ translateY: boardOffsetY }] }]}>
       <ImageBackground
         source={ASSETS.games.dbpSejarah.soalanBoard}
         style={[
@@ -125,7 +147,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
     </View>
   );
 
-  // Right Section: Input Field + OK Button
+  // Right Section: Input Field + TERUSKAN Button
   const rightSection = (
     <View style={styles.inputSection}>
       {/* Input Box */}
@@ -136,6 +158,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
           {
             width: getResponsiveSizeScaled(250, width),
             height: getResponsiveSizeScaled(70, width),
+            transform: [{ translateY: inputOffsetY }],
           },
         ]}
         resizeMode="contain">
@@ -161,15 +184,15 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
         />
       </ImageBackground>
 
-      {/* OK Button */}
+      {/* TERUSKAN Button */}
       <Pressable
         style={({ pressed }) => [
-          styles.okButton,
           {
-            width: getResponsiveSizeScaled(95, width),
-            height: getResponsiveSizeScaled(70, width),
             marginTop: getResponsiveSizeScaled(24, width),
-            transform: [{ scale: pressed && answer.trim() ? 0.92 : 1 }],
+            transform: [
+              { scale: pressed && answer.trim() ? 0.92 : 1 },
+              { translateY: teruskanOffsetY },
+            ],
           },
         ]}
         onPress={handleSubmit}
@@ -178,22 +201,43 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
         accessibilityRole="button"
         accessibilityLabel="Hantar jawapan"
         accessibilityState={{ disabled: !answer.trim() }}>
-        <Image
-          source={ASSETS.shared.buttons.ok.default}
-          style={[styles.okButtonImage, !answer.trim() && styles.buttonDisabled]}
-          contentFit="contain"
-        />
+        <View style={[
+          styles.teruskanTextButton,
+          {
+            paddingVertical: getResponsiveSizeScaled(14, width),
+            paddingHorizontal: getResponsiveSizeScaled(28, width),
+            borderRadius: getResponsiveSizeScaled(12, width),
+            minWidth: getResponsiveSizeScaled(120, width),
+            minHeight: getResponsiveSizeScaled(50, width),
+          },
+          !answer.trim() && styles.buttonDisabled
+        ]}>
+          <Text
+            style={[
+              styles.teruskanButtonText,
+              { fontSize: getResponsiveFontSize('answer', width) }
+            ]}
+            allowFontScaling={allowScaling}
+            adjustsFontSizeToFit={true}
+            minimumFontScale={0.8}
+            numberOfLines={1}
+          >
+            TERUSKAN
+          </Text>
+        </View>
       </Pressable>
     </View>
   );
 
   return (
-    <LandscapeLayout
-      leftSection={leftSection}
-      rightSection={rightSection}
-      leftWidth={LEFT_SECTION_FLEX}
-      rightWidth={RIGHT_SECTION_FLEX}
-    />
+    <View style={{ flex: 1, paddingTop: verticalOffset }}>
+      <LandscapeLayout
+        leftSection={leftSection}
+        rightSection={rightSection}
+        leftWidth={LEFT_SECTION_FLEX}
+        rightWidth={RIGHT_SECTION_FLEX}
+      />
+    </View>
   );
 }
 
@@ -209,10 +253,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   questionContent: {
-    width: '82%',
-    paddingVertical: 32,
+    width: '78%',
+    paddingVertical: 40,
     alignItems: 'center',
-    gap: 16,
+    gap: 20,
   },
   questionText: {
     fontFamily: Typography.fontFamily,
@@ -221,7 +265,7 @@ const styles = StyleSheet.create({
     // lineHeight calculated dynamically inline
   },
 
-  // Right Section: Input + OK Button
+  // Right Section: Input + TERUSKAN Button
   inputSection: {
     flex: 1,
     justifyContent: 'center',
@@ -237,12 +281,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '90%',
   },
-  okButton: {
-    position: 'relative',
+
+  // TERUSKAN Text Button
+  teruskanTextButton: {
+    backgroundColor: '#4CAF50',
+    alignItems: 'center',
+    justifyContent: 'center',
+    // paddingVertical, paddingHorizontal, borderRadius set inline dynamically
   },
-  okButtonImage: {
-    width: '100%',
-    height: '100%',
+  teruskanButtonText: {
+    fontFamily: Typography.fontFamily,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    fontWeight: 'normal',
+    // fontSize set inline dynamically
   },
   buttonDisabled: {
     opacity: 0.5,

@@ -10,7 +10,7 @@ import type { MalaysianState } from '@/types';
 export const stateDisplayNames: Record<MalaysianState, string> = {
   'perlis': 'PERLIS',
   'kedah': 'KEDAH',
-  'pulau-pinang': 'P. PINANG',
+  'pulau-pinang': 'Pulau Pinang',
   'perak': 'PERAK',
   'selangor': 'SELANGOR',
   'kuala-lumpur': 'KL',

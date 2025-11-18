@@ -236,60 +236,53 @@ export default function QuizScreen() {
     setFeedbackExplanation(result.explanation);
     setShowFeedback(true);
 
-    // Clear any existing timer
+    // Clear any existing timer (cleanup)
     if (answerTimerRef.current) {
       clearTimeout(answerTimerRef.current);
       answerTimerRef.current = null;
     }
-
-    // Move to next question after feedback is shown (2 seconds)
-    answerTimerRef.current = setTimeout(() => {
-      // Safety check: only proceed if component is still mounted
-      if (!isMountedRef.current) return;
-
-      // Hide feedback
-      setShowFeedback(false);
-
-      // Resume timer after feedback (if timer exists and not expired)
-      if (gameState.stateTimer && !isTimerExpired()) {
-        resumeStateTimer();
-      }
-
-      const isLastQuestion = currentQuestionIndex === questions.length - 1;
-
-      setCurrentQuestionIndex((prevIndex) => {
-        const nextIndex = prevIndex + 1;
-
-        if (nextIndex < questions.length) {
-          // More questions remaining - play transition sound
-          playQuestionTransitionSound(); // Soft transition between questions
-          setIsAnswering(false);
-          // NOTE: setQuestionIndexForState removed from here to prevent setState during render.
-          // Question index sync is now handled by useEffect watching currentQuestionIndex changes.
-          return nextIndex;
-        } else {
-          // All questions completed - don't call setState here
-          setIsAnswering(false);
-          return prevIndex;
-        }
-      });
-
-      // Fallback: if we've just answered the last question and
-      // completion hasn't been registered yet, mark the state complete.
-      // This guards against any edge cases where the answers-based
-      // completion effect doesn't fire (e.g., persisted state mismatch).
-      if (isLastQuestion && state && !hasCompletedRef.current) {
-        hasCompletedRef.current = true;
-        completeState(state);
-      }
-
-      answerTimerRef.current = null;
-    }, 2000); // Increased from 1000ms to 2000ms to show feedback
   };
 
   const handleFeedbackDismiss = () => {
-    // Callback when feedback auto-dismisses (handled by timer above)
+    // Callback when user manually dismisses feedback overlay
+    // Safety check: only proceed if component is still mounted
+    if (!isMountedRef.current) return;
+
+    // Hide feedback
     setShowFeedback(false);
+
+    // Resume timer after feedback (if timer exists and not expired)
+    if (gameState.stateTimer && !isTimerExpired()) {
+      resumeStateTimer();
+    }
+
+    const isLastQuestion = currentQuestionIndex === questions.length - 1;
+
+    setCurrentQuestionIndex((prevIndex) => {
+      const nextIndex = prevIndex + 1;
+
+      if (nextIndex < questions.length) {
+        // More questions remaining - play transition sound
+        playQuestionTransitionSound(); // Soft transition between questions
+        setIsAnswering(false);
+        // NOTE: setQuestionIndexForState removed from here to prevent setState during render.
+        // Question index sync is now handled by useEffect watching currentQuestionIndex changes.
+        return nextIndex;
+      } else {
+        // All questions completed - don't call setState here
+        setIsAnswering(false);
+        return prevIndex;
+      }
+    });
+
+    // Fallback: if we've just answered the last question and
+    // completion hasn't been registered yet, mark the state complete.
+    // This guards against any edge cases where the answers-based
+    // completion effect doesn't fire (e.g., persisted state mismatch).
+    if (isLastQuestion && state && !hasCompletedRef.current) {
+      hasCompletedRef.current = true;
+      completeState(state);
+    }
   };
 
   const handleSuccessContinue = () => {
