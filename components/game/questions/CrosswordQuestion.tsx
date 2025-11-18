@@ -1,9 +1,11 @@
-import { View, Text, StyleSheet, ImageBackground, useWindowDimensions, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ImageBackground, useWindowDimensions, ScrollView, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import { useState } from 'react';
 import { getResponsiveFontSize, Typography } from '@/constants/theme';
 import { getResponsiveSizeScaled, getQuestionBoardSize } from '@/constants/layout';
 import { ASSETS } from '@/constants/assets';
 import type { CrosswordQuestion as CWQuestion } from '@/types';
 import { useGameContext } from '@/contexts/GameContext';
+import ScrollGradientOverlay from '@/components/ui/ScrollGradientOverlay';
 
 interface Props {
   question: CWQuestion;
@@ -21,6 +23,8 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
   const { width } = useWindowDimensions();
+  const [isAcrossAtBottom, setIsAcrossAtBottom] = useState(false);
+  const [isDownAtBottom, setIsDownAtBottom] = useState(false);
 
   // Filter clues by direction
   const acrossClues = question.clues.filter((clue) => clue.direction === 'across');
@@ -47,6 +51,19 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
   const baseGridSize = getResponsiveSizeScaled(220, width);
   const gridSize = Math.min(baseGridSize, columnWidth);
 
+  // Scroll handlers for gradient overlays
+  const handleAcrossScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const isAtBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 10;
+    setIsAcrossAtBottom(isAtBottom);
+  };
+
+  const handleDownScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const isAtBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 10;
+    setIsDownAtBottom(isAtBottom);
+  };
+
   return (
     <View style={styles.container}>
       {/* Three-Column Layout: Across | Grid | Down */}
@@ -65,9 +82,12 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
             ]}
             resizeMode="contain">
             <View style={styles.clueBoardContent}>
+              <View style={{ position: 'relative', flex: 1 }}>
               <ScrollView
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.clueScrollContent}>
+                contentContainerStyle={styles.clueScrollContent}
+                onScroll={handleAcrossScroll}
+                scrollEventThrottle={16}>
                 <Text
                   style={[styles.clueTitle, { fontSize: getResponsiveFontSize('answer', width) }]}
                   allowFontScaling={allowScaling}
@@ -88,6 +108,16 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
                   </Text>
                 ))}
               </ScrollView>
+
+              {/* Subtle Gradient Overlay */}
+              <ScrollGradientOverlay
+                visible={!isAcrossAtBottom}
+                height={40}
+                colors={['rgba(255, 255, 255, 0)', 'rgba(245, 235, 215, 0.7)']}
+                opacity={0.8}
+                bottom={0}
+              />
+              </View>
             </View>
           </ImageBackground>
         </View>
@@ -144,9 +174,12 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
             ]}
             resizeMode="contain">
             <View style={styles.clueBoardContent}>
+              <View style={{ position: 'relative', flex: 1 }}>
               <ScrollView
                 showsVerticalScrollIndicator={false}
-                contentContainerStyle={styles.clueScrollContent}>
+                contentContainerStyle={styles.clueScrollContent}
+                onScroll={handleDownScroll}
+                scrollEventThrottle={16}>
                 <Text
                   style={[styles.clueTitle, { fontSize: getResponsiveFontSize('answer', width) }]}
                   allowFontScaling={allowScaling}
@@ -167,6 +200,16 @@ export default function CrosswordQuestion({ question, onAnswer }: Props) {
                   </Text>
                 ))}
               </ScrollView>
+
+              {/* Subtle Gradient Overlay */}
+              <ScrollGradientOverlay
+                visible={!isDownAtBottom}
+                height={40}
+                colors={['rgba(255, 255, 255, 0)', 'rgba(245, 235, 215, 0.7)']}
+                opacity={0.8}
+                bottom={0}
+              />
+              </View>
             </View>
           </ImageBackground>
         </View>

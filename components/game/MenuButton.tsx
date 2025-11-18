@@ -35,7 +35,7 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
   const [showMenu, setShowMenu] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
-  const { clearStateAnswers, gameState, setAllowFontScaling } = useGameContext();
+  const { clearStateAnswers, gameState } = useGameContext();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   // Use responsive button sizing (4-tier system)
@@ -79,11 +79,6 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
     playMenuSound(); // Exit transition
     setShowMenu(false);
     router.back();
-  };
-
-  const toggleTextScaling = () => {
-    playSound('click');
-    setAllowFontScaling(!gameState.allowFontScaling);
   };
 
   return (
@@ -173,24 +168,6 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
               Keluar ke Peta
             </Text>
           </Pressable>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.menuItemSecondary,
-              pressed && { transform: [{ scale: 0.96 }] }
-            ]}
-            onPress={toggleTextScaling}
-            hitSlop={TouchTargets.hitSlop}>
-            <Text
-              style={[styles.menuItemSecondaryText, { fontSize: getResponsiveFontSize('answer', width) }]}
-              allowFontScaling={gameState.allowFontScaling}
-              numberOfLines={1}
-              adjustsFontSizeToFit
-              minimumFontScale={0.8}
-            >
-              Aksesibiliti: Teks Besar {gameState.allowFontScaling ? 'Hidup' : 'Mati'}
-            </Text>
-          </Pressable>
         </View>
       </View>
       )}
@@ -246,20 +223,5 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     color: Colors.textLight,
-  },
-  menuItemSecondary: {
-    width: '100%',
-    backgroundColor: '#f3f4f6',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: BorderRadius.small,
-    marginTop: 16,
-    alignItems: 'center',
-  },
-  menuItemSecondaryText: {
-    // Dynamic: fontSize
-    fontFamily: Typography.fontFamily,
-    color: Colors.textSecondary,
-    fontWeight: Typography.fontWeight.semiBold,
   },
 });

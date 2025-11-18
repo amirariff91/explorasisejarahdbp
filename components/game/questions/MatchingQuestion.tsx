@@ -5,7 +5,7 @@ import type { MatchingQuestion as MQQuestion } from '@/types';
 import { playSound } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import {
   FlatList,
   ImageBackground,
@@ -14,9 +14,12 @@ import {
   Text,
   useWindowDimensions,
   View,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
 } from 'react-native';
 import { ASSETS } from '@/constants/assets';
 import CheckboxCard from './CheckboxCard';
+import ScrollHintText from '@/components/ui/ScrollHintText';
 
 interface Props {
   question: MQQuestion;
@@ -33,10 +36,11 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const allowScaling = gameState.allowFontScaling;
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [showNext, setShowNext] = useState(false);
+  const [showScrollHint, setShowScrollHint] = useState(true);
   const { width, height } = useWindowDimensions();
 
-  // Use singleBoardMC for taller board to accommodate vertical list
-  const baseBoardSize = getQuestionBoardSize('singleBoardMC', width);
+  // Use matching board type with taller aspect ratio for vertical checkbox list
+  const baseBoardSize = getQuestionBoardSize('matching', width);
   const boardSizeMultiplier = 1.0; // Can adjust per state if needed
 
   const boardSize = {
@@ -45,8 +49,9 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   };
 
   // Calculate final board dimensions with safety checks
-  const maxBoardWidth = width * 0.92;
-  const maxBoardHeight = height * 0.88;
+  // Maximize height usage for vertical content
+  const maxBoardWidth = width * 0.90;
+  const maxBoardHeight = height * 0.95;
   const aspectRatio = boardSize.width / boardSize.height;
 
   let boardWidth = Math.min(boardSize.width, maxBoardWidth);
@@ -62,22 +67,24 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   boardHeight = Math.max(boardHeight, 200);
 
   // Board layout offsets - Account for decorative border on soalan-board.png
-  // The board image has ornamental borders (~40px top, ~60px bottom, ~45px sides in original 1140×849px)
-  // Use percentage-based padding to match actual decorative border proportions
+  // Optimized for maximum question space while keeping list compact
   const offsets = {
-    boardPaddingTop: Math.round(boardHeight * 0.05),        // 5% of height (~19px phone → 34px tablet-lg)
-    boardPaddingBottom: Math.round(boardHeight * 0.075),    // 7.5% of height (~29px phone → 51px tablet-lg)
+    boardPaddingTop: Math.round(boardHeight * 0.04),        // 4% of height (smaller top border)
+    boardPaddingBottom: Math.round(boardHeight * 0.16),     // 16% of height (more clearance from bottom border)
     boardPaddingHorizontal: Math.round(boardWidth * 0.04),  // 4% of width (matches ~45px border at 1140px)
-    questionAreaHeight: Math.round(boardHeight * 0.24),     // 24% of height (91px phone → 164px tablet-lg)
-    listAreaTop: Math.round(boardHeight * 0.02),            // 2% of height (~8px phone → 14px tablet-lg)
+    questionAreaHeight: Math.round(boardHeight * 0.28),     // 28% of height (space for title + question)
+    listAreaTop: 0,                                         // No gap between question and list
   };
+
+  // Move board down so state header overlaps top edge slightly
+  const boardMarginTop = getResponsiveSizeScaled(80, width);
 
   // Calculate internal dimensions for question and list sections
   const questionSectionHeight = offsets.questionAreaHeight;
   const availableListHeight = boardHeight - offsets.boardPaddingTop - offsets.boardPaddingBottom - questionSectionHeight - offsets.listAreaTop;
 
   // Responsive sizing
-  const listGap = 4;  // Fixed 4px gap between checkboxes (reduced from responsive 8-14px)
+  const listGap = 2;  // Minimal 2px gap between checkboxes
   const listPaddingHorizontal = getResponsiveSizeScaled(16, width);
   const nextButtonSize = width < 1000 ? ButtonSizes.next.phone : ButtonSizes.next.tablet;
 
@@ -111,6 +118,15 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     onAnswer(selectedOptions);
   };
 
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset } = event.nativeEvent;
+
+    // Dismiss hint on first scroll
+    if (contentOffset.y > 5 && showScrollHint) {
+      setShowScrollHint(false);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Question Board - Contains Everything */}
@@ -121,6 +137,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
           {
             width: boardWidth,
             height: boardHeight,
+            marginTop: boardMarginTop,
             paddingTop: offsets.boardPaddingTop,
             paddingBottom: offsets.boardPaddingBottom,
             paddingHorizontal: offsets.boardPaddingHorizontal,
@@ -158,18 +175,15 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
             allowFontScaling={allowScaling}>
             {question.question}
           </Text>
-          <Text
-            style={[
-              styles.instructionText,
-              {
-                fontSize: getResponsiveFontSize('clue', width),
-                color: selectedOptions.length === 3 ? Colors.success : Colors.textSecondary,
-                marginTop: 8,
-              },
-            ]}
-            allowFontScaling={allowScaling}>
-            Pilih 3 jawapan yang betul ({selectedOptions.length}/3)
-          </Text>
+
+          {/* Scroll Hint - Auto-dismisses after 3 seconds or on scroll */}
+          <ScrollHintText
+            text="Leret untuk lihat semua pilihan ↓"
+            visible={showScrollHint}
+            onDismiss={() => setShowScrollHint(false)}
+            fontSizeContext="clue"
+            color={Colors.textSecondary}
+          />
         </View>
 
         {/* Checkbox List - Scrollable Section Below */}
@@ -195,8 +209,13 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
               />
             )}
             ItemSeparatorComponent={() => <View style={{ height: listGap }} />}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={{ paddingBottom: 20 }}
+            showsVerticalScrollIndicator={true}
+            indicatorStyle="black"
+            persistentScrollbar={true}
+            scrollIndicatorInsets={{ right: -10 }}
+            contentContainerStyle={{ paddingBottom: 6, paddingRight: 8 }}
+            onScroll={handleScroll}
+            scrollEventThrottle={16}
           />
         </View>
       </ImageBackground>
@@ -257,11 +276,6 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
-  },
-  instructionText: {
-    fontFamily: Typography.fontFamily,
-    textAlign: 'center',
-    fontWeight: Typography.fontWeight.semiBold,
   },
 
   // List Container - Scrollable Section

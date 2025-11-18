@@ -104,10 +104,10 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
     return -height * 0.05; // Default lift on phones
   })();
   const teruskanOffsetY = (() => {
-    if (question.state === 'kedah') return height * 0.05; // 5% down for Kedah
-    if (!isPhone && question.state === 'perak') return height * 0.05; // Lower OK on tablets for Perak
-    if (isPhone) return height * 0.05;
-    return 0;
+    if (question.state === 'kedah') return height * 0.10; // 10% down for Kedah
+    if (!isPhone && question.state === 'perak') return height * 0.10; // 10% down for Perak tablets
+    if (isPhone) return height * 0.10; // 10% down for all phones
+    return height * 0.05; // 5% down for other tablets
   })();
   const boardOffsetY =
     isPhone && (question.state === 'perak' || question.state === 'kedah')

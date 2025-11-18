@@ -40,3 +40,16 @@ export const peninsulaLayout: (MalaysianState | null)[][] = [
 
 // Borneo states
 export const borneoStates: MalaysianState[] = ['sabah', 'sarawak'] as const;
+
+/**
+ * Get all Malaysian states sorted alphabetically by display name
+ * @returns Array of all 14 states sorted A-Z
+ */
+export const getSortedStates = (): MalaysianState[] => {
+  const allStates = Object.keys(stateDisplayNames) as MalaysianState[];
+  return allStates.sort((a, b) => {
+    const nameA = stateDisplayNames[a].toUpperCase();
+    const nameB = stateDisplayNames[b].toUpperCase();
+    return nameA.localeCompare(nameB);
+  });
+};

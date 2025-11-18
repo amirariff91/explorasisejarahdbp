@@ -7,7 +7,7 @@ import type { Question } from '@/types';
  */
 export const sabahQuestions: Question[] = [
   {
-    id: 'sabah_1',
+    id: 'sabah-1',
     state: 'sabah',
     type: 'multipleChoice',
     question: 'Bilakah Sabah menyertai pembentukan Malaysia?',
@@ -16,7 +16,7 @@ export const sabahQuestions: Question[] = [
     explanation: 'Sabah menyertai pembentukan Malaysia pada 16 September 1963 bersama-sama dengan Sarawak dan Singapura.',
   },
   {
-    id: 'sabah_2',
+    id: 'sabah-2',
     state: 'sabah',
     type: 'trueFalse',
     question: 'Sabah terletak di Pulau Borneo?',
@@ -24,7 +24,7 @@ export const sabahQuestions: Question[] = [
     explanation: 'Sabah terletak di bahagian utara Pulau Borneo.',
   },
   {
-    id: 'sabah_3',
+    id: 'sabah-3',
     state: 'sabah',
     type: 'fillBlank',
     question: 'Ibu negeri Sabah ialah: K_TA K_NAB_LU',
@@ -34,7 +34,7 @@ export const sabahQuestions: Question[] = [
     explanation: 'Kota Kinabalu adalah ibu negeri Sabah.',
   },
   {
-    id: 'sabah_4',
+    id: 'sabah-4',
     state: 'sabah',
     type: 'multipleChoice',
     question: 'Gunung tertinggi di Malaysia terletak di Sabah. Apakah namanya?',

@@ -31,12 +31,12 @@ export default function CheckboxCard({
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const checkmarkAnim = useRef(new Animated.Value(isSelected ? 1 : 0)).current;
 
-  // Responsive sizing
-  const itemHeight = getResponsiveSizeScaled(56, width);
-  const checkboxSize = getResponsiveSizeScaled(20, width);
+  // Responsive sizing - comfortable tap target
+  const itemHeight = getResponsiveSizeScaled(32, width);  // Comfortable height
+  const checkboxSize = getResponsiveSizeScaled(18, width);
   const fontSize = getResponsiveFontSize('gridCell', width);
-  const horizontalPadding = getResponsiveSizeScaled(12, width);
-  const borderRadius = getResponsiveSizeScaled(12, width, 1.3);
+  const horizontalPadding = getResponsiveSizeScaled(10, width);
+  const borderRadius = getResponsiveSizeScaled(10, width, 1.3);
 
   // Animate checkmark on selection change
   useEffect(() => {
@@ -84,7 +84,7 @@ export default function CheckboxCard({
           styles.pressable,
           {
             paddingHorizontal: horizontalPadding,
-            paddingVertical: horizontalPadding * 0.75,
+            paddingVertical: horizontalPadding * 0.5,  // Reduced from 0.75 for more compact cards
             borderRadius,
             backgroundColor: isSelected ? Colors.primary : Colors.background,
             borderWidth: 2,
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
-    minHeight: 56,
+    minHeight: 32,  // Comfortable tap target
   },
   pressed: {
     opacity: Opacity.pressed,

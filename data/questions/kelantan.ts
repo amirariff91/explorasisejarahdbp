@@ -7,7 +7,7 @@ import type { Question } from '@/types';
  */
 export const kelantanQuestions: Question[] = [
   {
-    id: 'kelantan_1',
+    id: 'kelantan-1',
     state: 'kelantan',
     type: 'matching',
     question: 'Pilih 3 jawapan yang betul berdasarkan perkataan atau gambar yang diberi:',
@@ -31,7 +31,7 @@ export const kelantanQuestions: Question[] = [
     explanation: 'Tan Sri Mahiaddin (Muhyiddin Yassin) dilahirkan di Muar, Johor; menjadi Perdana Menteri pada 1 Mac 2020; dan merupakan Perdana Menteri ke-8.',
   },
   {
-    id: 'kelantan_2',
+    id: 'kelantan-2',
     state: 'kelantan',
     type: 'matching',
     question: 'Pilih 3 jawapan yang betul berdasarkan perkataan atau gambar yang diberi:',
@@ -41,17 +41,17 @@ export const kelantanQuestions: Question[] = [
       'Perdana Menteri ke-3',
       'Bersekolah di SM Air Putih, Kuantan',
       'Dilahirkan di Temerloh, Pahang',
-      'Menjadi Perdana Menteri pada 10 Ogos 2019',
+      'Menjadi Perdana Menteri pada 21 Ogos 2021',
       'Menteri Ekonomi',
       'Melanjutkan pelajaran ke SM Sains Muar',
-      'Perdana Menteri ke-7',
+      'Perdana Menteri ke-9',
       'Pernah berkhidmat sebagai peguam',
     ],
     correctAnswers: [
       'Dilahirkan di Temerloh, Pahang',
-      'Pernah berkhidmat sebagai peguam',
-      'Bersekolah di SM Air Putih, Kuantan',
+      'Menjadi Perdana Menteri pada 21 Ogos 2021',
+      'Perdana Menteri ke-9',
     ],
-    explanation: 'Dato\' Seri Ismail Sabri dilahirkan di Temerloh (Pahang), pernah berkhidmat sebagai peguam, dan bersekolah di Sekolah Menengah Air Putih, Kuantan.',
+    explanation: 'Dato\' Seri Ismail Sabri adalah Perdana Menteri ke-9 Malaysia yang menjadi PM pada 21 Ogos 2021. Beliau dilahirkan di Temerloh, Pahang dan pernah berkhidmat sebagai peguam.',
   },
 ];

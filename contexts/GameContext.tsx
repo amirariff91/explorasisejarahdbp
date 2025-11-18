@@ -26,6 +26,7 @@ interface GameContextType {
   gameState: GameState;
   hasSeenTutorial: boolean;
   showSuccessModal: boolean;
+  showGagalModal: boolean;
   answerQuestion: (questionId: string, answer: AnswerValue, question: Question) => AnswerResult;
   completeState: (state: MalaysianState) => void;
   clearStateAnswers: (state: MalaysianState) => void;
@@ -34,6 +35,8 @@ interface GameContextType {
   markTutorialComplete: () => void;
   resetGame: () => Promise<void>;
   setShowSuccessModal: (show: boolean) => void;
+  setShowGagalModal: (show: boolean) => void;
+  resetWrongAnswerCount: () => void;
   setAllowFontScaling: (allow: boolean) => void;
   setPlayerProfile: (name: string, age: number) => void;
   // State timer functions
@@ -58,6 +61,8 @@ const initialGameState: GameState = {
   answers: {},
   questionIndexByState: {},
   showSuccessModal: false,
+  showGagalModal: false,
+  wrongAnswerCount: 0,
   hasSeenTutorial: false,
   playerProfile: null,
   stateTimer: null,
@@ -246,13 +251,20 @@ export function GameProvider({ children }: { children: ReactNode }) {
   ): AnswerResult => {
     const isCorrect = checkAnswer(question, answer);
 
-    setGameState((prev) => ({
-      ...prev,
-      answers: {
-        ...prev.answers,
-        [questionId]: answer,
-      },
-    }));
+    setGameState((prev) => {
+      const newWrongCount = isCorrect ? prev.wrongAnswerCount : prev.wrongAnswerCount + 1;
+      const shouldShowGagal = newWrongCount >= 1; // 1 wrong answer = fail
+
+      return {
+        ...prev,
+        answers: {
+          ...prev.answers,
+          [questionId]: answer,
+        },
+        wrongAnswerCount: newWrongCount,
+        showGagalModal: shouldShowGagal,
+      };
+    });
 
     return {
       isCorrect,
@@ -326,6 +338,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const setShowSuccessModal = useCallback((show: boolean) => {
     setGameState((prev) => ({ ...prev, showSuccessModal: show }));
+  }, []);
+
+  const setShowGagalModal = useCallback((show: boolean) => {
+    setGameState((prev) => ({ ...prev, showGagalModal: show }));
+  }, []);
+
+  const resetWrongAnswerCount = useCallback(() => {
+    setGameState((prev) => ({ ...prev, wrongAnswerCount: 0, showGagalModal: false }));
   }, []);
 
   const setAllowFontScaling = useCallback((allow: boolean) => {
@@ -420,6 +440,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
       gameState,
       hasSeenTutorial: gameState.hasSeenTutorial,
       showSuccessModal: gameState.showSuccessModal,
+      showGagalModal: gameState.showGagalModal,
       answerQuestion,
       completeState,
       clearStateAnswers,
@@ -428,6 +449,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       markTutorialComplete,
       resetGame,
       setShowSuccessModal,
+      setShowGagalModal,
+      resetWrongAnswerCount,
       setAllowFontScaling,
       setPlayerProfile,
       startStateTimer,
@@ -451,6 +474,8 @@ export function GameProvider({ children }: { children: ReactNode }) {
       markTutorialComplete,
       resetGame,
       setShowSuccessModal,
+      setShowGagalModal,
+      resetWrongAnswerCount,
       setAllowFontScaling,
       setPlayerProfile,
       startStateTimer,

@@ -1,9 +1,9 @@
 import type { Question } from '@/types';
 
 /**
- * Kedah Questions - Melaka Sultanate (Spec-aligned)
- * Topic: The golden age and governance of the Melaka Sultanate
- * Focus: Sultans, trade, religion, and cultural peak of Melaka
+ * Kedah Questions - Melaka Sultanate Governance (Spec-aligned)
+ * Topic: Administrative system and key figures of the Melaka Sultanate
+ * Focus: Tun Perak, Jamung (torches), Kapitan system, Tun Besar
  * Question Type: 4 fill-blank questions
  * Timer: None
  */
@@ -12,40 +12,40 @@ export const kedahQuestions: Question[] = [
     id: 'kedah-1',
     state: 'kedah',
     type: 'fillBlank',
-    question: 'Zaman kegemilangan Kesultanan Melaka mencapai kemuncaknya pada abad ke-_______.',
-    correctAnswer: '15',
-    acceptableAnswers: ['15', '15.'],
+    question: 'Siapakah Bendahara Melaka yang pernah mempertahankan serangan tentera Siam sebanyak dua kali: _U_ P_RA_',
+    correctAnswer: 'Tun Perak',
+    acceptableAnswers: ['Tun Perak', 'tun perak', 'TUN PERAK'],
     caseSensitive: false,
-    explanation: 'Kesultanan Melaka mencapai zaman kegemilangannya pada abad ke-15 Masihi, terutamanya di bawah pemerintahan Sultan Mansur Shah (1459-1477). Melaka menjadi pusat perdagangan dan penyebaran Islam yang terpenting di Asia Tenggara.',
+    explanation: 'Tun Perak adalah Bendahara (Perdana Menteri) Kesultanan Melaka yang terkenal. Beliau berjaya mempertahankan Melaka dari serangan tentera Siam sebanyak dua kali, menunjukkan kepimpinan dan strategi ketenteraan yang cemerlang.',
   },
   {
     id: 'kedah-2',
     state: 'kedah',
     type: 'fillBlank',
-    question: 'Sultan _______ _______ adalah sultan pertama yang memeluk Islam di Kesultanan Melaka.',
-    correctAnswer: 'Muzaffar Shah',
-    acceptableAnswers: ['Muzaffar Shah', 'muzaffar shah', 'MUZAFFAR SHAH'],
+    question: 'Daun kelapa kering atau kain yang dicelup minyak untuk menjadi penyuluh: J_ _U_NG',
+    correctAnswer: 'Jamung',
+    acceptableAnswers: ['Jamung', 'jamung', 'JAMUNG'],
     caseSensitive: false,
-    explanation: 'Sultan Muzaffar Shah (memerintah 1445-1459) merupakan sultan pertama Melaka yang memeluk agama Islam. Penukaran agamanya menandakan permulaan penyebaran Islam secara meluas di Melaka dan Nusantara.',
+    explanation: 'Jamung adalah obor atau penyuluh yang dibuat dari daun kelapa kering atau kain yang dicelup minyak. Ia digunakan untuk menerangi kawasan pada waktu malam di Kesultanan Melaka, terutamanya untuk keselamatan.',
   },
   {
     id: 'kedah-3',
     state: 'kedah',
     type: 'fillBlank',
-    question: 'Melaka menjadi pusat perdagangan rempah yang penting kerana menghubungkan pedagang dari _______, India, dan Eropah.',
-    correctAnswer: 'China',
-    acceptableAnswers: ['China', 'china', 'CHINA'],
+    question: 'Ketua kumpulan setiap pedagang asing dikenali sebagai: _A_IT_N',
+    correctAnswer: 'Kapitan',
+    acceptableAnswers: ['Kapitan', 'kapitan', 'KAPITAN'],
     caseSensitive: false,
-    explanation: 'Melaka terletak di laluan perdagangan strategik yang menghubungkan China dengan India dan Eropah. Pedagang dari China membawa sutera dan porselin, manakala pedagang India dan Arab membawa kain dan rempah ratus.',
+    explanation: 'Kapitan adalah gelaran yang diberikan kepada ketua kumpulan pedagang asing di Melaka. Setiap kumpulan pedagang (seperti pedagang China, India, atau Jawa) mempunyai Kapitan mereka sendiri untuk mewakili kepentingan mereka.',
   },
   {
     id: 'kedah-4',
     state: 'kedah',
     type: 'fillBlank',
-    question: 'Undang-undang Melaka yang terkenal ialah Undang-Undang _______ Melaka atau Hukum Kanun Melaka.',
-    correctAnswer: 'Laut',
-    acceptableAnswers: ['Laut', 'laut', 'LAUT'],
+    question: 'Siapakah anak Tun Perak yang dibunuh oleh Raja Muhammad, putera kepada Sultan Mansur Shah: _U_ B_S_R',
+    correctAnswer: 'Tun Besar',
+    acceptableAnswers: ['Tun Besar', 'tun besar', 'TUN BESAR'],
     caseSensitive: false,
-    explanation: 'Undang-Undang Laut Melaka (juga dikenali sebagai Hukum Kanun Melaka) adalah kod undang-undang maritim yang mengawal aktiviti perdagangan dan pelayaran. Undang-undang ini digunakan secara meluas di Nusantara dan menunjukkan sistem pentadbiran Melaka yang tersusun.',
+    explanation: 'Tun Besar adalah anak kepada Tun Perak yang dibunuh oleh Raja Muhammad. Peristiwa tragis ini berlaku dalam konflik dalaman kerajaan Melaka dan menunjukkan ketegangan politik pada zaman tersebut.',
   },
 ];

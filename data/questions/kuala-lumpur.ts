@@ -1,10 +1,10 @@
 import type { Question } from '@/types';
 
 /**
- * Kuala Lumpur Questions - Independence Timeline (Spec-aligned)
- * Topic: Key dates and events leading to Malaysia's independence (1946-1963)
- * Focus: Chronological milestones from Malayan Union to Malaysia formation
- * Question Type: 7 multiple choice questions
+ * Kuala Lumpur Questions - Resistance Fighters & Independence (Spec-aligned)
+ * Topic: Local heroes and basic independence facts
+ * Focus: Dato' Bahaman, Tok Janggut, independence date, first PM, meaning of merdeka
+ * Question Type: 5 multiple choice questions
  * Timer: 10 minutes (600 seconds)
  */
 export const kualaLumpurQuestions: Question[] = [
@@ -12,63 +12,45 @@ export const kualaLumpurQuestions: Question[] = [
     id: 'kuala-lumpur-1',
     state: 'kuala-lumpur',
     type: 'multipleChoice',
-    question: 'Pada tahun berapakah Malayan Union dicadangkan oleh British?',
-    options: ['1945', '1946', '1947', '1948'],
-    correctAnswer: '1946',
-    explanation: 'Malayan Union dicadangkan oleh British pada tahun 1946. Cadangan ini ditentang hebat oleh orang Melayu kerana mengancam kedudukan raja-raja Melayu dan hak istimewa orang Melayu. Penentangan ini menyebabkan pembentukan UMNO.',
+    question: "Dato' Bahaman menyerang Balai Polis Lubuk Terua pada tahun:",
+    options: ['1890', '1892', '1895', '1891'],
+    correctAnswer: '1891',
+    explanation: "Dato' Bahaman adalah pahlawan Pahang yang menentang British. Pada tahun 1891, beliau memimpin serangan ke atas Balai Polis Lubuk Terua sebagai tindak balas terhadap campur tangan British dalam pentadbiran Pahang. Perlawanan beliau adalah antara penentangan awal terhadap penjajahan British di Tanah Melayu.",
   },
   {
     id: 'kuala-lumpur-2',
     state: 'kuala-lumpur',
     type: 'multipleChoice',
-    question: 'Pada tarikh berapakah UMNO ditubuhkan untuk menentang Malayan Union?',
-    options: ['11 Mei 1946', '31 Ogos 1946', '1 Februari 1948', '31 Ogos 1957'],
-    correctAnswer: '11 Mei 1946',
-    explanation: 'UMNO (United Malays National Organisation) ditubuhkan pada 11 Mei 1946 di Johor Bahru oleh Dato\' Onn Jaafar. Parti ini ditubuhkan hasil daripada Kongres Melayu Seluruh Malaya untuk menentang Malayan Union.',
+    question: 'Tok Janggut terkorban dalam serangan British di:',
+    options: ['Besut', 'Teluk Panglima Garang', 'Kampung Baru', 'Kampung Saring'],
+    correctAnswer: 'Kampung Saring',
+    explanation: 'Tok Janggut (Haji Abdul Rahman Limbong) adalah pahlawan Kelantan yang menentang penjajahan British. Beliau terkorban dalam serangan British di Kampung Saring pada tahun 1915. Perlawanan Tok Janggut dikenali sebagai Pemberontakan Kelantan 1915.',
   },
   {
     id: 'kuala-lumpur-3',
     state: 'kuala-lumpur',
     type: 'multipleChoice',
-    question: 'Malayan Union digantikan dengan Persekutuan Tanah Melayu (Federation of Malaya) pada tahun:',
-    options: ['1946', '1947', '1948', '1949'],
-    correctAnswer: '1948',
-    explanation: 'Persekutuan Tanah Melayu (Federation of Malaya) ditubuhkan pada 1 Februari 1948 menggantikan Malayan Union. Sistem ini mengembalikan kuasa raja-raja Melayu dan melindungi hak istimewa orang Melayu.',
+    question: 'Bilakah Tanah Melayu mencapai kemerdekaan?',
+    options: ['31 Ogos 1957', '31 Ogos 1963', '16 September 1963', '1 Januari 1956'],
+    correctAnswer: '31 Ogos 1957',
+    explanation: 'Tanah Melayu mencapai kemerdekaan pada 31 Ogos 1957. Tunku Abdul Rahman mengisytiharkan kemerdekaan di Stadium Merdeka, Kuala Lumpur dengan laungan "Merdeka!" sebanyak tujuh kali. Tarikh ini disambut sebagai Hari Kebangsaan setiap tahun.',
   },
   {
     id: 'kuala-lumpur-4',
     state: 'kuala-lumpur',
     type: 'multipleChoice',
-    question: 'Pilihan raya umum pertama Tanah Melayu diadakan pada tahun:',
-    options: ['1952', '1953', '1954', '1955'],
-    correctAnswer: '1955',
-    explanation: 'Pilihan raya umum pertama Tanah Melayu diadakan pada tahun 1955. Parti Perikatan (Alliance Party) yang diterajui Tunku Abdul Rahman memenangi 51 daripada 52 kerusi. Kemenangan besar ini menguatkan tuntutan kemerdekaan.',
+    question: 'Siapakah Perdana Menteri pertama Malaysia?',
+    options: ['Tun Abdul Razak', 'Tunku Abdul Rahman', 'Tun Dr Mahathir', "Dato' Onn Jaafar"],
+    correctAnswer: 'Tunku Abdul Rahman',
+    explanation: 'Tunku Abdul Rahman Putra Al-Haj adalah Perdana Menteri pertama Malaysia (1957-1970). Beliau dikenali sebagai "Bapa Kemerdekaan" kerana peranannya dalam memimpin perjuangan kemerdekaan dan rundingan dengan British. Beliau juga memainkan peranan penting dalam pembentukan Malaysia.',
   },
   {
     id: 'kuala-lumpur-5',
     state: 'kuala-lumpur',
     type: 'multipleChoice',
-    question: 'Merdeka Mission ke London untuk rundingan kemerdekaan berlangsung pada tahun:',
-    options: ['1954', '1955', '1956', '1957'],
-    correctAnswer: '1956',
-    explanation: 'Merdeka Mission (Delegasi Kemerdekaan) dipimpin oleh Tunku Abdul Rahman ke London pada Januari-Februari 1956. Rundingan ini berjaya mendapat persetujuan British untuk memberikan kemerdekaan kepada Tanah Melayu pada 31 Ogos 1957.',
-  },
-  {
-    id: 'kuala-lumpur-6',
-    state: 'kuala-lumpur',
-    type: 'multipleChoice',
-    question: 'Tanah Melayu mencapai kemerdekaan pada:',
-    options: ['31 Ogos 1956', '31 Ogos 1957', '16 September 1963', '1 Januari 1957'],
-    correctAnswer: '31 Ogos 1957',
-    explanation: 'Tanah Melayu (Malaya) mencapai kemerdekaan pada 31 Ogos 1957. Tunku Abdul Rahman mengisytiharkan kemerdekaan di Stadium Merdeka, Kuala Lumpur dengan laungan "Merdeka!" sebanyak tujuh kali. Ini adalah tarikh bersejarah yang disambut setiap tahun sebagai Hari Kebangsaan.',
-  },
-  {
-    id: 'kuala-lumpur-7',
-    state: 'kuala-lumpur',
-    type: 'multipleChoice',
-    question: 'Malaysia dibentuk melalui penggabungan Tanah Melayu, Singapura, Sabah dan Sarawak pada:',
-    options: ['31 Ogos 1957', '1 Januari 1963', '16 September 1963', '9 Ogos 1965'],
-    correctAnswer: '16 September 1963',
-    explanation: 'Malaysia dibentuk pada 16 September 1963 melalui penggabungan Persekutuan Tanah Melayu, Singapura, Sabah (dahulunya British North Borneo) dan Sarawak. Tarikh ini disambut sebagai Hari Malaysia. Brunei tidak menyertai Malaysia, manakala Singapura berpisah pada 9 Ogos 1965.',
+    question: "Apakah maksud 'merdeka'?",
+    options: ['Membuka sempadan negara', 'Bebas daripada penjajahan', 'Menyertai peperangan', 'Melawat negara asing'],
+    correctAnswer: 'Bebas daripada penjajahan',
+    explanation: "'Merdeka' bermaksud bebas daripada penjajahan atau kawalan kuasa asing. Perkataan ini menjadi laungan kebanggaan rakyat Malaysia semasa pengisytiharan kemerdekaan. Ia melambangkan kebebasan politik dan hak untuk mentadbir negara sendiri.",
   },
 ];

@@ -17,6 +17,7 @@ import TrueFalseQuestion from '@/components/game/questions/TrueFalseQuestion';
 // UI Components
 import CountdownTimer from '@/components/game/CountdownTimer';
 import FeedbackOverlay from '@/components/game/FeedbackOverlay';
+import GagalModal from '@/components/game/GagalModal';
 import MenuButton from '@/components/game/MenuButton';
 import StatusBar from '@/components/game/StatusBar';
 import SuccessModal from '@/components/game/SuccessModal';
@@ -36,6 +37,9 @@ export default function QuizScreen() {
     clearStateAnswers,
     showSuccessModal,
     setShowSuccessModal,
+    showGagalModal,
+    setShowGagalModal,
+    resetWrongAnswerCount,
     setCurrentState,
     setQuestionIndexForState,
     startStateTimer,
@@ -96,6 +100,10 @@ export default function QuizScreen() {
         setCurrentQuestionIndex(clampedIndex);
         setError(null);
         hasCompletedRef.current = false; // Reset completion flag for new state
+        // Reset wrong answer count for fresh start (only if starting from beginning)
+        if (savedIndex === 0) {
+          resetWrongAnswerCount();
+        }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -120,17 +128,19 @@ export default function QuizScreen() {
 
   // Handle state completion when all questions are answered
   // Guard by verifying every question has a recorded answer
+  // Only complete if no wrong answers (perfect score required)
   useEffect(() => {
     if (!state || questions.length === 0 || !isMountedRef.current) return;
     const answeredCount = questions.filter((q) => gameState.answers[q.id] !== undefined).length;
     const allAnswered = answeredCount === questions.length;
     // Require at least one recorded answer to avoid auto-complete on clean starts
-    if (allAnswered && answeredCount > 0 && !hasCompletedRef.current) {
+    // Only show success if no wrong answers (GAGAL handles wrong answers)
+    if (allAnswered && answeredCount > 0 && !hasCompletedRef.current && gameState.wrongAnswerCount === 0) {
       hasCompletedRef.current = true;
       completeState(state);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questions, gameState.answers, state]);
+  }, [questions, gameState.answers, state, gameState.wrongAnswerCount]);
 
   // Play quiz background music on mount
   useEffect(() => {
@@ -279,7 +289,8 @@ export default function QuizScreen() {
     // completion hasn't been registered yet, mark the state complete.
     // This guards against any edge cases where the answers-based
     // completion effect doesn't fire (e.g., persisted state mismatch).
-    if (isLastQuestion && state && !hasCompletedRef.current) {
+    // Only complete if no wrong answers (GAGAL handles wrong answers)
+    if (isLastQuestion && state && !hasCompletedRef.current && gameState.wrongAnswerCount === 0) {
       hasCompletedRef.current = true;
       completeState(state);
     }
@@ -316,6 +327,27 @@ export default function QuizScreen() {
       hasCompletedRef.current = true;
       completeState(state);
     }
+  };
+
+  const handleGagalRetry = () => {
+    if (!isMountedRef.current || !state) return;
+    setShowGagalModal(false);
+    resetWrongAnswerCount();
+    clearStateAnswers(state);
+    setCurrentQuestionIndex(0);
+    setQuestionIndexForState(state, 0);
+    setIsAnswering(false);
+    hasCompletedRef.current = false;
+    clearStateTimer();
+    startStateTimer(state);
+  };
+
+  const handleGagalBackToMap = () => {
+    if (!isMountedRef.current) return;
+    setShowGagalModal(false);
+    resetWrongAnswerCount();
+    clearStateTimer();
+    router.back();
   };
 
   const renderQuestion = () => {
@@ -396,6 +428,12 @@ export default function QuizScreen() {
         visible={showSuccessModal}
         onContinue={handleSuccessContinue}
         onRestart={handleSuccessRestart}
+      />
+
+      <GagalModal
+        visible={showGagalModal}
+        onRetry={handleGagalRetry}
+        onBackToMap={handleGagalBackToMap}
       />
     </ImageBackground>
   );

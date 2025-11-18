@@ -7,7 +7,7 @@ import type { Question } from '@/types';
  */
 export const terengganuQuestions: Question[] = [
   {
-    id: 'terengganu_1',
+    id: 'terengganu-1',
     state: 'terengganu',
     type: 'matching',
     question: 'Pilih 3 jawapan yang betul:',
@@ -31,7 +31,7 @@ export const terengganuQuestions: Question[] = [
     explanation: 'Tun Dr. Mahathir adalah Perdana Menteri keempat dan ketujuh Malaysia, dilahirkan pada 10 Julai 1925, dan berkahwin dengan Tun Dr. Siti Hasmah.',
   },
   {
-    id: 'terengganu_2',
+    id: 'terengganu-2',
     state: 'terengganu',
     type: 'matching',
     question: 'Pilih 3 jawapan yang betul:',
@@ -55,27 +55,27 @@ export const terengganuQuestions: Question[] = [
     explanation: 'Tun Abdullah Ahmad Badawi digelar Bapa Pembangunan Modal Insan, melanjutkan pelajaran ke Universiti Al-Azhar, dan dilahirkan di Kampung Perlis, Bayan Lepas.',
   },
   {
-    id: 'terengganu_3',
+    id: 'terengganu-3',
     state: 'terengganu',
     type: 'matching',
     question: 'Pilih 3 jawapan yang betul:',
     title: 'Dato\' Sri Mohd Najib bin Tun Abdul Razak',
     options: [
-      'Menteri Besar Perak',
       'PM ke-3',
       'Gagasan 1 Malaysia',
-      'Lahir di Kuala Lipis',
-      'Berasal dari Melaka',
+      'Menjadi PM pada 3 April 2009',
+      'PM ke-6',
+      'Dilahirkan di Kuala Lipis',
       'Anak PM ke-2',
-      'Cikgu di Alor Setar',
+      'Berasal dari Melaka',
       'Menteri Pertahanan',
       'Lahir 31 Ogos 1963',
     ],
     correctAnswers: [
       'Gagasan 1 Malaysia',
-      'Anak PM ke-2',
-      'Menteri Pertahanan',
+      'Menjadi PM pada 3 April 2009',
+      'PM ke-6',
     ],
-    explanation: 'Dato\' Sri Mohd Najib memperkenalkan Gagasan 1 Malaysia, anak kepada Perdana Menteri ke-2 (Tun Abdul Razak), dan pernah menjadi Menteri Pertahanan.',
+    explanation: 'Dato\' Sri Mohd Najib adalah Perdana Menteri ke-6 Malaysia yang menjadi PM pada 3 April 2009. Beliau memperkenalkan Gagasan 1 Malaysia dan merupakan anak kepada Perdana Menteri ke-2, Tun Abdul Razak.',
   },
 ];

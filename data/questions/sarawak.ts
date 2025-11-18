@@ -7,7 +7,7 @@ import type { Question } from '@/types';
  */
 export const sarawakQuestions: Question[] = [
   {
-    id: 'sarawak_1',
+    id: 'sarawak-1',
     state: 'sarawak',
     type: 'multipleChoice',
     question: 'Bilakah Sarawak menyertai pembentukan Malaysia?',
@@ -16,7 +16,7 @@ export const sarawakQuestions: Question[] = [
     explanation: 'Sarawak menyertai pembentukan Malaysia pada 16 September 1963 bersama-sama dengan Sabah dan Singapura.',
   },
   {
-    id: 'sarawak_2',
+    id: 'sarawak-2',
     state: 'sarawak',
     type: 'trueFalse',
     question: 'Sarawak terletak di Pulau Borneo?',
@@ -24,7 +24,7 @@ export const sarawakQuestions: Question[] = [
     explanation: 'Sarawak terletak di bahagian barat laut Pulau Borneo.',
   },
   {
-    id: 'sarawak_3',
+    id: 'sarawak-3',
     state: 'sarawak',
     type: 'fillBlank',
     question: 'Ibu negeri Sarawak ialah: K_CH_NG',

@@ -9,8 +9,8 @@ import {
 import { getResponsiveSizeScaled } from '@/constants/layout';
 import { playRandomFeedback } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
-import { useEffect } from 'react';
-import { ScrollView, StyleSheet, Text, View, useWindowDimensions, Pressable, TouchableWithoutFeedback } from 'react-native';
+import { useEffect, useState } from 'react';
+import { ScrollView, StyleSheet, Text, View, useWindowDimensions, Pressable, TouchableWithoutFeedback, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -45,6 +45,8 @@ export default function FeedbackOverlay({
   const { width } = useWindowDimensions();
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
+  const [isAtBottom, setIsAtBottom] = useState(false);
+  const [showScrollHint, setShowScrollHint] = useState(true);
 
   // Simple responsive sizing
   const iconSize = getResponsiveSizeScaled(60, width);
@@ -52,6 +54,7 @@ export default function FeedbackOverlay({
   const explanationTextSize = getResponsiveFontSize('answer', width);
   const closeButtonSize = getResponsiveSizeScaled(40, width);
   const closeIconSize = getResponsiveFontSize('question', width);
+  const hintTextSize = getResponsiveFontSize('clue', width);
 
   // Animation values
   const scale = useSharedValue(0);
@@ -103,6 +106,31 @@ export default function FeedbackOverlay({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, isCorrect]);
+
+  // Auto-show scroll hint after 1 second if content overflows
+  useEffect(() => {
+    if (visible && explanation) {
+      const timer = setTimeout(() => {
+        setShowScrollHint(true);
+      }, 1000);
+      return () => clearTimeout(timer);
+    } else {
+      setShowScrollHint(false);
+      setIsAtBottom(false);
+    }
+  }, [visible, explanation]);
+
+  // Scroll handler
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const isScrolledToBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 5;
+    setIsAtBottom(isScrolledToBottom);
+
+    // Dismiss hint on scroll
+    if (contentOffset.y > 5 && showScrollHint) {
+      setShowScrollHint(false);
+    }
+  };
 
   // Animated styles
   const overlayAnimatedStyle = useAnimatedStyle(() => ({
@@ -182,7 +210,9 @@ export default function FeedbackOverlay({
                 <ScrollView
                   style={styles.explanationScroll}
                   showsVerticalScrollIndicator={true}
-                  bounces={false}>
+                  bounces={false}
+                  onScroll={handleScroll}
+                  scrollEventThrottle={16}>
                   <Text
                     style={[
                       styles.explanationText,
@@ -195,6 +225,20 @@ export default function FeedbackOverlay({
                     {explanation}
                   </Text>
                 </ScrollView>
+
+                {/* Scroll Hint - Shows after 1 second if content overflows */}
+                {showScrollHint && !isAtBottom && (
+                  <Text
+                    style={[
+                      styles.scrollHint,
+                      {
+                        fontSize: hintTextSize,
+                      },
+                    ]}
+                    allowFontScaling={allowScaling}>
+                    Baca lagi ↓
+                  </Text>
+                )}
               </Animated.View>
             )}
           </View>
@@ -278,5 +322,13 @@ const styles = StyleSheet.create({
     // Dynamic: fontSize
     color: '#f44336', // Red color matching wrong answer
     fontWeight: 'bold',
+  },
+  scrollHint: {
+    // Dynamic: fontSize
+    fontFamily: Typography.fontFamily,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    fontStyle: 'italic',
+    marginTop: 8,
   },
 });

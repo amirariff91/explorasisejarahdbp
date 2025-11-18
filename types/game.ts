@@ -169,6 +169,9 @@ export interface GameState {
   // Per-state current question index for resuming quizzes
   questionIndexByState?: Partial<Record<MalaysianState, number>>;
   showSuccessModal: boolean;
+  showGagalModal: boolean;
+  // Wrong answer tracking for fail condition
+  wrongAnswerCount: number;
   hasSeenTutorial: boolean;
   playerProfile: PlayerProfile | null;
   // State-level timer (null if no timer for current state)

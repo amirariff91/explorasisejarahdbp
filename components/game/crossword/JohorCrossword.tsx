@@ -7,6 +7,8 @@ import {
   Pressable,
   ScrollView,
   useWindowDimensions,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -37,6 +39,7 @@ import FeedbackOverlay from '@/components/game/FeedbackOverlay';
 import SuccessModal from '@/components/game/SuccessModal';
 import { useGameContext } from '@/contexts/GameContext';
 import { ASSETS } from '@/constants/assets';
+import ScrollArrowIndicator from '@/components/ui/ScrollArrowIndicator';
 import type {
   CrosswordPuzzleClue,
   CrosswordPuzzleDefinition,
@@ -85,6 +88,14 @@ export default function JohorCrossword() {
   const [feedbackVisible, setFeedbackVisible] = useState(false);
   const [feedbackExplanation, setFeedbackExplanation] = useState<string | undefined>(undefined);
   const [showHint, setShowHint] = useState(true);
+
+  // Auto-dismiss hint after 5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowHint(false);
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, []);
 
   const wordMap = useMemo(() => {
     const entries = PUZZLE.words.map((word: CrosswordPuzzleWord) => [word.id, word] as const);
@@ -572,6 +583,7 @@ function ClueBoard({
 }: ClueBoardProps) {
   const scrollRef = useRef<ScrollView | null>(null);
   const itemLayoutRef = useRef<Record<string, number>>({});
+  const [isAtBottom, setIsAtBottom] = useState(false);
   const isAcross = title === 'MENDATAR';
   const isDown = title === 'MENEGAK';
   const titleColor = isAcross ? '#0a87b8' : '#1d9c3a';
@@ -583,6 +595,17 @@ function ClueBoard({
     const offset = Math.max(y - 40, 0);
     scrollRef.current.scrollTo({ y: offset, animated: true });
   }, [activeClueId]);
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const scrollPosition = contentOffset.y;
+    const scrollViewHeight = layoutMeasurement.height;
+    const contentHeight = contentSize.height;
+
+    // Check if scrolled to bottom (with 20px threshold)
+    const isScrolledToBottom = scrollPosition + scrollViewHeight >= contentHeight - 20;
+    setIsAtBottom(isScrolledToBottom);
+  };
 
   return (
     <ImageBackground
@@ -625,21 +648,24 @@ function ClueBoard({
         numberOfLines={1}
         adjustsFontSizeToFit
         minimumFontScale={0.8}>
-        {title}
+        {title} ({clues.length} Petunjuk)
       </Text>
         <Text
-          style={[styles.clueHint, { fontSize: hintSize }]}
+          style={[styles.clueHint, { fontSize: hintSize, fontWeight: 'bold' }]}
           allowFontScaling={allowScaling}
           numberOfLines={1}
           adjustsFontSizeToFit
           minimumFontScale={0.8}>
-          Leret untuk lihat semua petunjuk
+          Leret untuk lihat semua petunjuk ↓
         </Text>
+        <View style={{ position: 'relative', flex: 1 }}>
         <ScrollView
           ref={scrollRef}
           style={styles.clueScroll}
           bounces={false}
-          showsVerticalScrollIndicator={false}>
+          showsVerticalScrollIndicator={false}
+          onScroll={handleScroll}
+          scrollEventThrottle={16}>
           {clues.map((clue) => {
             const isActive = activeClueId === clue.id;
             const isVisited = visitedClues[clue.id];
@@ -683,6 +709,17 @@ function ClueBoard({
             );
           })}
         </ScrollView>
+
+        {/* Arrow Indicator - Shows when more clues are below */}
+        <ScrollArrowIndicator
+          visible={!isAtBottom}
+          direction="down"
+          color={titleColor}
+          size={24}
+          bottom={8}
+          pulse={true}
+        />
+        </View>
       </View>
     </ImageBackground>
   );

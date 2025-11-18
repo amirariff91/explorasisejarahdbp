@@ -98,6 +98,11 @@ export const QuestionBoardBase = {
     width: 680,
     height: 380,
   },
+  // Matching Question Board (taller aspect ratio for vertical checkbox list)
+  matching: {
+    width: 600,
+    height: 420,
+  },
   // Map Board (State selection map container)
   map: {
     width: 680,

@@ -1,4 +1,6 @@
 import MalaysiaMapSVG from "@/components/game/MalaysiaMapSVG";
+import StatePicker from "@/components/game/StatePicker";
+import StateDropdownButton from "@/components/game/StateDropdownButton";
 import { BorderRadius, Colors, Shadows, Typography, getComponentShadowStyle, getResponsiveFontSize } from "@/constants/theme";
 import { useGameContext } from "@/contexts/GameContext";
 import { getMapBoardSize } from "@/constants/layout";
@@ -62,6 +64,7 @@ export default function StateSelectionScreen() {
   const [isPreloading, setIsPreloading] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
   const isNavigatingRef = useRef(false); // Synchronous lock to prevent race conditions
+  const [showDropdown, setShowDropdown] = useState(false);
 
   // Play background music and ambient sounds on mount
   useEffect(() => {
@@ -144,11 +147,7 @@ export default function StateSelectionScreen() {
             console.log('[Map] Navigating to state:', state);
           }
 
-          if (state === 'johor') {
-            router.push(`/crossword/${state}`);
-          } else {
-            router.push(`/quiz/${state}`);
-          }
+          router.push(`/quiz/${state}`);
           // Note: Lock resets when screen regains focus via useFocusEffect hook
         } catch (error) {
           console.error('[Map] Navigation failed:', error);
@@ -286,8 +285,7 @@ export default function StateSelectionScreen() {
           const label = `Sambung ${name} • Soalan ${nextQ}/${total}`;
           const onResume = () => {
             playSound('click');
-            if (s === 'johor') router.push(`/crossword/${s}`);
-            else router.push(`/quiz/${s}`);
+            router.push(`/quiz/${s}`);
           };
           return (
             <Pressable
@@ -344,14 +342,29 @@ export default function StateSelectionScreen() {
               </Text>
             </View>
 
+            {/* State Dropdown Button */}
+            <View style={styles.dropdownButtonContainer}>
+              <StateDropdownButton
+                onPress={() => setShowDropdown(true)}
+                disabled={isNavigating}
+              />
+            </View>
+
             {/* Map View Container */}
             <View style={styles.mapViewContainer}>
-              {__DEV__ && console.log('[Map] Rendering MalaysiaMapSVG with disabled:', isNavigating)}
               <MalaysiaMapSVG onStateSelect={handleStateSelect} disabled={isNavigating} />
             </View>
           </ImageBackground>
         </View>
       </View>
+
+      {/* State Picker */}
+      <StatePicker
+        visible={showDropdown}
+        onClose={() => setShowDropdown(false)}
+        onStateSelect={handleStateSelect}
+        disabled={isNavigating}
+      />
     </ImageBackground>
   );
 }
@@ -397,6 +410,12 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
     textAlign: "center",
     letterSpacing: 1,
+  },
+  // Dropdown Button Container
+  dropdownButtonContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    alignItems: "center",
   },
   // Map View Container - stretches to full height
   mapViewContainer: {
