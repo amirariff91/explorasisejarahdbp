@@ -76,9 +76,9 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
 
   // Final safety check: ensure board fits within screen bounds
   // Perlis/Perak/Kedah tablets: allow up to 52% width to accommodate larger board
-  const maxWidthPercent = isLargeBoardTablet ? 0.52 : 0.45;
+  const maxWidthPercent = isLargeBoardTablet ? 0.55 : 0.48;
   boardWidth = Math.min(boardWidth, width * maxWidthPercent);
-  boardHeight = Math.min(boardHeight, height * 0.88);
+  boardHeight = Math.min(boardHeight, height * 0.90);
 
   // Ensure minimum size for usability
   boardWidth = Math.max(boardWidth, 250);
@@ -92,31 +92,9 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
     }
   };
 
-  const shouldOffsetDown = isPhone && question.state === 'perlis';
-  const verticalOffset = shouldOffsetDown ? height * 0.1 : 0;
-  const inputOffsetY = (() => {
-    if (!isPhone) {
-      // Tablets: raise Perak input slightly for better balance
-      if (question.state === 'perak') return -height * 0.05;
-      return 0;
-    }
-    if (question.state === 'perak') return height * 0.05; // Slightly lower on phones for Perak
-    return -height * 0.05; // Default lift on phones
-  })();
-  const teruskanOffsetY = (() => {
-    if (question.state === 'kedah') return height * 0.10; // 10% down for Kedah
-    if (!isPhone && question.state === 'perak') return height * 0.10; // 10% down for Perak tablets
-    if (isPhone) return height * 0.10; // 10% down for all phones
-    return height * 0.05; // 5% down for other tablets
-  })();
-  const boardOffsetY =
-    isPhone && (question.state === 'perak' || question.state === 'kedah')
-      ? height * 0.05
-      : 0;
-
   // Left Section: Question Board
   const leftSection = (
-    <View style={[styles.questionSection, { transform: [{ translateY: boardOffsetY }] }]}>
+    <View style={styles.questionSection}>
       <ImageBackground
         source={ASSETS.games.dbpSejarah.soalanBoard}
         style={[
@@ -136,9 +114,9 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
                 lineHeight: getResponsiveFontSize('question', width) * Typography.lineHeight.normal,
               },
             ]}
-            numberOfLines={3}
+            numberOfLines={4}
             adjustsFontSizeToFit
-            minimumFontScale={0.9}
+            minimumFontScale={0.85}
             allowFontScaling={allowScaling}>
             {question.question}
           </Text>
@@ -149,16 +127,15 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
 
   // Right Section: Input Field + TERUSKAN Button
   const rightSection = (
-    <View style={styles.inputSection}>
+    <View style={[styles.inputSection, { gap: getResponsiveSizeScaled(20, width) }]}>
       {/* Input Box */}
       <ImageBackground
         source={ASSETS.games.dbpSejarah.isiTempatKosong}
         style={[
           styles.inputContainer,
           {
-            width: getResponsiveSizeScaled(250, width),
-            height: getResponsiveSizeScaled(70, width),
-            transform: [{ translateY: inputOffsetY }],
+            width: getResponsiveSizeScaled(280, width),
+            height: getResponsiveSizeScaled(80, width),
           },
         ]}
         resizeMode="contain">
@@ -188,10 +165,8 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
       <Pressable
         style={({ pressed }) => [
           {
-            marginTop: getResponsiveSizeScaled(24, width),
             transform: [
-              { scale: pressed && answer.trim() ? 0.92 : 1 },
-              { translateY: teruskanOffsetY },
+              { scale: pressed && answer.trim() ? 0.95 : 1 },
             ],
           },
         ]}
@@ -204,11 +179,17 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
         <View style={[
           styles.teruskanTextButton,
           {
-            paddingVertical: getResponsiveSizeScaled(14, width),
-            paddingHorizontal: getResponsiveSizeScaled(28, width),
-            borderRadius: getResponsiveSizeScaled(12, width),
-            minWidth: getResponsiveSizeScaled(120, width),
-            minHeight: getResponsiveSizeScaled(50, width),
+            paddingVertical: getResponsiveSizeScaled(12, width),
+            paddingHorizontal: getResponsiveSizeScaled(24, width),
+            borderRadius: getResponsiveSizeScaled(16, width),
+            minWidth: getResponsiveSizeScaled(140, width),
+            minHeight: getResponsiveSizeScaled(55, width),
+            // Add shadow for polish
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+            elevation: 4,
           },
           !answer.trim() && styles.buttonDisabled
         ]}>
@@ -230,7 +211,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   );
 
   return (
-    <View style={{ flex: 1, paddingTop: verticalOffset }}>
+    <View style={{ flex: 1 }}>
       <LandscapeLayout
         leftSection={leftSection}
         rightSection={rightSection}
