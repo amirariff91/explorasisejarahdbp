@@ -174,7 +174,10 @@ export default function Homepage() {
             <View
               style={[
                 styles.logoContainer,
-                { paddingVertical: 10 * paddingScale },
+                {
+                  paddingTop: getResponsiveSizeScaled(40, width) * paddingScale,
+                  paddingBottom: 10 * paddingScale,
+                },
               ]}
             >
               <Image
