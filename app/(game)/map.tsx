@@ -274,7 +274,15 @@ export default function StateSelectionScreen() {
         {isPreloading && (
           <View style={styles.warmupBadge}>
             <ActivityIndicator size="small" color="#fff" />
-            <Text style={styles.warmupText} allowFontScaling={allowScaling}>Memuatkan aset...</Text>
+            <Text 
+              style={[
+                styles.warmupText,
+                { fontSize: getResponsiveFontSize('clue', width) }
+              ]} 
+              allowFontScaling={allowScaling}
+            >
+              Memuatkan aset...
+            </Text>
           </View>
         )}
         {/* Resume badge */}
@@ -304,7 +312,10 @@ export default function StateSelectionScreen() {
               accessibilityLabel={label}
             >
               <Text
-                style={styles.warmupText}
+                style={[
+                  styles.warmupText,
+                  { fontSize: getResponsiveFontSize('clue', width) }
+                ]}
                 allowFontScaling={allowScaling}
                 numberOfLines={1}
                 adjustsFontSizeToFit
@@ -482,7 +493,7 @@ const styles = StyleSheet.create({
   },
   warmupText: {
     fontFamily: Typography.fontFamily,
-    fontSize: getResponsiveFontSize('clue', width),
+    // fontSize set inline
     color: Colors.textLight,
   },
 

@@ -75,12 +75,6 @@ export default function GameLayout() {
               animation: 'slide_from_right',
             }}
           />
-          <Stack.Screen
-            name="crossword/[state]"
-            options={{
-              animation: 'slide_from_right',
-            }}
-          />
         </Stack>
       </ErrorBoundary>
     </GameProvider>
