@@ -49,9 +49,9 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   };
 
   // Calculate final board dimensions with safety checks
-  // Maximize height usage for vertical content
-  const maxBoardWidth = width * 0.90;
-  const maxBoardHeight = height * 0.95;
+  // Maximize height usage for vertical content (96%)
+  const maxBoardWidth = width * 0.95;
+  const maxBoardHeight = height * 0.96;
   const aspectRatio = boardSize.width / boardSize.height;
 
   let boardWidth = Math.min(boardSize.width, maxBoardWidth);
@@ -77,7 +77,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   };
 
   // Move board down so state header overlaps top edge slightly
-  const boardMarginTop = getResponsiveSizeScaled(80, width);
+  const boardMarginTop = getResponsiveSizeScaled(85, width); // Increased slightly
 
   // Calculate internal dimensions for question and list sections
   const questionSectionHeight = offsets.questionAreaHeight;

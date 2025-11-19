@@ -5,6 +5,7 @@ import {
   getTextShadowStyle,
   Shadows,
   Typography,
+  getComponentShadowStyle,
 } from '@/constants/theme';
 import { useGameContext } from '@/contexts/GameContext';
 import type { TrueFalseQuestion as TFQuestion } from '@/types';
@@ -35,6 +36,7 @@ interface Props {
  * True/False Question - Single Board Layout
  * Question at top of board
  * BETUL and SALAH buttons side-by-side at bottom of board
+ * Refactored to use CSS-styled buttons instead of images for better text handling
  */
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -90,6 +92,11 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
 
   // Use new trueFalse button sizes (kid-friendly, larger)
   const buttonSize = width < 1000 ? ButtonSizes.trueFalse.phone : ButtonSizes.trueFalse.tablet;
+
+  // CSS Button Styles - Overflow Prevention
+  // Ensure button fits within board width minus padding (and a small safety margin)
+  const maxButtonWidth = (boardWidth - (offsets.boardPaddingHorizontal * 2)) * 0.9;
+  const clampedButtonWidth = Math.min(buttonSize.width, maxButtonWidth);
 
   // Animation values for buttons
   const betulScale = useSharedValue(1);
@@ -155,12 +162,13 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
 
           {/* Buttons Section - Bottom (Vertical Stacking per Figma) */}
           <View style={styles.buttonsSection}>
-            {/* BETUL Button - Top */}
+            {/* BETUL Button - CSS Styled */}
             <AnimatedPressable
               style={[
-                styles.button,
+                styles.cssButton,
+                styles.betulButton,
                 {
-                  width: buttonSize.width,
+                  width: clampedButtonWidth,
                   height: buttonSize.height,
                 },
                 betulAnimatedStyle,
@@ -169,31 +177,29 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
               hitSlop={TouchTargets.hitSlop}
               accessibilityRole="button"
               accessibilityLabel="Jawapan: Betul">
-              <Image
-                source={ASSETS.games.dbpSejarah.betulButton.default}
-                style={[styles.buttonImage, { width: buttonSize.width, height: buttonSize.height }]}
-                contentFit="fill"
-              />
-              <Text
-                style={[
-                  styles.buttonText,
-                  { fontSize: getResponsiveFontSize('answer', width) * 1.15 }, // Slightly larger for action buttons
-                ]}
-                allowFontScaling={allowScaling}
-                numberOfLines={1}
-                adjustsFontSizeToFit={true}
-                minimumFontScale={0.75}
-                ellipsizeMode="tail">
-                BETUL
-              </Text>
+              <View style={styles.cssButtonInner}>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { fontSize: getResponsiveFontSize('answer', width) * 1.15 },
+                  ]}
+                  allowFontScaling={allowScaling}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  minimumFontScale={0.75}
+                  ellipsizeMode="tail">
+                  BETUL
+                </Text>
+              </View>
             </AnimatedPressable>
 
-            {/* SALAH Button - Bottom */}
+            {/* SALAH Button - CSS Styled */}
             <AnimatedPressable
               style={[
-                styles.button,
+                styles.cssButton,
+                styles.salahButton,
                 {
-                  width: buttonSize.width,
+                  width: clampedButtonWidth,
                   height: buttonSize.height,
                   marginTop: offsets.buttonGap,
                 },
@@ -203,23 +209,20 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
               hitSlop={TouchTargets.hitSlop}
               accessibilityRole="button"
               accessibilityLabel="Jawapan: Salah">
-              <Image
-                source={ASSETS.games.dbpSejarah.salahButton.default}
-                style={[styles.buttonImage, { width: buttonSize.width, height: buttonSize.height }]}
-                contentFit="fill"
-              />
-              <Text
-                style={[
-                  styles.buttonText,
-                  { fontSize: getResponsiveFontSize('answer', width) * 1.15 }, // Slightly larger for action buttons
-                ]}
-                allowFontScaling={allowScaling}
-                numberOfLines={1}
-                adjustsFontSizeToFit={true}
-                minimumFontScale={0.75}
-                ellipsizeMode="tail">
-                SALAH
-              </Text>
+              <View style={styles.cssButtonInner}>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    { fontSize: getResponsiveFontSize('answer', width) * 1.15 },
+                  ]}
+                  allowFontScaling={allowScaling}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                  minimumFontScale={0.75}
+                  ellipsizeMode="tail">
+                  SALAH
+                </Text>
+              </View>
             </AnimatedPressable>
           </View>
         </ImageBackground>
@@ -268,21 +271,41 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  button: {
-    position: 'relative',
-    alignItems: 'center',
+  
+  // CSS Styled Button Base
+  cssButton: {
+    borderRadius: 12,
+    borderWidth: 3,
     justifyContent: 'center',
+    alignItems: 'center',
+    ...getComponentShadowStyle(Shadows.component.small),
     overflow: 'hidden',
   },
-  buttonImage: {
+  cssButtonInner: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     width: '100%',
-    height: '100%',
-    position: 'absolute',
+    backgroundColor: 'rgba(255,255,255,0.1)', // Slight gloss
   },
+  
+  // Theme-specific styles
+  betulButton: {
+    backgroundColor: '#4CAF50', // Green
+    borderColor: '#2E7D32',     // Darker green border
+  },
+  salahButton: {
+    backgroundColor: '#F44336', // Red
+    borderColor: '#C62828',     // Darker red border
+  },
+  
   buttonText: {
     fontFamily: Typography.fontFamily,
     fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     color: Colors.textLight,
-    ...getTextShadowStyle(Shadows.text.medium),
+    ...getTextShadowStyle(Shadows.text.strong),
+    textShadowColor: 'rgba(0, 0, 0, 0.4)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
 });

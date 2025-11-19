@@ -110,7 +110,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
 
   // Responsive board sizing - Allow board to reach its base dimensions
   const maxBoardWidth = width * 0.90;
-  const maxBoardHeight = height; // Allow full height (was 0.88)
+  const maxBoardHeight = height * 0.96; // Slightly reduced from 100% to avoid header crowding
   const aspectRatio = boardSize.width / boardSize.height;
 
   // Safe bounds checking to prevent extreme values
@@ -125,7 +125,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
 
   // Final safety check: ensure board fits within screen bounds
   boardWidth = Math.min(boardWidth, width * 0.95);
-  boardHeight = Math.min(boardHeight, height); // Full height allowed
+  boardHeight = Math.min(boardHeight, height * 0.96); // Match max height limit
 
   // Ensure minimum size for usability
   boardWidth = Math.max(boardWidth, 300);
@@ -274,7 +274,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.boardContainer}>
+      <View style={[styles.boardContainer, { marginTop: getResponsiveSizeScaled(10, width) }]}>
         <ImageBackground
           source={ASSETS.games.dbpSejarah.soalanBoard}
           style={[
