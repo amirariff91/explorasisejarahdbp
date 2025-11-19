@@ -76,7 +76,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
 
   // Final safety check: ensure board fits within screen bounds
   // Perlis/Perak/Kedah tablets: allow up to 52% width to accommodate larger board
-  const maxWidthPercent = isLargeBoardTablet ? 0.55 : 0.48;
+  const maxWidthPercent = isLargeBoardTablet ? 0.58 : 0.48;
   boardWidth = Math.min(boardWidth, width * maxWidthPercent);
   boardHeight = Math.min(boardHeight, height * 0.90);
 
@@ -232,6 +232,7 @@ const styles = StyleSheet.create({
   questionBoard: {
     justifyContent: 'center',
     alignItems: 'center',
+    flexShrink: 1, // Allow shrinking if needed to prevent overlap
   },
   questionContent: {
     width: '78%',
@@ -255,6 +256,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    flexShrink: 1, // Allow shrinking to scale down if screen is tight
   },
   input: {
     fontFamily: Typography.fontFamily,
