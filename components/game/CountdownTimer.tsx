@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { Text, StyleSheet, useWindowDimensions, Animated } from 'react-native';
 import { getDeviceSize, getResponsiveSizeScaled } from '@/constants/layout';
 import { useGameContext } from '@/contexts/GameContext';
-import { getResponsiveFontSize } from '@/constants/theme';
+import { getResponsiveFontSize, Typography } from '@/constants/theme';
+import { formatTime, getTimerColor } from '@/constants/stateTimers';
 
 interface CountdownTimerProps {
   allowFontScaling?: boolean;
