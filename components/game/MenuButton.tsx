@@ -23,6 +23,13 @@ import {
 import { ButtonSizes, TouchTargets, getResponsiveSizeScaled } from '@/constants/layout';
 import { ASSETS } from '@/constants/assets';
 
+const MENU_TEXT = {
+  title: 'MENU',
+  resume: 'Teruskan',
+  restart: 'Ulang Semula',
+  quit: 'Keluar ke Peta',
+} as const;
+
 /**
  * MenuButton Component - Bottom-left pause button
  * Opens overlay with: Resume, Restart, Quit, Settings
@@ -124,7 +131,7 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
                 { fontSize: getResponsiveFontSize('question', width) },
               ]}
               allowFontScaling={gameState.allowFontScaling}>
-              MENU
+              {MENU_TEXT.title}
             </Text>
 
           <Pressable
@@ -138,7 +145,7 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
               style={[styles.menuItemText, { fontSize: getResponsiveFontSize('answer', width) }]}
               allowFontScaling={gameState.allowFontScaling}
             >
-              Teruskan
+              {MENU_TEXT.resume}
             </Text>
           </Pressable>
 
@@ -153,7 +160,7 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
               style={[styles.menuItemText, { fontSize: getResponsiveFontSize('answer', width) }]}
               allowFontScaling={gameState.allowFontScaling}
             >
-              Ulang Semula
+              {MENU_TEXT.restart}
             </Text>
           </Pressable>
 
@@ -168,7 +175,7 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
               style={[styles.menuItemText, { fontSize: getResponsiveFontSize('answer', width) }]}
               allowFontScaling={gameState.allowFontScaling}
             >
-              Keluar ke Peta
+              {MENU_TEXT.quit}
             </Text>
           </Pressable>
         </Animated.View>

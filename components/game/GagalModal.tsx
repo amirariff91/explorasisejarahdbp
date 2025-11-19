@@ -191,7 +191,7 @@ const styles = StyleSheet.create({
   },
   messageText: {
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.semiBold,
+    fontWeight: Typography.fontWeight.normal,
     color: Colors.textLight,
     textAlign: 'center',
     paddingHorizontal: 24,

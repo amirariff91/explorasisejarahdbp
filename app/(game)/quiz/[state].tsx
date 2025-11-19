@@ -10,7 +10,6 @@ import { ASSETS } from '@/constants/assets';
 import { Colors, GameFeedback, getResponsiveFontSize } from '@/constants/theme';
 
 // Question Components
-import CrosswordQuestion from '@/components/game/questions/CrosswordQuestion';
 import FillBlankQuestion from '@/components/game/questions/FillBlankQuestion';
 import MatchingQuestion from '@/components/game/questions/MatchingQuestion';
 import MultipleChoiceQuestion from '@/components/game/questions/MultipleChoiceQuestion';
@@ -387,14 +386,6 @@ export default function QuizScreen() {
             onAnswer={handleAnswer}
           />
         );
-      case 'crossword':
-        return (
-          <CrosswordQuestion
-            key={currentQuestion.id}
-            question={currentQuestion}
-            onAnswer={handleAnswer}
-          />
-        );
       default:
         return <Text>Unknown question type</Text>;
     }
@@ -470,7 +461,7 @@ const styles = StyleSheet.create({
     padding: 40,
   },
   errorText: {
-    fontSize: getResponsiveFontSize('question', width),
+    // fontSize set dynamically
     color: GameFeedback.wrong.color,
     textAlign: 'center',
     marginBottom: 20,
@@ -485,7 +476,7 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     color: Colors.textLight,
-    fontSize: getResponsiveFontSize('answer', width),
+    // fontSize set dynamically
     fontWeight: 'bold',
   },
 });

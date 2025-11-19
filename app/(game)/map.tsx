@@ -192,7 +192,13 @@ export default function StateSelectionScreen() {
       >
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#4CAF50" />
-          <Text style={styles.loadingText} allowFontScaling={allowScaling}>
+          <Text 
+            style={[
+              styles.loadingText, 
+              { fontSize: getResponsiveFontSize('question', width) }
+            ]} 
+            allowFontScaling={allowScaling}
+          >
             Memuatkan kemajuan...
           </Text>
         </View>
@@ -434,7 +440,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontFamily: Typography.fontFamily,
-    fontSize: 16,
+    // fontSize set inline
     color: Colors.textSecondary,
     textAlign: "center",
   },
@@ -465,7 +471,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: Colors.backgroundOverlay,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 12,
@@ -476,8 +482,8 @@ const styles = StyleSheet.create({
   },
   warmupText: {
     fontFamily: Typography.fontFamily,
-    fontSize: 12,
-    color: '#fff',
+    fontSize: getResponsiveFontSize('clue', width),
+    color: Colors.textLight,
   },
 
   // Top Bar with minimum height (will expand with font scaling)
@@ -523,7 +529,7 @@ const styles = StyleSheet.create({
     fontFamily: Typography.fontFamily,
     fontSize: 13,
     color: Colors.textLight,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal,
   },
   statItemCompact: {
     backgroundColor: Colors.semiTransparentCard,
@@ -535,7 +541,7 @@ const styles = StyleSheet.create({
   statTextCompact: {
     fontFamily: Typography.fontFamily,
     fontSize: 12,
-    fontWeight: Typography.fontWeight.semiBold,
+    fontWeight: Typography.fontWeight.normal,
     color: Colors.textPrimary,
     textAlign: "center",
   },

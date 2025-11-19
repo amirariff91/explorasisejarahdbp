@@ -27,8 +27,7 @@ export type QuestionType =
   | 'multipleChoice' // 4 options
   | 'trueFalse' // BETUL/SALAH
   | 'fillBlank' // Text input
-  | 'matching' // 9-grid matching
-  | 'crossword'; // Crossword puzzle
+  | 'matching'; // 9-grid matching
 
 // Base Question Interface
 export interface BaseQuestion {
@@ -69,81 +68,18 @@ export interface MatchingQuestion extends BaseQuestion {
   correctAnswers: string[]; // Subset of correct options
 }
 
-// Crossword Question
-export interface CrosswordClue {
-  direction: 'across' | 'down'; // MENDATAR | MENEGAK
-  number: number;
-  clue: string;
-  answer: string;
-  startX: number;
-  startY: number;
-}
-
-export interface CrosswordQuestion extends BaseQuestion {
-  type: 'crossword';
-  gridSize: { rows: number; cols: number };
-  clues: CrosswordClue[];
-}
-
-// Enhanced crossword puzzle definition for dedicated mini-game scenes
-export interface CrosswordPuzzleWord {
-  /** Unique identifier used to track the word in UI interactions */
-  id: string;
-  /** Correct answer spelled in uppercase characters */
-  answer: string;
-  /** Word orientation on the grid */
-  direction: 'across' | 'down';
-  /** Zero-based starting row position (top to bottom) */
-  startRow: number;
-  /** Zero-based starting column position (left to right) */
-  startCol: number;
-  /** Clue identifier that references the clue entry in the puzzle definition */
-  clueId: string;
-}
-
-export interface CrosswordPuzzleClue {
-  /** Unique clue identifier used to connect to a word */
-  id: string;
-  /** Display number (e.g., 1, 2, 3) */
-  number: number;
-  /** Short label shown alongside the clue number (e.g., "MENEGAK") */
-  label: string;
-  /** Full clue text displayed in the clue card */
-  text: string;
-  /** Direction that determines which clue card the entry lives in */
-  direction: 'across' | 'down';
-  /** Linked crossword word identifier */
-  wordId: string;
-}
-
-export interface CrosswordPuzzleDefinition {
-  /** Puzzle identifier (used for routing / analytics) */
-  id: string;
-  /** Total number of rows and columns in the grid */
-  gridSize: { rows: number; cols: number };
-  /** Ordered list of clue metadata grouped by orientation */
-  clues: {
-    across: CrosswordPuzzleClue[];
-    down: CrosswordPuzzleClue[];
-  };
-  /** Collection of word placements that fill the grid */
-  words: CrosswordPuzzleWord[];
-}
-
 // Union type for all questions
 export type Question =
   | MultipleChoiceQuestion
   | TrueFalseQuestion
   | FillBlankQuestion
-  | MatchingQuestion
-  | CrosswordQuestion;
+  | MatchingQuestion;
 
 // Answer value types for different question types
 export type AnswerValue =
   | string    // For multipleChoice and fillBlank
   | boolean   // For trueFalse
-  | string[]  // For matching
-  | Record<number, string>;  // For crossword (clue number -> answer)
+  | string[]; // For matching
 
 // Player Profile
 export interface PlayerProfile {

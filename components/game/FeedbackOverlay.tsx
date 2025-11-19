@@ -5,6 +5,7 @@ import {
   getResponsiveFontSize,
   Shadows,
   Typography,
+  GameFeedback,
 } from '@/constants/theme';
 import { getResponsiveSizeScaled } from '@/constants/layout';
 import { playRandomFeedback } from '@/utils/audio';
@@ -283,10 +284,10 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   iconCorrect: {
-    color: '#4CAF50', // Green
+    color: GameFeedback.correct.color, // Green
   },
   iconWrong: {
-    color: '#f44336', // Red
+    color: GameFeedback.wrong.color, // Red
   },
   feedbackText: {
     fontFamily: Typography.fontFamily,
@@ -295,10 +296,10 @@ const styles = StyleSheet.create({
     ...getTextShadowStyle(Shadows.text.strong),
   },
   feedbackTextCorrect: {
-    color: '#4CAF50',
+    color: GameFeedback.correct.color,
   },
   feedbackTextWrong: {
-    color: '#f44336',
+    color: GameFeedback.wrong.color,
   },
   explanationContainer: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -332,9 +333,9 @@ const styles = StyleSheet.create({
   },
   closeIcon: {
     // Dynamic: fontSize
-    color: '#f44336', // Red color matching wrong answer
+    color: GameFeedback.wrong.color, // Red color matching wrong answer
     fontFamily: Typography.fontFamily, // Galindo
-    fontWeight: 'bold',
+    fontWeight: 'normal',
   },
   scrollHint: {
     // Dynamic: fontSize

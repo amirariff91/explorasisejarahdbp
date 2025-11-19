@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Text, StyleSheet, Animated, useWindowDimensions } from 'react-native';
+import { StyleSheet, Animated, useWindowDimensions } from 'react-native';
 import { getResponsiveFontSize } from '@/constants/theme';
 
 interface ScrollHintTextProps {

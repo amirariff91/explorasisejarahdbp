@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { Typography } from '@/constants/theme';
+import { View, Text, StyleSheet, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { Typography, Colors, getResponsiveFontSize } from '@/constants/theme';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -18,6 +18,7 @@ interface LoadingScreenProps {
  * Animated loading indicator with optional message
  */
 export default function LoadingScreen({ message = 'Memuatkan...' }: LoadingScreenProps) {
+  const { width } = useWindowDimensions();
   const opacity = useSharedValue(0.5);
 
   useEffect(() => {
@@ -35,9 +36,9 @@ export default function LoadingScreen({ message = 'Memuatkan...' }: LoadingScree
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#4CAF50" />
+      <ActivityIndicator size="large" color={Colors.primary} />
       <Animated.View style={animatedStyle}>
-        <Text style={styles.text}>{message}</Text>
+        <Text style={[styles.text, { fontSize: getResponsiveFontSize('question', width) }]}>{message}</Text>
       </Animated.View>
     </View>
   );
@@ -52,8 +53,7 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: 20,
-    fontSize: 18,
     fontFamily: Typography.fontFamily,
-    color: '#ffffff',
+    color: Colors.textLight,
   },
 });

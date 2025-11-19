@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, useWindowDimensions } from 'react-native';
-import { getResponsiveSizeScaled, getResponsiveFontSize } from '@/constants/layout';
+import { View, StyleSheet, Animated, useWindowDimensions } from 'react-native';
+import { getResponsiveSizeScaled } from '@/constants/layout';
 
 interface ScrollArrowIndicatorProps {
   /**

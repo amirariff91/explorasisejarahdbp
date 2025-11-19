@@ -236,9 +236,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
           uniqueAnswers.every((item) => question.correctAnswers.includes(item)) &&
           question.correctAnswers.every((correct) => uniqueAnswers.includes(correct))
         );
-      case 'crossword':
-        // Crossword checking logic
-        return true; // Placeholder
       default:
         return false;
     }

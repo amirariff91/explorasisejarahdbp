@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.semiBold,
+    fontWeight: Typography.fontWeight.normal,
     flex: 1,
   },
 });

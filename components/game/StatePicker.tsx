@@ -232,7 +232,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal,
   },
   subtitle: {
     fontFamily: Typography.fontFamily,
@@ -272,7 +272,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal,
   },
   cancelButtonText: {
     color: Colors.textSecondary,

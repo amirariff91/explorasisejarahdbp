@@ -5,7 +5,7 @@ import { useGameContext } from "@/contexts/GameContext";
 import { playMusic, playSound, stopMusic, stopAllAmbient } from "@/utils/audio";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { preloadAssets } from "@/utils/preload-assets";
 import {
     ImageBackground,
@@ -22,7 +22,6 @@ import Animated, {
   withRepeat,
   withSequence,
   withTiming,
-  withSpring,
 } from "react-native-reanimated";
 
 /**
@@ -31,7 +30,7 @@ import Animated, {
  */
 export default function TutorialScreen() {
   const router = useRouter();
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const { markTutorialComplete } = useGameContext();
   const [currentStep, setCurrentStep] = useState(0);
   const { gameState } = useGameContext();
@@ -331,20 +330,20 @@ const styles = StyleSheet.create({
   // Skip Button (Top-Right)
   skipButton: {
     position: 'absolute',
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    backgroundColor: Colors.backgroundOverlay,
     zIndex: 10,
     // top, right, padding, borderRadius set inline dynamically
   },
   skipButtonText: {
     fontFamily: "Galindo",
-    color: Colors.textPrimary,
+    color: Colors.textLight,
     // fontSize set inline dynamically
   },
 
   // Warmup Indicator (Top-Left)
   warmupBadge: {
     position: 'absolute',
-    backgroundColor: 'rgba(0,0,0,0.35)',
+    backgroundColor: Colors.backgroundOverlay,
     flexDirection: 'row',
     alignItems: 'center',
     zIndex: 10,
@@ -352,7 +351,7 @@ const styles = StyleSheet.create({
   },
   warmupText: {
     fontFamily: "Galindo",
-    color: '#fff',
+    color: Colors.textLight,
     // fontSize set inline dynamically
   },
 
@@ -429,14 +428,14 @@ const styles = StyleSheet.create({
 
   // TERUSKAN Text Button
   teruskanTextButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: Colors.primary,
     alignItems: "center",
     justifyContent: "center",
     // paddingVertical, paddingHorizontal, borderRadius set inline dynamically
   },
   teruskanButtonText: {
     fontFamily: "Galindo",
-    color: '#FFFFFF',
+    color: Colors.textLight,
     textAlign: "center",
     fontWeight: "normal",
     // fontSize set inline dynamically

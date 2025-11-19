@@ -282,7 +282,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal,
   },
   closeButton: {
     padding: 8,
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontFamily: Typography.fontFamily,
     color: Colors.secondary,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal,
   },
   scrollView: {
     flex: 1,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
   stateName: {
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal,
   },
   progressText: {
     fontFamily: Typography.fontFamily,

@@ -345,7 +345,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal,
   },
   subtitle: {
     fontFamily: Typography.fontFamily,
@@ -361,7 +361,7 @@ const styles = StyleSheet.create({
   closeButtonText: {
     fontFamily: Typography.fontFamily,
     color: Colors.textTertiary,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal,
   },
   scrollViewContent: {
     flexGrow: 1,
@@ -395,7 +395,7 @@ const styles = StyleSheet.create({
   stateName: {
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal,
   },
   progressText: {
     fontFamily: Typography.fontFamily,
@@ -405,12 +405,12 @@ const styles = StyleSheet.create({
   },
   checkmark: {
     color: Colors.success,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal,
     marginLeft: 8,
   },
   chevron: {
     color: Colors.textTertiary,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal,
     marginLeft: 8,
   },
 });

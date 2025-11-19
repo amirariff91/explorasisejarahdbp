@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.normal,
     textAlign: 'center',
   },
 });
