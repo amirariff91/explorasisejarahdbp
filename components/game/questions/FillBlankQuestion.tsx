@@ -94,7 +94,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
               ]}
               numberOfLines={isPhone ? 5 : 7}
               adjustsFontSizeToFit
-              minimumFontScale={0.5}
+              minimumFontScale={0.4}
               allowFontScaling={allowScaling}>
               {question.question}
             </Text>
@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   unifiedContent: {
-    width: '78%', // Reduced from 85% to ensure text stays within paper area
+    width: '70%', // Reduced from 78% to 70% to guarantee text stays within paper area
     height: '85%', // Increase height usage
     alignItems: 'center',
     justifyContent: 'center', // Center content block vertically
@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 5,
+    paddingHorizontal: 10, // Extra padding for safety
   },
   questionText: {
     fontFamily: Typography.fontFamily,
