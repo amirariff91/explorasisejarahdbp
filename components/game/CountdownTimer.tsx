@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, useWindowDimensions, Animated } from 'react-native';
-import { getDeviceSize } from '@/constants/layout';
+import { Text, StyleSheet, useWindowDimensions, Animated } from 'react-native';
+import { getDeviceSize, getResponsiveSizeScaled } from '@/constants/layout';
 import { useGameContext } from '@/contexts/GameContext';
-import { formatTime, getTimerColor } from '@/constants/stateTimers';
-import { getResponsiveSizeScaled } from '@/constants/layout';
 import { getResponsiveFontSize } from '@/constants/theme';
 
 interface CountdownTimerProps {
@@ -15,7 +13,7 @@ export default function CountdownTimer({
   allowFontScaling = false,
   onExpire
 }: CountdownTimerProps) {
-  const { gameState, getTimeRemaining, isTimerExpired } = useGameContext();
+  const { gameState, getTimeRemaining } = useGameContext();
   const { width } = useWindowDimensions();
   const isPhone = getDeviceSize(width) === 'phone';
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
@@ -150,7 +148,7 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   time: {
-    fontFamily: 'System',
-    fontWeight: '700',
+    fontFamily: Typography.fontFamily, // Galindo
+    // fontWeight: '700', // Galindo doesn't have bold weight, handled by font file
   },
 });

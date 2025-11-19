@@ -11,6 +11,7 @@ import { playRandomFeedback } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View, useWindowDimensions, Pressable, TouchableWithoutFeedback, NativeScrollEvent, NativeSyntheticEvent } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -43,6 +44,7 @@ export default function FeedbackOverlay({
   onDismiss,
 }: FeedbackOverlayProps) {
   const { width } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
   const [isAtBottom, setIsAtBottom] = useState(false);
@@ -158,15 +160,20 @@ export default function FeedbackOverlay({
             {
               width: closeButtonSize,
               height: closeButtonSize,
-              top: getResponsiveSizeScaled(20, width),
-              right: getResponsiveSizeScaled(20, width),
+              top: Math.max(insets.top, getResponsiveSizeScaled(20, width)),
+              right: Math.max(insets.right, getResponsiveSizeScaled(20, width)),
+              borderRadius: closeButtonSize / 2, // Make it circular
             },
           ]}
-          hitSlop={8}>
+          hitSlop={16}>
           <Text
             style={[
               styles.closeIcon,
-              { fontSize: closeIconSize },
+              { 
+                fontSize: closeIconSize * 0.8,
+                lineHeight: closeButtonSize, // Center vertically
+                textAlign: 'center', // Center horizontally
+              },
             ]}
             allowFontScaling={allowScaling}>
             ✕
@@ -313,14 +320,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     // Dynamic: top, right, width, height
     zIndex: 10000,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   closeIcon: {
     // Dynamic: fontSize
     color: '#f44336', // Red color matching wrong answer
+    fontFamily: Typography.fontFamily, // Galindo
     fontWeight: 'bold',
   },
   scrollHint: {

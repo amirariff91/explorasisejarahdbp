@@ -1,7 +1,8 @@
+import Animated, { SlideInRight, SlideOutLeft } from 'react-native-reanimated';
 import { useGameContext } from '@/contexts/GameContext';
 import { getQuestionsForState } from '@/data/questions';
 import type { AnswerValue, MalaysianState, Question } from '@/types';
-import { playAmbient, playMusic, playSound, playQuestionTransitionSound, stopAllAmbient, stopMusic } from '@/utils/audio';
+import { playAmbient, playMusic, playQuestionTransitionSound, stopAllAmbient, stopMusic } from '@/utils/audio';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Alert, BackHandler, ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
@@ -414,7 +415,18 @@ export default function QuizScreen() {
 
       <MenuButton size="small" />
 
-      <View style={styles.content}>{renderQuestion()}</View>
+      <View style={styles.content}>
+        {currentQuestion && (
+          <Animated.View
+            key={currentQuestion.id}
+            entering={SlideInRight.duration(400)}
+            exiting={SlideOutLeft.duration(400)}
+            style={{ flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center' }}
+          >
+            {renderQuestion()}
+          </Animated.View>
+        )}
+      </View>
 
       {/* Feedback Overlay */}
       <FeedbackOverlay

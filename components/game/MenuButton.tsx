@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter, usePathname } from 'expo-router';
 import { useGameContext } from '@/contexts/GameContext';
 import { playSound, playMenuSound } from '@/utils/audio';
+import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated';
 import {
   Colors,
   Typography,
@@ -107,7 +108,9 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
       {/* Menu Overlay - Only render when visible */}
       {showMenu && (
         <View style={styles.modalOverlay}>
-          <View
+          <Animated.View
+            entering={ZoomIn.duration(200)}
+            exiting={ZoomOut.duration(200)}
             style={[
               styles.menuContainer,
               {
@@ -168,7 +171,7 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
               Keluar ke Peta
             </Text>
           </Pressable>
-        </View>
+        </Animated.View>
       </View>
       )}
     </>
