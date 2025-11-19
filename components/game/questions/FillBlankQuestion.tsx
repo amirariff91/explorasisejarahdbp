@@ -213,7 +213,7 @@ const styles = StyleSheet.create({
     flexShrink: 1,
   },
   unifiedContent: {
-    width: '85%', // Keep content inside the board margins
+    width: '78%', // Reduced from 85% to ensure text stays within paper area
     height: '85%', // Increase height usage
     alignItems: 'center',
     justifyContent: 'center', // Center content block vertically
