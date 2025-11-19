@@ -92,9 +92,9 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
                   lineHeight: getResponsiveFontSize('question', width) * Typography.lineHeight.normal,
                 },
               ]}
-              numberOfLines={isPhone ? 4 : 6}
+              numberOfLines={isPhone ? 5 : 7}
               adjustsFontSizeToFit
-              minimumFontScale={0.6}
+              minimumFontScale={0.5}
               allowFontScaling={allowScaling}>
               {question.question}
             </Text>
@@ -221,6 +221,7 @@ const styles = StyleSheet.create({
   },
   textContainer: {
     width: '100%',
+    maxHeight: '45%', // Limit text height to prevent pushing other elements off
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 5,
