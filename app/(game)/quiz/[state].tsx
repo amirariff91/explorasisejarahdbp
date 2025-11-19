@@ -5,8 +5,9 @@ import type { AnswerValue, MalaysianState, Question } from '@/types';
 import { playAmbient, playMusic, playQuestionTransitionSound, stopAllAmbient, stopMusic } from '@/utils/audio';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Alert, BackHandler, ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, BackHandler, ImageBackground, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { ASSETS } from '@/constants/assets';
+import { Colors, GameFeedback, getResponsiveFontSize } from '@/constants/theme';
 
 // Question Components
 import CrosswordQuestion from '@/components/game/questions/CrosswordQuestion';
@@ -50,6 +51,7 @@ export default function QuizScreen() {
     isTimerExpired,
   } = useGameContext();
 
+  const { width } = useWindowDimensions();
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isAnswering, setIsAnswering] = useState(false);
@@ -198,11 +200,11 @@ export default function QuizScreen() {
     return (
       <View style={styles.container}>
         <View style={styles.errorContainer}>
-          <Text style={styles.errorText}>{error}</Text>
+          <Text style={[styles.errorText, { fontSize: getResponsiveFontSize('question', width) }]}>{error}</Text>
           <Pressable
             style={styles.backButton}
             onPress={() => router.back()}>
-            <Text style={styles.backButtonText}>Back to Map</Text>
+            <Text style={[styles.backButtonText, { fontSize: getResponsiveFontSize('answer', width) }]}>Back to Map</Text>
           </Pressable>
         </View>
       </View>
@@ -468,22 +470,22 @@ const styles = StyleSheet.create({
     padding: 40,
   },
   errorText: {
-    fontSize: 18,
-    color: '#d32f2f',
+    fontSize: getResponsiveFontSize('question', width),
+    color: GameFeedback.wrong.color,
     textAlign: 'center',
     marginBottom: 20,
     fontWeight: '600',
   },
   backButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: Colors.secondary,
     paddingHorizontal: 30,
     paddingVertical: 15,
     borderRadius: 25,
     marginTop: 10,
   },
   backButtonText: {
-    color: '#fff',
-    fontSize: 16,
+    color: Colors.textLight,
+    fontSize: getResponsiveFontSize('answer', width),
     fontWeight: 'bold',
   },
 });
