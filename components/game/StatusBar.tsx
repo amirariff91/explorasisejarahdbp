@@ -133,9 +133,11 @@ const styles = StyleSheet.create({
   stateName: {
     position: 'absolute',
     fontFamily: Typography.fontFamily,
-    fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight, Android falls back to system font with bold
+    fontWeight: Typography.fontWeight.normal,
     color: Colors.textLight,
     textAlign: 'center',
+    width: '80%', // Prevent text from hitting curved edges
+    top: '22%', // Visually center text within the wood badge (optical adjustment)
     ...getTextShadowStyle(Shadows.text.subtle),
   },
 });

@@ -13,14 +13,16 @@ import {
   getResponsiveFontSize,
   Opacity,
   Typography,
+  Shadows,
+  getComponentShadowStyle,
 } from '@/constants/theme';
 import { ASSETS } from '@/constants/assets';
 import { useGameContext } from '@/contexts/GameContext';
 import type { MultipleChoiceQuestion as MCQuestion } from '@/types';
 import { playSound } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
-import { Image } from 'expo-image';
 import { useState } from 'react';
+import { Image } from 'expo-image';
 import {
   ImageBackground,
   Pressable,
@@ -44,6 +46,7 @@ interface Props {
  * Multiple Choice Question - Single Board Layout
  * Question at top of board
  * 4 JAWAPAN buttons in 2x2 grid at bottom of board
+ * Refactored to use CSS-styled buttons instead of images for better text handling
  */
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -60,7 +63,6 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const isSarawak = question.state === 'sarawak';
   const isMelaka = question.state === 'melaka';
   const isSelangor = question.state === 'selangor';
-  const isBorneoPhone = isPhone && (isSabah || isSarawak);
   const isTightPhone = isPhone && (isSabah || isSarawak || isMelaka || isSelangor);
   const forceWrap = isTightPhone;
   const questionMaxWidth = forceWrap ? '72%' : '85%';
@@ -108,7 +110,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
 
   // Responsive board sizing - Allow board to reach its base dimensions
   const maxBoardWidth = width * 0.90;
-  const maxBoardHeight = height * 0.88;
+  const maxBoardHeight = height; // Allow full height (was 0.88)
   const aspectRatio = boardSize.width / boardSize.height;
 
   // Safe bounds checking to prevent extreme values
@@ -123,11 +125,11 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
 
   // Final safety check: ensure board fits within screen bounds
   boardWidth = Math.min(boardWidth, width * 0.95);
-  boardHeight = Math.min(boardHeight, height * 0.95);
+  boardHeight = Math.min(boardHeight, height); // Full height allowed
 
   // Ensure minimum size for usability
   boardWidth = Math.max(boardWidth, 300);
-  boardHeight = Math.max(boardHeight, 200);
+  boardHeight = Math.max(boardHeight, 220);
   const nextButtonSize = isLandscape ? ButtonSizes.next.landscape : ButtonSizes.next.portrait;
 
   // Calculate button dimensions based on board width
@@ -144,26 +146,21 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const buttonWidthMax = isTightPhone ? 230 : (isPhone ? 260 : 312); // 260 * 1.2 = 312 for tablets
   const clampedButtonWidth = Math.max(buttonWidthMin, Math.min(buttonWidth, buttonWidthMax));
 
-  // Maintain button aspect ratio, but give enough height
-  // for multi-line text without pushing buttons off the board.
-  const buttonAspectRatio = 184 / 626; // jawapan-button.png aspect ratio
-  const baseButtonHeight = clampedButtonWidth * buttonAspectRatio;
-
   // Font size for answer text (used in height calculation)
   const answerFontSize = getResponsiveFontSize('answer', width);
 
-  // Minimum height required to comfortably fit up to 3 lines of text
-  // inside the button (with padding).
+  // CSS-styled button logic - dynamic height based on content
   const answerHorizontalPadding = getResponsiveSizeScaled(12, width);
   const minAnswerHeight =
-    answerFontSize * Typography.lineHeight.tight * 3 +
+    answerFontSize * Typography.lineHeight.tight * 2 + // Ensure at least 2 lines fit
     answerHorizontalPadding * 2;
 
   // Available vertical space for the 2×2 grid (answers) inside the board.
+  // Relax padding constraints slightly to give more room
   const availableAnswerAreaHeight =
     boardHeight -
-    offsets.boardPaddingTop -
-    offsets.boardPaddingBottom -
+    (offsets.boardPaddingTop * 0.8) - // Reduce top padding influence
+    (offsets.boardPaddingBottom * 0.5) - // Reduce bottom padding influence
     offsets.questionAreaHeight -
     offsets.answerAreaTop;
 
@@ -172,9 +169,11 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const maxHeightPerAnswerFromBoard =
     (availableAnswerAreaHeight - totalAnswerRowGaps) / 2;
 
-  const phoneHeightTrim = isPhone ? 0.9 : 1.0; // reduce answer box height 10% on phones
+  const phoneHeightTrim = isPhone ? 0.85 : 1.0; // reduce answer box height 15% on phones to be safe
 
-  let clampedButtonHeight = Math.max(baseButtonHeight, minAnswerHeight) * phoneHeightTrim;
+  // Base height for touch target consistency, but allow growth
+  const baseCSSHeight = 50 * (isPhone ? 1 : 1.2);
+  let clampedButtonHeight = Math.max(baseCSSHeight, minAnswerHeight) * phoneHeightTrim;
 
   if (Number.isFinite(maxHeightPerAnswerFromBoard) && maxHeightPerAnswerFromBoard > 0) {
     clampedButtonHeight = Math.min(clampedButtonHeight, maxHeightPerAnswerFromBoard);
@@ -230,6 +229,49 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
     }
   };
 
+  // Reusable Button Render Function
+  const renderOptionButton = (option: string, btnIndex: number, isSecondRow = false) => {
+    // Correct index for 2nd row items (0,1 -> 2,3)
+    const index = isSecondRow ? btnIndex + 2 : btnIndex;
+    return (
+      <AnimatedPressable
+        key={index}
+        style={[
+          styles.cssButton,
+          {
+            width: clampedButtonWidth,
+            height: clampedButtonHeight,
+          },
+          selectedAnswer === option && styles.optionButtonSelected,
+          buttonAnimatedStyles[index],
+        ]}
+        onPress={() => handleSelect(option, index)}
+        hitSlop={TouchTargets.hitSlop}
+        pressRetentionOffset={TouchTargets.hitSlop}
+        accessibilityRole="button"
+        accessibilityLabel={`Jawapan ${index + 1}: ${option}`}
+        accessibilityState={{ selected: selectedAnswer === option }}>
+        <View style={styles.cssButtonInner}>
+          <Text
+            style={[
+              styles.optionText,
+              {
+                fontSize: answerFontSize,
+                paddingHorizontal: answerHorizontalPadding,
+                lineHeight: answerFontSize * Typography.lineHeight.tight,
+              },
+            ]}
+            numberOfLines={3}
+            adjustsFontSizeToFit
+            minimumFontScale={0.8}
+            allowFontScaling={allowScaling}>
+            {option}
+          </Text>
+        </View>
+      </AnimatedPressable>
+    );
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.boardContainer}>
@@ -268,92 +310,11 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
           <View style={[styles.answersSection, { transform: [{ translateY: answerYOffset }] }]}>
             <View style={[styles.optionsContainer, { gap: offsets.optionsContainer.gap }]}>
               <View style={[styles.optionRow, { gap: offsets.optionRow.gap }]}>
-                {question.options.slice(0, 2).map((option, btnIndex) => (
-                  <AnimatedPressable
-                    key={btnIndex}
-                    style={[
-                      styles.optionButton,
-                      {
-                        width: clampedButtonWidth,
-                        height: clampedButtonHeight,
-                      },
-                      selectedAnswer === option && styles.optionButtonSelected,
-                      buttonAnimatedStyles[btnIndex],
-                    ]}
-                    onPress={() => handleSelect(option, btnIndex)}
-                    hitSlop={TouchTargets.hitSlop}
-                    pressRetentionOffset={TouchTargets.hitSlop}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Jawapan ${btnIndex + 1}: ${option}`}
-                    accessibilityState={{ selected: selectedAnswer === option }}>
-                    <ImageBackground
-                      source={ASSETS.games.dbpSejarah.jawapanButton.default}
-                      style={styles.optionButtonBg}
-                      resizeMode="stretch">
-                      <Text
-                        style={[
-                          styles.optionText,
-                          {
-                            fontSize: answerFontSize,
-                            paddingHorizontal: answerHorizontalPadding,
-                            lineHeight: answerFontSize * Typography.lineHeight.tight,
-                          },
-                        ]}
-                        numberOfLines={3}
-                        adjustsFontSizeToFit
-                        minimumFontScale={0.9}
-                        allowFontScaling={allowScaling}>
-                        {option}
-                      </Text>
-                    </ImageBackground>
-                  </AnimatedPressable>
-                ))}
+                {question.options.slice(0, 2).map((option, i) => renderOptionButton(option, i, false))}
               </View>
 
               <View style={[styles.optionRow, { gap: offsets.optionRow.gap }]}>
-                {question.options.slice(2, 4).map((option, btnIndex) => {
-                  const index = btnIndex + 2;
-                  return (
-                    <AnimatedPressable
-                      key={index}
-                      style={[
-                        styles.optionButton,
-                        {
-                          width: clampedButtonWidth,
-                          height: clampedButtonHeight,
-                        },
-                        selectedAnswer === option && styles.optionButtonSelected,
-                        buttonAnimatedStyles[index],
-                      ]}
-                      onPress={() => handleSelect(option, index)}
-                      hitSlop={TouchTargets.hitSlop}
-                      pressRetentionOffset={TouchTargets.hitSlop}
-                      accessibilityRole="button"
-                      accessibilityLabel={`Jawapan ${index + 1}: ${option}`}
-                      accessibilityState={{ selected: selectedAnswer === option }}>
-                      <ImageBackground
-                        source={ASSETS.games.dbpSejarah.jawapanButton.default}
-                        style={styles.optionButtonBg}
-                        resizeMode="stretch">
-                        <Text
-                          style={[
-                            styles.optionText,
-                            {
-                              fontSize: answerFontSize,
-                              paddingHorizontal: answerHorizontalPadding,
-                              lineHeight: answerFontSize * Typography.lineHeight.tight,
-                            },
-                          ]}
-                          numberOfLines={3}
-                          adjustsFontSizeToFit
-                          minimumFontScale={0.9}
-                          allowFontScaling={allowScaling}>
-                          {option}
-                        </Text>
-                      </ImageBackground>
-                    </AnimatedPressable>
-                  );
-                })}
+                {question.options.slice(2, 4).map((option, i) => renderOptionButton(option, i, true))}
               </View>
             </View>
           </View>
@@ -440,18 +401,26 @@ const styles = StyleSheet.create({
   optionRow: {
     flexDirection: 'row',
   },
-  optionButton: {
-    position: 'relative',
+  // CSS-Styled Button (Replacements for ImageBackground)
+  cssButton: {
+    backgroundColor: '#5D4037', // Wood texture color
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#FFD700', // Gold border
+    ...getComponentShadowStyle(Shadows.component.small),
+    overflow: 'hidden',
+  },
+  cssButtonInner: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.1)', // Subtle inner shadow/gradient effect
   },
   optionButtonSelected: {
     opacity: Opacity.selected,
     transform: [{ scale: 0.95 }],
-  },
-  optionButtonBg: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#4E342E', // Darker wood on select
+    borderColor: '#FFF176', // Lighter gold
   },
   optionText: {
     // Dynamic: paddingHorizontal
@@ -459,6 +428,9 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
     textAlign: 'center',
     fontWeight: Typography.fontWeight.semiBold,
+    textShadowColor: 'rgba(0, 0, 0, 0.5)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
 
   // Footer: Next Button (Outside board)
