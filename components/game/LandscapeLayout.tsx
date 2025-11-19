@@ -7,6 +7,7 @@ interface LandscapeLayoutProps {
   leftSection?: ReactNode;
   rightSection?: ReactNode;
   footer?: ReactNode;
+  children?: ReactNode; // Allow direct children
   leftWidth?: number; // Flex ratio (not percentage)
   rightWidth?: number; // Flex ratio (not percentage)
   backgroundColor?: string;
@@ -27,6 +28,7 @@ export default function LandscapeLayout({
   leftSection,
   rightSection,
   footer,
+  children,
   leftWidth = 40,
   rightWidth = 58,
   backgroundColor = 'transparent',
@@ -69,7 +71,7 @@ export default function LandscapeLayout({
         {/* Full Width Section (if only one section provided) */}
         {!leftSection && !rightSection && (
           <View style={styles.fullWidthSection}>
-            {/* Fallback content */}
+            {children}
           </View>
         )}
       </View>
