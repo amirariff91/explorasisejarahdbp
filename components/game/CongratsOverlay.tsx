@@ -128,7 +128,6 @@ const BUTTON_ASSET = ASSETS.games.dbpSejarah.buttonTeruskan.default;
 export default function CongratsOverlay({
   visible,
   title = 'TAHNIAH',
-  stars = 3,
   reward,
   continueLabel = 'TERUSKAN',
   restartLabel = 'ULANG SEMULA',
@@ -201,7 +200,13 @@ export default function CongratsOverlay({
       ))}
 
       <Animated.View style={[styles.panelWrapper, { paddingTop: getResponsiveSizeScaled(60, width) }, contentAnimatedStyle]}>
-        <View style={[styles.panelBackground, { padding: getResponsiveSizeScaled(32, width) }]}>
+        <View style={[
+          styles.panelBackground, 
+          { 
+            padding: getResponsiveSizeScaled(32, width),
+            minWidth: Math.min(width * 0.6, 500)
+          }
+        ]}>
           <View style={styles.content}>
             <Text
               style={[
@@ -294,11 +299,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xxxl,
   },
   panelBackground: {
-    backgroundColor: 'rgba(60, 40, 20, 0.95)',
+    backgroundColor: '#5D4037', // Wood color
     borderRadius: 20,
-    borderWidth: 3,
-    borderColor: '#8B6914',
-    ...getComponentShadowStyle(Shadows.component.large),
+    borderWidth: 4,
+    borderColor: '#FFD700', // Gold border
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.5,
+    shadowRadius: 15,
+    elevation: 10,
   },
   content: {
     alignItems: 'center',
@@ -308,9 +317,12 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: Typography.fontFamily,
     fontWeight: Typography.fontWeight.normal,
-    color: Colors.gold,
+    color: '#FFD700', // Gold
     letterSpacing: 1.5,
-    ...getTextShadowStyle(Shadows.text.medium),
+    ...getTextShadowStyle(Shadows.text.strong),
+    textShadowColor: 'rgba(0,0,0,0.5)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 4,
   },
   rewardText: {
     fontFamily: Typography.fontFamily,
@@ -318,6 +330,7 @@ const styles = StyleSheet.create({
     color: Colors.textLight,
     textAlign: 'center',
     paddingHorizontal: 24,
+    opacity: 0.9,
   },
   rewardCustom: {
     alignItems: 'center',

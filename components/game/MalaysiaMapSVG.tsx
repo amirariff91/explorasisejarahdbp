@@ -1,3 +1,4 @@
+import { getDeviceSize } from "@/constants/layout";
 import { statePaths } from "@/constants/mapPaths";
 import { StateVisuals } from "@/constants/theme";
 import { useGameContext } from "@/contexts/GameContext";
@@ -25,7 +26,6 @@ interface MalaysiaMapSVGProps {
 export default function MalaysiaMapSVG({ onStateSelect, disabled = false }: MalaysiaMapSVGProps) {
   const { width, height } = useWindowDimensions();
   const { gameState } = useGameContext();
-  const isLandscape = width >= 800;
   const [pressedState, setPressedState] = useState<MalaysianState | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const isProcessingRef = useRef(false); // Synchronous processing lock to prevent race conditions
@@ -39,32 +39,45 @@ export default function MalaysiaMapSVG({ onStateSelect, disabled = false }: Mala
     };
   }, []);
 
-  // Calculate responsive map dimensions based on available space
-  // Restored to original size for better visibility within board
+  // Calculate responsive map dimensions based on device tier
+  // Tier-specific ratios ensure optimal fit within board container
   const { mapWidth, mapHeight } = useMemo(() => {
-    const DESIRED_WIDTH_RATIO = isLandscape ? 0.85 : 0.88;
-    const MIN_WIDTH_RATIO = isLandscape ? 0.65 : 0.72;
-    const MAX_HEIGHT_RATIO = isLandscape ? 0.85 : 0.72;
+    const deviceSize = getDeviceSize(width);
 
-    const desiredWidth = width * DESIRED_WIDTH_RATIO;
-    const minWidth = width * MIN_WIDTH_RATIO;
-    const maxMapHeight = height * MAX_HEIGHT_RATIO;
+    // Tier-specific ratios for optimal fit within board
+    const sizeConfig = {
+      'phone': { width: 0.92, minWidth: 0.78, height: 0.85 },
+      'tablet-sm': { width: 0.88, minWidth: 0.72, height: 0.82 },
+      'tablet-md': { width: 0.85, minWidth: 0.68, height: 0.80 },
+      'tablet-lg': { width: 0.82, minWidth: 0.65, height: 0.78 },
+    };
 
-    let mapHeight = Math.min(desiredWidth * 0.667, maxMapHeight);
-    let mapWidth = mapHeight / 0.667;
+    const config = sizeConfig[deviceSize];
+    const desiredWidth = width * config.width;
+    const minWidth = width * config.minWidth;
+    const maxMapHeight = height * config.height;
 
-    if (mapWidth < minWidth) {
-      mapWidth = minWidth;
-      mapHeight = Math.min(mapWidth * 0.667, maxMapHeight);
+    let calculatedHeight = Math.min(desiredWidth * 0.667, maxMapHeight);
+    let calculatedWidth = calculatedHeight / 0.667;
+
+    if (calculatedWidth < minWidth) {
+      calculatedWidth = minWidth;
+      calculatedHeight = Math.min(calculatedWidth * 0.667, maxMapHeight);
     }
 
-    return { mapWidth, mapHeight };
-  }, [width, height, isLandscape]);
+    return { mapWidth: calculatedWidth, mapHeight: calculatedHeight };
+  }, [width, height]);
 
-  const mapVerticalOffset = useMemo(
-    () => -Math.max(mapHeight * 0.15, 20),
-    [mapHeight],
-  );
+  const mapVerticalOffset = useMemo(() => {
+    const deviceSize = getDeviceSize(width);
+    const offsetConfig = {
+      'phone': 0.15,
+      'tablet-sm': 0.12,
+      'tablet-md': 0.10,
+      'tablet-lg': 0.08,
+    };
+    return -Math.max(mapHeight * offsetConfig[deviceSize], 15);
+  }, [mapHeight, width]);
 
   // Responsive Borneo positioning - scales with map size for iPad and phone
   const borneoOffsetX = useMemo(() => -(mapWidth * 0.31), [mapWidth]); // ~31% of map width (was fixed -220)
@@ -120,13 +133,13 @@ export default function MalaysiaMapSVG({ onStateSelect, disabled = false }: Mala
       // Still navigate even if there's an error
       onStateSelect(state);
     } finally {
-      // Reset processing state after a short delay to prevent accidental double-taps (reduced from 300ms for better responsiveness)
+      // Reset processing state after a short delay to prevent accidental double-taps
       setTimeout(() => {
         if (isMountedRef.current) {
           isProcessingRef.current = false; // Reset ref synchronously
           setIsProcessing(false); // Reset state for visual feedback
         }
-      }, 150);
+      }, 200);
     }
   };
 
@@ -166,7 +179,7 @@ export default function MalaysiaMapSVG({ onStateSelect, disabled = false }: Mala
         d={pathData}
         fill={getStateColor(state)}
         stroke={isPressed ? "#FFD700" : "#2c3e50"}
-        strokeWidth={isPressed ? "6" : "5"}
+        strokeWidth={isPressed ? "2" : "1"}
         // Reduced opacity when disabled to provide visual feedback
         opacity={isDisabled ? 0.5 : (isPressed ? 0.95 : 0.85)}
         // Using onPressIn for Android compatibility - fires on touch-down before

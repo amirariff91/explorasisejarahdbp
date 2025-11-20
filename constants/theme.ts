@@ -20,7 +20,7 @@ export const Colors = {
   cardBackground: '#fff',
   background: '#fff', // General background (alias for cardBackground)
   semiTransparentCard: 'rgba(255, 255, 255, 0.8)',
-  loginPanel: '#1E8EEA', // Login panel background (bright blue)
+  loginPanel: '#FFFFFF', // Login panel background (white card)
 
   // Border Colors
   border: '#E0E0E0', // Light gray border for cards, checkboxes, inputs

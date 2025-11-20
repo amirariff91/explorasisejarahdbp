@@ -8,20 +8,20 @@ import type { MalaysianState } from '@/types';
 
 // State display names
 export const stateDisplayNames: Record<MalaysianState, string> = {
-  'perlis': 'PERLIS',
-  'kedah': 'KEDAH',
+  'perlis': 'Perlis',
+  'kedah': 'Kedah',
   'pulau-pinang': 'Pulau Pinang',
-  'perak': 'PERAK',
-  'selangor': 'SELANGOR',
-  'kuala-lumpur': 'KL',
-  'negeri-sembilan': 'N. SEMBILAN',
-  'melaka': 'MELAKA',
-  'johor': 'JOHOR',
-  'pahang': 'PAHANG',
-  'terengganu': 'TERENGGANU',
-  'kelantan': 'KELANTAN',
-  'sabah': 'SABAH',
-  'sarawak': 'SARAWAK',
+  'perak': 'Perak',
+  'selangor': 'Selangor',
+  'kuala-lumpur': 'Kuala Lumpur',
+  'negeri-sembilan': 'Negeri Sembilan',
+  'melaka': 'Melaka',
+  'johor': 'Johor',
+  'pahang': 'Pahang',
+  'terengganu': 'Terengganu',
+  'kelantan': 'Kelantan',
+  'sabah': 'Sabah',
+  'sarawak': 'Sarawak',
 } as const;
 
 // Geographic layout - Peninsula states positioned roughly by geography

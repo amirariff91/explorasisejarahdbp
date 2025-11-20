@@ -168,7 +168,6 @@ export interface SuccessModalProps {
 export interface CongratsOverlayProps {
   visible: boolean;
   title?: string;
-  stars?: number;
   reward?: ReactNode;
   continueLabel?: string;
   restartLabel?: string;

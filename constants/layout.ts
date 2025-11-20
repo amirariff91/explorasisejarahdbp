@@ -70,8 +70,8 @@ export const Spacing = {
 export const QuestionBoardBase = {
   // Standard Question Board (True/False, Fill Blank)
   standard: {
-    width: 480,
-    height: 300,
+    width: 550,
+    height: 380,
   },
   // Compact Board (Matching, smaller content)
   compact: {
@@ -95,8 +95,8 @@ export const QuestionBoardBase = {
   },
   // Single Board (Multiple Choice - question + answers on same board)
   singleBoardMC: {
-    width: 680,
-    height: 380,
+    width: 750,
+    height: 480,
   },
   // Matching Question Board (taller aspect ratio for vertical checkbox list)
   matching: {
@@ -174,8 +174,8 @@ export const ButtonSizes = {
   },
   // True/False Buttons (BETUL/SALAH)
   trueFalse: {
-    phone: { width: 140, height: 72 },     // Larger for kids!
-    tablet: { width: 220, height: 85 },    // Close to Figma
+    phone: { width: 120, height: 60 },     // Reduced for better fit
+    tablet: { width: 180, height: 70 },    // Reduced for better fit
   },
   // TERUSKAN Button (submit fill-in-the-blank)
   teruskan: {
@@ -437,19 +437,19 @@ export const QuestionOffsets = {
   trueFalseSingle: {
     landscape: {
       boardPaddingTop: 35,
-      boardPaddingBottom: 25,
+      boardPaddingBottom: 30, // Increased bottom padding
       boardPaddingHorizontal: 40,
-      questionAreaHeight: 110,
-      buttonsAreaTop: 20,
-      buttonGap: 16, // Reduced by 20% (was 20)
+      questionAreaHeight: 130, // Increased area for question
+      buttonsAreaTop: 30, // Increased top gap for centered row
+      buttonGap: 20, // Increased horizontal gap for better separation
     },
     portrait: {
       boardPaddingTop: 30,
-      boardPaddingBottom: 20,
+      boardPaddingBottom: 25, // Increased bottom padding
       boardPaddingHorizontal: 30,
-      questionAreaHeight: 100,
-      buttonsAreaTop: 18,
-      buttonGap: 14, // Reduced by 20% (was 18)
+      questionAreaHeight: 120, // Increased area for question
+      buttonsAreaTop: 25, // Increased top gap
+      buttonGap: 16, // Horizontal gap
     },
   },
 } as const;

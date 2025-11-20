@@ -147,10 +147,10 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const clampedButtonWidth = Math.max(buttonWidthMin, Math.min(buttonWidth, buttonWidthMax));
 
   // Font size for answer text (used in height calculation)
-  const answerFontSize = getResponsiveFontSize('answer', width);
+  const answerFontSize = getResponsiveFontSize('answer', width) * 0.9; // Reduce by 10% to prevent overflow
 
   // CSS-styled button logic - dynamic height based on content
-  const answerHorizontalPadding = getResponsiveSizeScaled(12, width);
+  const answerHorizontalPadding = getResponsiveSizeScaled(8, width); // Reduced from 12
   const minAnswerHeight =
     answerFontSize * Typography.lineHeight.tight * 2 + // Ensure at least 2 lines fit
     answerHorizontalPadding * 2;
@@ -172,7 +172,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const phoneHeightTrim = isPhone ? 0.85 : 1.0; // reduce answer box height 15% on phones to be safe
 
   // Base height for touch target consistency, but allow growth
-  const baseCSSHeight = 50 * (isPhone ? 1 : 1.2);
+  const baseCSSHeight = 45 * (isPhone ? 1 : 1.2); // Reduced base height (was 50)
   let clampedButtonHeight = Math.max(baseCSSHeight, minAnswerHeight) * phoneHeightTrim;
 
   if (Number.isFinite(maxHeightPerAnswerFromBoard) && maxHeightPerAnswerFromBoard > 0) {

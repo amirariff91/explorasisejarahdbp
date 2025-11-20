@@ -22,6 +22,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { useGameContext } from '@/contexts/GameContext';
+import { LinearGradient } from 'expo-linear-gradient';
 
 interface FeedbackOverlayProps {
   visible: boolean;
@@ -215,38 +216,47 @@ export default function FeedbackOverlay({
             {/* Explanation Text */}
             {explanation && (
               <Animated.View style={[styles.explanationContainer, explanationAnimatedStyle]}>
-                <ScrollView
-                  style={styles.explanationScroll}
-                  showsVerticalScrollIndicator={true}
-                  bounces={false}
-                  onScroll={handleScroll}
-                  scrollEventThrottle={16}>
-                  <Text
-                    style={[
-                      styles.explanationText,
-                      {
-                        fontSize: explanationTextSize,
-                        lineHeight: explanationTextSize * Typography.lineHeight.relaxed,
-                      },
-                    ]}
-                    allowFontScaling={allowScaling}>
-                    {explanation}
-                  </Text>
-                </ScrollView>
-
-                {/* Scroll Hint - Shows after 1 second if content overflows */}
-                {showScrollHint && !isAtBottom && (
-                  <Text
-                    style={[
-                      styles.scrollHint,
-                      {
-                        fontSize: hintTextSize,
-                      },
-                    ]}
-                    allowFontScaling={allowScaling}>
-                    Baca lagi ↓
-                  </Text>
-                )}
+                <View style={{ height: '100%', flexShrink: 1 }}>
+                  <ScrollView
+                    style={styles.explanationScroll}
+                    contentContainerStyle={styles.explanationScrollContent}
+                    showsVerticalScrollIndicator={true}
+                    bounces={false}
+                    onScroll={handleScroll}
+                    scrollEventThrottle={16}>
+                    <Text
+                      style={[
+                        styles.explanationText,
+                        {
+                          fontSize: explanationTextSize,
+                          lineHeight: explanationTextSize * Typography.lineHeight.relaxed,
+                        },
+                      ]}
+                      allowFontScaling={allowScaling}>
+                      {explanation}
+                    </Text>
+                  </ScrollView>
+                  
+                  {/* Gradient fade at bottom for scroll hint */}
+                  {showScrollHint && !isAtBottom && (
+                    <LinearGradient
+                      colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']}
+                      style={styles.gradientHint}
+                      pointerEvents="none"
+                    >
+                       <Text
+                        style={[
+                          styles.scrollHint,
+                          {
+                            fontSize: hintTextSize,
+                          },
+                        ]}
+                        allowFontScaling={allowScaling}>
+                        Baca lagi ↓
+                      </Text>
+                    </LinearGradient>
+                  )}
+                </View>
               </Animated.View>
             )}
           </View>
@@ -307,15 +317,29 @@ const styles = StyleSheet.create({
     padding: 16,
     maxWidth: '100%',
     maxHeight: 200, // Prevent overflow, allow scrolling
+    overflow: 'hidden',
   },
   explanationScroll: {
     maxHeight: 168, // Container padding (16*2) subtracted from maxHeight
+  },
+  explanationScrollContent: {
+    paddingBottom: 24, // Extra padding for gradient overlap
   },
   explanationText: {
     // Dynamic: fontSize, lineHeight
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
     textAlign: 'center',
+  },
+  gradientHint: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 40,
+    justifyContent: 'flex-end',
+    paddingBottom: 4,
+    alignItems: 'center',
   },
   closeButton: {
     position: 'absolute',
@@ -343,6 +367,5 @@ const styles = StyleSheet.create({
     color: Colors.textSecondary,
     textAlign: 'center',
     fontStyle: 'italic',
-    marginTop: 8,
   },
 });

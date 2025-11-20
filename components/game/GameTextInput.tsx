@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
 
   label: {
     fontWeight: '600',
-    color: Colors.textLight,
+    color: Colors.secondary,
     letterSpacing: 0.5,
   },
 

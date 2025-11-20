@@ -44,8 +44,8 @@ export default function Homepage() {
   // Vertical responsiveness: scale content so it fits short phone heights (e.g. Pixel 8a landscape)
   const availableHeight = height;
   const baseTopPadding = getResponsiveSizeScaled(isLandscape ? 16 : 24, width);
-  const baseBottomPadding = getResponsiveSizeScaled(isLandscape ? 24 : 32, width);
-  const baseLogoPaddingVertical = 20; // logoContainer paddingTop + paddingBottom
+  const baseBottomPadding = getResponsiveSizeScaled(isLandscape ? 8 : 12, width);
+  const baseLogoPaddingVertical = 30; // logoContainer paddingTop (20) + paddingBottom (10)
   const baseTitlePaddingVertical = 40; // titleContainer paddingTop + paddingBottom
 
   const baseContentHeight =
@@ -175,7 +175,7 @@ export default function Homepage() {
               style={[
                 styles.logoContainer,
                 {
-                  paddingTop: getResponsiveSizeScaled(40, width) * paddingScale,
+                  paddingTop: getResponsiveSizeScaled(20, width) * paddingScale,
                   paddingBottom: 10 * paddingScale,
                 },
               ]}

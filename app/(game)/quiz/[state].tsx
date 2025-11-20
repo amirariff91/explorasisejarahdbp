@@ -131,18 +131,8 @@ export default function QuizScreen() {
   // Handle state completion when all questions are answered
   // Guard by verifying every question has a recorded answer
   // Only complete if no wrong answers (perfect score required)
-  useEffect(() => {
-    if (!state || questions.length === 0 || !isMountedRef.current) return;
-    const answeredCount = questions.filter((q) => gameState.answers[q.id] !== undefined).length;
-    const allAnswered = answeredCount === questions.length;
-    // Require at least one recorded answer to avoid auto-complete on clean starts
-    // Only show success if no wrong answers (GAGAL handles wrong answers)
-    if (allAnswered && answeredCount > 0 && !hasCompletedRef.current && gameState.wrongAnswerCount === 0) {
-      hasCompletedRef.current = true;
-      completeState(state);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [questions, gameState.answers, state, gameState.wrongAnswerCount]);
+  // REMOVED: Auto-completion logic moved to handleFeedbackDismiss to allow "End-of-Quiz" evaluation.
+  // This prevents premature success/failure modals and ensures user sees feedback for the last question.
 
   // Play quiz background music on mount
   useEffect(() => {
@@ -270,31 +260,48 @@ export default function QuizScreen() {
 
     const isLastQuestion = currentQuestionIndex === questions.length - 1;
 
-    setCurrentQuestionIndex((prevIndex) => {
-      const nextIndex = prevIndex + 1;
+    if (isLastQuestion) {
+      // End of Quiz Logic
+      // Check total wrong answers from context (which includes the latest answer)
+      const totalWrong = gameState.wrongAnswerCount;
 
-      if (nextIndex < questions.length) {
-        // More questions remaining - play transition sound
+      // If answer just submitted was WRONG, local totalWrong in context might not be updated yet in this render cycle?
+      // answerQuestion updates state immediately, but gameState in this scope is from render start.
+      // However, we can't easily access the *next* state here.
+      // Better approach: We know the result of the *current* answer from feedbackIsCorrect.
+      // If current answer was WRONG, we add 1 to current count.
+      
+      // Actually, simpler: The context updates immediately. But React batches updates.
+      // Let's trust the user flow: User sees feedback overlay -> dismisses it.
+      // By the time dismiss happens, context *should* have updated?
+      // Let's use a functional state update or ref if needed, but for now let's rely on the fact that 
+      // feedback overlay showed the result, so state update definitely fired.
+      
+      // Wait, if we are in the same render cycle as when we showed feedback, gameState is stale.
+      // But handleFeedbackDismiss is a *new* event handler call (user pressed dismiss).
+      // So gameState *should* be fresh from the latest render *if* the component re-rendered.
+      // Did it re-render? answerQuestion called setGameState. Yes.
+      
+      if (totalWrong > 0) {
+        // Any wrong answers -> Failure
+        setShowGagalModal(true);
+      } else {
+        // Perfect score -> Success
+        if (!hasCompletedRef.current && state) {
+          hasCompletedRef.current = true;
+          completeState(state);
+        }
+      }
+      
+      setIsAnswering(false);
+    } else {
+      // Move to next question
+      setCurrentQuestionIndex((prevIndex) => {
+        const nextIndex = prevIndex + 1;
         playQuestionTransitionSound(); // Soft transition between questions
         setIsAnswering(false);
-        // NOTE: setQuestionIndexForState removed from here to prevent setState during render.
-        // Question index sync is now handled by useEffect watching currentQuestionIndex changes.
         return nextIndex;
-      } else {
-        // All questions completed - don't call setState here
-        setIsAnswering(false);
-        return prevIndex;
-      }
-    });
-
-    // Fallback: if we've just answered the last question and
-    // completion hasn't been registered yet, mark the state complete.
-    // This guards against any edge cases where the answers-based
-    // completion effect doesn't fire (e.g., persisted state mismatch).
-    // Only complete if no wrong answers (GAGAL handles wrong answers)
-    if (isLastQuestion && state && !hasCompletedRef.current && gameState.wrongAnswerCount === 0) {
-      hasCompletedRef.current = true;
-      completeState(state);
+      });
     }
   };
 

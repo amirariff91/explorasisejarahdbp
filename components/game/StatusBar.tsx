@@ -20,7 +20,7 @@ interface StatusBarProps {
 
 /**
  * StatusBar Component - Top game HUD (Landscape Optimized)
- * Shows: Current State (center)
+ * Shows: Current State (top-left)
  * Figma: BG-NATION 1
  * Optimized for landscape orientation with horizontal layout and dead zones
  */
@@ -34,29 +34,29 @@ export default function StatusBar({ state }: StatusBarProps) {
   const edgeMargin = getEdgeMargin(isLandscape);
   const statusBarSizes = UIElements.statusBar;
   const allowScaling = gameState.allowFontScaling;
-  const topOffset = insets.top + Spacing.sm;
+  const topOffset = insets.top;
 
   const stateDisplayNames: Record<MalaysianState, string> = {
-    perlis: 'PERLIS',
-    kedah: 'KEDAH',
+    perlis: 'Perlis',
+    kedah: 'Kedah',
     'pulau-pinang': 'Pulau Pinang',
-    perak: 'PERAK',
-    selangor: 'SELANGOR',
-    'kuala-lumpur': 'KUALA LUMPUR',
-    'negeri-sembilan': 'NEGERI SEMBILAN',
-    melaka: 'MELAKA',
-    johor: 'JOHOR',
-    pahang: 'PAHANG',
-    terengganu: 'TERENGGANU',
-    kelantan: 'KELANTAN',
-    sabah: 'SABAH',
-    sarawak: 'SARAWAK',
+    perak: 'Perak',
+    selangor: 'Selangor',
+    'kuala-lumpur': 'Kuala Lumpur',
+    'negeri-sembilan': 'Negeri Sembilan',
+    melaka: 'Melaka',
+    johor: 'Johor',
+    pahang: 'Pahang',
+    terengganu: 'Terengganu',
+    kelantan: 'Kelantan',
+    sabah: 'Sabah',
+    sarawak: 'Sarawak',
   };
 
   const baseStateIndicatorSize = isLandscape
     ? statusBarSizes.stateIndicator.landscape
     : statusBarSizes.stateIndicator.portrait;
-  const stateIndicatorScale = 1.3;
+  const stateIndicatorScale = 1.1;
 
   // All states except Johor: 20% larger badge on tablets only
   const badgeEnhancement = !isJohor && !isPhone ? 1.2 : 1.0;
@@ -71,7 +71,6 @@ export default function StatusBar({ state }: StatusBarProps) {
         position: 'absolute',
         top: topOffset,
         left: edgeMargin,
-        right: edgeMargin,
         paddingTop: 0,
         zIndex: 25,
       }
@@ -81,7 +80,7 @@ export default function StatusBar({ state }: StatusBarProps) {
 
   return (
     <View style={[styles.container, { paddingHorizontal: edgeMargin }, containerDynamicStyle]}>
-      {/* State Name - Center */}
+      {/* State Name - Left */}
       <View style={styles.stateContainer}>
         <Image
           source={ASSETS.shared.ui.bgNation}
@@ -117,7 +116,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     // paddingTop set dynamically with safe area insets
     paddingBottom: Spacing.sm,
     // paddingHorizontal set dynamically for dead zones

@@ -45,7 +45,7 @@ export default function TutorialScreen() {
     {
       title: "Selamat Datang!",
       description:
-        "Jelajah sejarah Malaysia melalui 14 negeri! Setiap negeri mengajar topik sejarah yang berbeza. Beberapa negeri mempunyai had masa 10 minit atau 5 minit untuk menyelesaikan soalan.",
+        "Mari menjelajah sejarah 14 buah negeri di Malaysia. Setiap negeri mengandungi topik sejarah yang berbeza. Anda perlu menyelesaikan semua soalan.",
     },
     {
       title: "Cara Bermain",

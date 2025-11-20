@@ -95,7 +95,8 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
 
   // CSS Button Styles - Overflow Prevention
   // Ensure button fits within board width minus padding (and a small safety margin)
-  const maxButtonWidth = (boardWidth - (offsets.boardPaddingHorizontal * 2)) * 0.9;
+  // Side-by-side layout: (TotalWidth - Gap) / 2
+  const maxButtonWidth = (boardWidth - (offsets.boardPaddingHorizontal * 2) - offsets.buttonGap) / 2;
   const clampedButtonWidth = Math.min(buttonSize.width, maxButtonWidth);
 
   // Animation values for buttons
@@ -160,8 +161,8 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
             </Text>
           </View>
 
-          {/* Buttons Section - Bottom (Vertical Stacking per Figma) */}
-          <View style={styles.buttonsSection}>
+          {/* Buttons Section - Bottom (Horizontal Side-by-Side) */}
+          <View style={[styles.buttonsSection, { gap: offsets.buttonGap }]}>
             {/* BETUL Button - CSS Styled */}
             <AnimatedPressable
               style={[
@@ -201,7 +202,6 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
                 {
                   width: clampedButtonWidth,
                   height: buttonSize.height,
-                  marginTop: offsets.buttonGap,
                 },
                 salahAnimatedStyle,
               ]}
@@ -263,11 +263,11 @@ const styles = StyleSheet.create({
     // lineHeight calculated dynamically inline
   },
 
-  // Buttons Section (Bottom of board - Vertical per Figma)
+  // Buttons Section (Bottom of board - Horizontal Side-by-Side)
   buttonsSection: {
     width: '100%',
     flex: 1,
-    flexDirection: 'column',
+    flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },

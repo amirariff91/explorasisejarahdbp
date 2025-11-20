@@ -1,8 +1,9 @@
 {
   "expo": {
-    "name": "explorasisejarahdbp",
+    "name": "Explorasi Sejarah",
     "slug": "explorasisejarahdbp",
     "version": "1.0.0",
+    "description": "An interactive educational game to teach Malaysian history through gameplay",
     "orientation": "landscape",
     "icon": "./assets/images/icon.png",
     "scheme": "explorasisejarahdbp",
@@ -55,12 +56,13 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/game/logo-dbp/logo-dbp.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#1a237e",
+          "backgroundColor": "#ffffff",
           "dark": {
-            "backgroundColor": "#1a237e"
+            "image": "./assets/images/game/logo-dbp/logo-dbp.png",
+            "backgroundColor": "#ffffff"
           }
         }
       ],

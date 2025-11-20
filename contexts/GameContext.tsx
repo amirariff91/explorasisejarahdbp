@@ -250,7 +250,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
     setGameState((prev) => {
       const newWrongCount = isCorrect ? prev.wrongAnswerCount : prev.wrongAnswerCount + 1;
-      const shouldShowGagal = newWrongCount >= 1; // 1 wrong answer = fail
+      // Sudden death removed - failure is handled at end of quiz
 
       return {
         ...prev,
@@ -259,7 +259,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
           [questionId]: answer,
         },
         wrongAnswerCount: newWrongCount,
-        showGagalModal: shouldShowGagal,
       };
     });
 
