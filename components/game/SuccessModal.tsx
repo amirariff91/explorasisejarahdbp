@@ -9,9 +9,16 @@ import CongratsOverlay from './CongratsOverlay';
  * SuccessModal Component - wraps the shared CongratsOverlay with
  * game-specific audio + haptic feedback.
  */
-export default function SuccessModal({ visible, onContinue, onRestart }: SuccessModalProps) {
+export default function SuccessModal({ visible, totalQuestions, onContinue, onRestart }: SuccessModalProps) {
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
+  // Count answers for current state only to avoid cross-state contamination
+  const answeredCount = totalQuestions ?? Object.entries(gameState.answers || {}).filter(([key]) => {
+    return gameState.currentState && (key.startsWith(`${gameState.currentState}-`) || key.startsWith(`${gameState.currentState}_`));
+  }).length;
+  const successMessage = answeredCount > 0
+    ? `Anda telah menjawab semua ${answeredCount} soalan dengan betul`
+    : undefined;
 
   useEffect(() => {
     if (visible) {
@@ -41,6 +48,7 @@ export default function SuccessModal({ visible, onContinue, onRestart }: Success
     <CongratsOverlay
       visible={visible}
       title="TAHNIAH"
+      reward={successMessage}
       allowFontScaling={allowScaling}
       onContinue={handleContinue}
       onRestart={handleRestart}

@@ -11,7 +11,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import { Colors, Typography, getResponsiveFontSize, getTextShadowStyle, Shadows, getComponentShadowStyle } from '@/constants/theme';
-import { ButtonSizes, TouchTargets, Spacing, getResponsiveSizeScaled } from '@/constants/layout';
+import { ButtonSizes, TouchTargets, Spacing, getResponsiveSizeScaled, getDeviceSize } from '@/constants/layout';
 import type { CongratsOverlayProps } from '@/types';
 
 // Confetti colors - celebratory palette
@@ -163,9 +163,12 @@ export default function CongratsOverlay({
   }));
 
   // Use responsive scaling for success modal elements (4-tier system)
+  const deviceSize = getDeviceSize(width);
+  const tabletBoost = deviceSize !== 'phone' ? 1.1 : 1.0; // 10% boost for tablets
+
   const buttonDimensions = {
-    width: getResponsiveSizeScaled(ButtonSizes.successAction.portrait.width, width),
-    height: getResponsiveSizeScaled(ButtonSizes.successAction.portrait.height, width),
+    width: Math.round(getResponsiveSizeScaled(ButtonSizes.successAction.portrait.width, width) * tabletBoost),
+    height: Math.round(getResponsiveSizeScaled(ButtonSizes.successAction.portrait.height, width) * tabletBoost),
   };
 
   const renderReward = () => {

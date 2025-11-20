@@ -57,17 +57,23 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const { width, height } = useWindowDimensions();
   const isLandscape = isLandscapeMode(width);
   const isPhone = getDeviceSize(width) === 'phone';
+  const isTablet = !isPhone;
   const allowScaling = gameState.allowFontScaling;
   const isJohor = question.state === 'johor';
   const isSabah = question.state === 'sabah';
   const isSarawak = question.state === 'sarawak';
   const isMelaka = question.state === 'melaka';
   const isSelangor = question.state === 'selangor';
+  const isSelangorTablet = isSelangor && isTablet;
+  const textBoostStates = ['selangor', 'kuala-lumpur', 'negeri-sembilan'] as const;
+  const isTabletTextBoost = isTablet && textBoostStates.includes(question.state as (typeof textBoostStates)[number]);
   const isTightPhone = isPhone && (isSabah || isSarawak || isMelaka || isSelangor);
   const forceWrap = isTightPhone;
-  const questionMaxWidth = forceWrap ? '72%' : '85%';
+  const questionMaxWidth = forceWrap ? '72%' : (isTabletTextBoost ? '84%' : '85%');
   const baseQuestionFontSize = getResponsiveFontSize('question', width);
-  const questionFontSize = forceWrap ? Math.round(baseQuestionFontSize * 1.08) : baseQuestionFontSize;
+  const tabletQuestionBoost = isTabletTextBoost ? 1.22 : 1.0;
+  const questionFontSizeRaw = forceWrap ? Math.round(baseQuestionFontSize * 1.08) : baseQuestionFontSize;
+  const questionFontSize = Math.round(questionFontSizeRaw * tabletQuestionBoost);
   const baseOffsets = getQuestionOffsets('multipleChoiceSingle', isLandscape) as {
     boardPaddingTop: number;
     boardPaddingBottom: number;
@@ -89,7 +95,13 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
         optionsContainer: { ...baseOffsets.optionsContainer, gap: Math.min(baseOffsets.optionsContainer.gap, 12) },
         optionRow: { ...baseOffsets.optionRow, gap: Math.min(baseOffsets.optionRow.gap, 8) },
       }
-    : baseOffsets;
+    : {
+        ...baseOffsets,
+        ...(isTabletTextBoost && {
+          questionAreaHeight: Math.round(baseOffsets.questionAreaHeight * 1.1), // more vertical space for larger text
+          answerAreaTop: baseOffsets.answerAreaTop + Math.round(boardHeight * 0.10), // push question block down by 10% of board
+        }),
+      };
   // Use new responsive board sizing system (auto-scales by device tier)
   const baseBoardSize = getQuestionBoardSize('singleBoardMC', width);
 
@@ -101,7 +113,8 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const tabletBoardMultiplier = isLargeBoardTablet ? 1.4 : 1.0;
 
   // All states except Johor: 40% larger board on tablets only
-  const boardSizeMultiplier = !isJohor && !isPhone ? 1.4 : 1.0;
+  // Boost Selangor board on tablets for more space
+  const boardSizeMultiplier = !isJohor && !isPhone ? (isSelangorTablet ? 1.5 : 1.4) : 1.0;
 
   const boardSize = {
     width: baseBoardSize.width * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier,
@@ -136,18 +149,21 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const buttonAreaWidth = boardWidth - (offsets.boardPaddingHorizontal * 2);
   const horizontalGap = offsets.optionRow.gap;
   const baseButtonWidth = (buttonAreaWidth - horizontalGap) / 2;
+  const baseButtonWidthAdjusted = isSelangorTablet ? baseButtonWidth * 0.9 : baseButtonWidth;
 
   // Apply 20% increase on tablets only
-  const tabletMultiplier = isPhone ? 1.0 : 1.2;
-  const buttonWidth = baseButtonWidth * tabletMultiplier;
+  // Larger buttons on tablets; extra bump for Selangor
+  const tabletMultiplier = isPhone ? 1.0 : (isSelangorTablet ? 1.2 : 1.2);
+  const buttonWidth = baseButtonWidthAdjusted * tabletMultiplier;
 
   // Clamp button width with min/max bounds (adjusted for tablets)
   const buttonWidthMin = isTightPhone ? 130 : 140;
-  const buttonWidthMax = isTightPhone ? 230 : (isPhone ? 260 : 312); // 260 * 1.2 = 312 for tablets
+  const buttonWidthMax = isTightPhone ? 230 : (isPhone ? 260 : (isSelangorTablet ? 260 : 312));
   const clampedButtonWidth = Math.max(buttonWidthMin, Math.min(buttonWidth, buttonWidthMax));
 
   // Font size for answer text (used in height calculation)
-  const answerFontSize = getResponsiveFontSize('answer', width) * 0.9; // Reduce by 10% to prevent overflow
+  const baseAnswerFont = getResponsiveFontSize('answer', width);
+  const answerFontSize = (isTabletTextBoost ? baseAnswerFont * 1.3 : baseAnswerFont) * 0.92; // slight trim for overflow safety
 
   // CSS-styled button logic - dynamic height based on content
   const answerHorizontalPadding = getResponsiveSizeScaled(8, width); // Reduced from 12
@@ -274,7 +290,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
 
   return (
     <View style={styles.container}>
-      <View style={[styles.boardContainer, { marginTop: getResponsiveSizeScaled(10, width) }]}>
+      <View style={[styles.boardContainer, { marginTop: isTablet ? 0 : getResponsiveSizeScaled(10, width) }]}>
         <ImageBackground
           source={ASSETS.games.dbpSejarah.soalanBoard}
           style={[

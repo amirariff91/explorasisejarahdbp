@@ -15,6 +15,7 @@ import * as Haptics from 'expo-haptics';
 interface GagalModalProps {
   visible: boolean;
   message?: string;
+  wrongCount?: number;
   onRetry: () => void;
   onBackToMap: () => void;
   allowFontScaling?: boolean;
@@ -25,6 +26,7 @@ const BUTTON_ASSET = ASSETS.games.dbpSejarah.buttonTeruskan.default;
 export default function GagalModal({
   visible,
   message = 'Anda telah menjawab 3 soalan dengan salah',
+  wrongCount,
   onRetry,
   onBackToMap,
   allowFontScaling = false,
@@ -94,7 +96,9 @@ export default function GagalModal({
             style={[styles.messageText, { fontSize: getResponsiveFontSize('answer', width) }]}
             allowFontScaling={allowFontScaling}
           >
-            {message}
+            {wrongCount !== undefined
+              ? `Anda telah menjawab ${wrongCount} soalan dengan salah`
+              : message}
           </Text>
 
           <View style={styles.buttons}>

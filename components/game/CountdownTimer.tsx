@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Text, StyleSheet, useWindowDimensions, Animated } from 'react-native';
+import { Text, StyleSheet, useWindowDimensions, Animated, View } from 'react-native';
 import { getDeviceSize, getResponsiveSizeScaled } from '@/constants/layout';
 import { useGameContext } from '@/contexts/GameContext';
 import { getResponsiveFontSize, Typography } from '@/constants/theme';
@@ -8,11 +8,13 @@ import { formatTime, getTimerColor } from '@/constants/stateTimers';
 interface CountdownTimerProps {
   allowFontScaling?: boolean;
   onExpire?: () => void;
+  alignBesideState?: boolean;
 }
 
 export default function CountdownTimer({
   allowFontScaling = false,
-  onExpire
+  onExpire,
+  alignBesideState = false,
 }: CountdownTimerProps) {
   const { gameState, getTimeRemaining } = useGameContext();
   const { width } = useWindowDimensions();
@@ -87,16 +89,10 @@ export default function CountdownTimer({
   const topOffset = isPhone ? 12 : 16;
   const rightOffset = isPhone ? width * 0.10 : 18;
 
-  return (
+  const content = (
     <Animated.View
       style={[
         styles.container,
-        isPhone && {
-          position: 'absolute',
-          top: topOffset,
-          right: rightOffset,
-          zIndex: 30,
-        },
         {
           paddingHorizontal: containerPadding,
           paddingVertical: containerPadding * 0.6,
@@ -104,30 +100,40 @@ export default function CountdownTimer({
           borderColor: timerColor,
           transform: [{ scale: pulseAnim }],
         },
-      ]}
-    >
-      {/* Clock icon */}
+      ]}>
       <Text
         style={[styles.icon, { fontSize: iconSize }]}
-        allowFontScaling={allowFontScaling}
-      >
+        allowFontScaling={allowFontScaling}>
         ⏱️
       </Text>
-
-      {/* Time display */}
       <Text
         style={[
           styles.time,
           {
             fontSize,
             color: timerColor,
-          }
+          },
         ]}
-        allowFontScaling={allowFontScaling}
-      >
+        allowFontScaling={allowFontScaling}>
         {formattedTime}
       </Text>
     </Animated.View>
+  );
+
+  if (alignBesideState || !isPhone) {
+    return content;
+  }
+
+  return (
+    <View
+      style={{
+        position: 'absolute',
+        top: topOffset,
+        right: rightOffset,
+        zIndex: 30,
+      }}>
+      {content}
+    </View>
   );
 }
 

@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Alert, BackHandler, ImageBackground, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { ASSETS } from '@/constants/assets';
 import { Colors, GameFeedback, getResponsiveFontSize } from '@/constants/theme';
+import { getDeviceSize } from '@/constants/layout';
 
 // Question Components
 import FillBlankQuestion from '@/components/game/questions/FillBlankQuestion';
@@ -51,6 +52,7 @@ export default function QuizScreen() {
   } = useGameContext();
 
   const { width } = useWindowDimensions();
+  const isTablet = getDeviceSize(width) !== 'phone';
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isAnswering, setIsAnswering] = useState(false);
@@ -403,15 +405,27 @@ export default function QuizScreen() {
       source={ASSETS.shared.backgrounds.main}
       style={styles.container}
       resizeMode="cover">
-      <StatusBar state={state} />
-
-      {/* Countdown Timer (only shown for states with timers) */}
-      {gameState.stateTimer && (
-        <CountdownTimer
-          allowFontScaling={gameState.allowFontScaling}
-          onExpire={handleTimerExpire}
-        />
-      )}
+      {/* Top HUD: state + timer (timer inline on tablets) */}
+      <View style={styles.timerWrapper}>
+        <View style={styles.statusBarRow}>
+          <StatusBar state={state} />
+          {gameState.stateTimer && isTablet && (
+            <View style={styles.timerInline}>
+              <CountdownTimer
+                allowFontScaling={gameState.allowFontScaling}
+                onExpire={handleTimerExpire}
+                alignBesideState
+              />
+            </View>
+          )}
+        </View>
+        {gameState.stateTimer && !isTablet && (
+          <CountdownTimer
+            allowFontScaling={gameState.allowFontScaling}
+            onExpire={handleTimerExpire}
+          />
+        )}
+      </View>
 
       <MenuButton size="small" />
 
@@ -438,12 +452,14 @@ export default function QuizScreen() {
 
       <SuccessModal
         visible={showSuccessModal}
+        totalQuestions={questions.length}
         onContinue={handleSuccessContinue}
         onRestart={handleSuccessRestart}
       />
 
       <GagalModal
         visible={showGagalModal}
+        wrongCount={gameState.wrongAnswerCount}
         onRetry={handleGagalRetry}
         onBackToMap={handleGagalBackToMap}
       />
@@ -454,6 +470,23 @@ export default function QuizScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  timerWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 30,
+    paddingHorizontal: 12,
+    paddingTop: 6,
+  },
+  statusBarRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  timerInline: {
+    paddingRight: 12,
   },
   content: {
     flex: 1,

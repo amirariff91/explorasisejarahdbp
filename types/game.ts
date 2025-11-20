@@ -161,6 +161,7 @@ export type MenuAction = 'resume' | 'restart' | 'quit' | 'settings';
 // Success Modal Props
 export interface SuccessModalProps {
   visible: boolean;
+  totalQuestions?: number;
   onContinue: () => void;
   onRestart: () => void;
 }

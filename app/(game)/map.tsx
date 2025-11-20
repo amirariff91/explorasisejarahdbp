@@ -3,7 +3,7 @@ import StatePicker from "@/components/game/StatePicker";
 import StateDropdownButton from "@/components/game/StateDropdownButton";
 import { BorderRadius, Colors, Shadows, Typography, getComponentShadowStyle, getResponsiveFontSize } from "@/constants/theme";
 import { useGameContext } from "@/contexts/GameContext";
-import { getMapBoardSize } from "@/constants/layout";
+import { getMapBoardSize, getDeviceSize } from "@/constants/layout";
 import type { MalaysianState } from "@/types";
 import { playAmbient, playMusic, playSound, stopAllAmbient, stopMusic } from "@/utils/audio";
 import { useRouter } from "expo-router";
@@ -42,6 +42,8 @@ const LAYOUT_CONFIG = {
 export default function StateSelectionScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
+  const mapBoardSize = getMapBoardSize(width);
+  const isTablet = getDeviceSize(width) !== 'phone';
   const {
     gameState,
     isLoading,
@@ -342,12 +344,18 @@ export default function StateSelectionScreen() {
             source={ASSETS.games.dbpSejarah.soalanBoard}
             style={[
               styles.mapBoard,
-              getMapBoardSize(width),
+              mapBoardSize,
             ]}
             resizeMode="contain"
           >
             {/* Map Title Header */}
-            <View style={styles.mapTitleContainer}>
+            <View
+              style={[
+                styles.mapTitleContainer,
+                {
+                  marginTop: 12 + (width >= 800 ? mapBoardSize.height * 0.07 : 0),
+                },
+              ]}>
               <Text
                 style={[
                   styles.mapTitleText,
@@ -360,7 +368,15 @@ export default function StateSelectionScreen() {
             </View>
 
             {/* State Dropdown Button */}
-            <View style={styles.dropdownButtonContainer}>
+            <View
+              style={[
+                styles.dropdownButtonContainer,
+                {
+                  marginTop:
+                    LAYOUT_CONFIG.dropdownMinOffset +
+                    (width >= 800 ? mapBoardSize.height * 0.07 : 0),
+                },
+              ]}>
               <StateDropdownButton
                 onPress={() => setShowDropdown(true)}
                 disabled={isNavigating}
@@ -368,7 +384,11 @@ export default function StateSelectionScreen() {
             </View>
 
             {/* Map View Container */}
-            <View style={styles.mapViewContainer}>
+            <View
+              style={[
+                styles.mapViewContainer,
+                isTablet && { transform: [{ translateY: -mapBoardSize.height * 0.08 }] },
+              ]}>
               <MalaysiaMapSVG onStateSelect={handleStateSelect} disabled={isNavigating} />
             </View>
           </ImageBackground>

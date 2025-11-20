@@ -7,7 +7,7 @@ import {
   Typography,
   GameFeedback,
 } from '@/constants/theme';
-import { getResponsiveSizeScaled } from '@/constants/layout';
+import { getResponsiveSizeScaled, getDeviceSize } from '@/constants/layout';
 import { playRandomFeedback } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useState } from 'react';
@@ -46,19 +46,25 @@ export default function FeedbackOverlay({
   onDismiss,
 }: FeedbackOverlayProps) {
   const { width } = useWindowDimensions();
+  const isTablet = getDeviceSize(width) !== 'phone';
   const insets = useSafeAreaInsets();
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
   const [isAtBottom, setIsAtBottom] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(true);
+  const [scrollHeight, setScrollHeight] = useState(0);
+  const [contentHeight, setContentHeight] = useState(0);
 
   // Simple responsive sizing
   const iconSize = getResponsiveSizeScaled(60, width);
-  const feedbackTextSize = getResponsiveFontSize('question', width);
-  const explanationTextSize = getResponsiveFontSize('answer', width);
+  const feedbackTextBoost = isTablet ? 1.2 : 1.0;
+  const feedbackTextSize = getResponsiveFontSize('question', width) * feedbackTextBoost;
+  const explanationTextSizeBase = getResponsiveFontSize('answer', width);
+  const explanationTextSize = isTablet ? Math.round(explanationTextSizeBase * 1.2) : explanationTextSizeBase;
   const closeButtonSize = getResponsiveSizeScaled(40, width);
   const closeIconSize = getResponsiveFontSize('question', width);
   const hintTextSize = getResponsiveFontSize('clue', width);
+  const hasOverflow = contentHeight - scrollHeight > 4; // Only show hint when scrolling is possible
 
   // Animation values
   const scale = useSharedValue(0);
@@ -113,19 +119,19 @@ export default function FeedbackOverlay({
 
   // Auto-show scroll hint after 1 second if content overflows
   useEffect(() => {
-    if (visible && explanation) {
+    if (visible && explanation && hasOverflow) {
       const timer = setTimeout(() => {
         setShowScrollHint(true);
-      }, 1000);
+      }, 800);
       return () => clearTimeout(timer);
-    } else {
-      setShowScrollHint(false);
-      setIsAtBottom(false);
     }
-  }, [visible, explanation]);
+    setShowScrollHint(false);
+    setIsAtBottom(false);
+  }, [visible, explanation, hasOverflow]);
 
   // Scroll handler
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    if (!hasOverflow) return;
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
     const isScrolledToBottom = contentOffset.y + layoutMeasurement.height >= contentSize.height - 5;
     setIsAtBottom(isScrolledToBottom);
@@ -184,7 +190,14 @@ export default function FeedbackOverlay({
 
         {/* Content Container - Stop propagation for scrolling */}
         <TouchableWithoutFeedback>
-          <View style={styles.container}>
+          <View
+            style={[
+              styles.container,
+              {
+                maxWidth: isTablet ? '70%' : '82%',
+                padding: isTablet ? 24 : 20,
+              },
+            ]}>
             {/* Feedback Icon & Text */}
             <Animated.View style={[styles.iconContainer, iconAnimatedStyle]}>
               <Text
@@ -216,13 +229,15 @@ export default function FeedbackOverlay({
             {/* Explanation Text */}
             {explanation && (
               <Animated.View style={[styles.explanationContainer, explanationAnimatedStyle]}>
-                <View style={{ height: '100%', flexShrink: 1 }}>
+                <View style={{ height: '100%', flexShrink: 1, width: isTablet ? '94%' : '100%' }}>
                   <ScrollView
                     style={styles.explanationScroll}
                     contentContainerStyle={styles.explanationScrollContent}
                     showsVerticalScrollIndicator={true}
                     bounces={false}
                     onScroll={handleScroll}
+                    onLayout={(e) => setScrollHeight(e.nativeEvent.layout.height)}
+                    onContentSizeChange={(_, h) => setContentHeight(h)}
                     scrollEventThrottle={16}>
                     <Text
                       style={[
@@ -324,6 +339,7 @@ const styles = StyleSheet.create({
   },
   explanationScrollContent: {
     paddingBottom: 24, // Extra padding for gradient overlap
+    alignItems: 'center',
   },
   explanationText: {
     // Dynamic: fontSize, lineHeight

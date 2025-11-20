@@ -586,25 +586,28 @@ export const getQuestionBoardSize = (
 
 /**
  * Get Responsive Map Board Size
- * Uses standard 4-tier scaling (same as other question boards)
+ * Uses standard 4-tier scaling with tablet boost
  *
  * @param width - Screen width in pixels
  * @returns Scaled map board dimensions { width, height }
  *
  * @example
  * getMapBoardSize(667)  // { width: 680, height: 510 } (phone: 1.0×)
- * getMapBoardSize(820)  // { width: 816, height: 612 } (tablet-sm: 1.2×)
- * getMapBoardSize(1080) // { width: 1020, height: 765 } (tablet-md: 1.5×)
- * getMapBoardSize(1366) // { width: 1224, height: 918 } (tablet-lg: 1.8×)
+ * getMapBoardSize(820)  // { width: 1071, height: 803 } (tablet-sm: 1.2× × 1.3 boost)
+ * getMapBoardSize(1080) // { width: 1330, height: 998 } (tablet-md: 1.5× × 1.3 boost)
+ * getMapBoardSize(1366) // { width: 1596, height: 1197 } (tablet-lg: 1.8× × 1.3 boost)
  */
 export const getMapBoardSize = (width: number): { width: number; height: number } => {
   const base = QuestionBoardBase.map;
   const deviceSize = getDeviceSize(width);
   const scale = ScaleFactors[deviceSize];
 
+  // Apply boost for tablets (30% larger)
+  const tabletBoost = deviceSize !== 'phone' ? 1.3 : 1.0;
+
   return {
-    width: Math.round(base.width * scale),
-    height: Math.round(base.height * scale),
+    width: Math.round(base.width * scale * tabletBoost),
+    height: Math.round(base.height * scale * tabletBoost),
   };
 };
 

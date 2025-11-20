@@ -33,6 +33,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   const { gameState } = useGameContext();
   const allowScaling = gameState.allowFontScaling;
   const isPhone = getDeviceSize(width) === 'phone';
+  const isTablet = !isPhone;
 
   // Use new responsive board sizing system (auto-scales by device tier)
   const baseBoardSize = getQuestionBoardSize('standard', width);
@@ -47,14 +48,17 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
   // All states except Johor: 40% larger board on tablets only
   const boardSizeMultiplier = !isPhone ? 1.4 : 1.0;
   const perakTabletBoardBoost = !isPhone && question.state === 'perak' ? 1.3 : 1.0;
+  const isPerlisTablet = isTablet && question.state === 'perlis';
+  const perlisTabletScaleDown = isPerlisTablet ? 0.9 : 1.0; // Prevent oversized board on tablets
 
-  let boardWidth = baseBoardSize.width * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier * perakTabletBoardBoost;
-  let boardHeight = baseBoardSize.height * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier * perakTabletBoardBoost;
+  let boardWidth = baseBoardSize.width * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier * perakTabletBoardBoost * perlisTabletScaleDown;
+  let boardHeight = baseBoardSize.height * boardSizeMultiplier * phoneBoardMultiplier * tabletBoardMultiplier * perakTabletBoardBoost * perlisTabletScaleDown;
 
   // UNIFIED LAYOUT SIZING: Maximize board size
-  const maxWidthPercent = isPhone ? 0.90 : 0.75;
+  const maxWidthPercent = isPhone ? 0.90 : isPerlisTablet ? 0.72 : 0.75;
+  const maxHeightPercent = isPhone ? 1.0 : isPerlisTablet ? 0.86 : 1.0;
   boardWidth = Math.min(boardWidth * 1.5, width * maxWidthPercent);
-  boardHeight = Math.min(boardHeight * 1.5, height); // Allow full height
+  boardHeight = Math.min(boardHeight * 1.5, height * maxHeightPercent);
 
   // Ensure minimum size for usability
   boardWidth = Math.max(boardWidth, 320);

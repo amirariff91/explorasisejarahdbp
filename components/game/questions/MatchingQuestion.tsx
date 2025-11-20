@@ -5,7 +5,7 @@ import type { MatchingQuestion as MQQuestion } from '@/types';
 import { playSound } from '@/utils/audio';
 import * as Haptics from 'expo-haptics';
 import { Image } from 'expo-image';
-import { useState, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {
   FlatList,
   ImageBackground,
@@ -38,10 +38,14 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const [showNext, setShowNext] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(true);
   const { width, height } = useWindowDimensions();
+  const isTablet = getDeviceSize(width) !== 'phone';
+  const isTerengganu = question.state === 'terengganu';
+  const noScrollStates = ['terengganu', 'kelantan', 'pulau-pinang', 'pahang'] as const;
+  const isTabletNoScroll = isTablet && noScrollStates.includes(question.state as typeof noScrollStates[number]);
 
   // Use matching board type with taller aspect ratio for vertical checkbox list
   const baseBoardSize = getQuestionBoardSize('matching', width);
-  const boardSizeMultiplier = 1.0; // Can adjust per state if needed
+  const boardSizeMultiplier = isTabletNoScroll ? 1.05 : 1.0; // Slightly larger board on tablets for these states (fits all rows)
 
   const boardSize = {
     width: baseBoardSize.width * boardSizeMultiplier,
@@ -68,7 +72,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
 
   // Board layout offsets - Account for decorative border on soalan-board.png
   // Optimized for maximum question space while keeping list compact
-  const offsets = {
+  const defaultOffsets = {
     boardPaddingTop: Math.round(boardHeight * 0.04),        // 4% of height (smaller top border)
     boardPaddingBottom: Math.round(boardHeight * 0.16),     // 16% of height (more clearance from bottom border)
     boardPaddingHorizontal: Math.round(boardWidth * 0.04),  // 4% of width (matches ~45px border at 1140px)
@@ -76,8 +80,20 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
     listAreaTop: 0,                                         // No gap between question and list
   };
 
+  // Tablets (no-scroll states): shrink bottom padding & question area for more list height (no scrolling)
+  const tabletNoScrollOffsets = {
+    boardPaddingTop: Math.round(boardHeight * 0.04),
+    boardPaddingBottom: Math.round(boardHeight * 0.10),
+    boardPaddingHorizontal: Math.round(boardWidth * 0.04),
+    questionAreaHeight: Math.round(boardHeight * 0.24),
+    listAreaTop: 0,
+  };
+
+  const offsets = isTabletNoScroll ? tabletNoScrollOffsets : defaultOffsets;
+
   // Move board down so state header overlaps top edge slightly
-  const boardMarginTop = getResponsiveSizeScaled(85, width); // Increased slightly
+  const baseBoardMarginTop = getResponsiveSizeScaled(85, width);
+  const boardMarginTop = isTablet ? 0 : baseBoardMarginTop;
 
   // Calculate internal dimensions for question and list sections
   const questionSectionHeight = offsets.questionAreaHeight;
@@ -87,6 +103,13 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const listGap = 2;  // Minimal 2px gap between checkboxes
   const listPaddingHorizontal = getResponsiveSizeScaled(16, width);
   const nextButtonSize = width < 1000 ? ButtonSizes.next.phone : ButtonSizes.next.tablet;
+  const scrollEnabled = !isTabletNoScroll;
+
+  useEffect(() => {
+    if (!scrollEnabled && showScrollHint) {
+      setShowScrollHint(false);
+    }
+  }, [scrollEnabled, showScrollHint]);
 
   const handleToggleOption = async (option: string) => {
     playSound('click');
@@ -96,17 +119,17 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
       if (prev.includes(option)) {
         // Deselect
         const newSelected = prev.filter((item) => item !== option);
-        setShowNext(newSelected.length === 3);
+        setShowNext(newSelected.length === question.correctAnswers.length);
         return newSelected;
       } else {
-        // Only allow selection if less than 3 already selected
-        if (prev.length >= 3) {
-          // Already have 3 selections, don't allow more
+        // Only allow selection if less than max correct answers already selected
+        if (prev.length >= question.correctAnswers.length) {
+          // Already selected the required number, don't allow more
           return prev;
         }
         // Select
         const newSelected = [...prev, option];
-        setShowNext(newSelected.length === 3);
+        setShowNext(newSelected.length === question.correctAnswers.length);
         return newSelected;
       }
     });
@@ -179,7 +202,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
           {/* Scroll Hint - Auto-dismisses after 3 seconds or on scroll */}
           <ScrollHintText
             text="Leret untuk lihat semua pilihan ↓"
-            visible={showScrollHint}
+            visible={showScrollHint && scrollEnabled}
             onDismiss={() => setShowScrollHint(false)}
             fontSizeContext="clue"
             color={Colors.textSecondary}
@@ -191,7 +214,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
           style={[
             styles.listContainer,
             {
-              height: availableListHeight,
+              height: isTabletNoScroll ? undefined : availableListHeight,
               marginTop: offsets.listAreaTop,
             },
           ]}>
@@ -202,19 +225,19 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
               <CheckboxCard
                 option={item}
                 isSelected={selectedOptions.includes(item)}
-                isDisabled={selectedOptions.length >= 3 && !selectedOptions.includes(item)}
+                isDisabled={selectedOptions.length >= question.correctAnswers.length && !selectedOptions.includes(item)}
                 onPress={() => handleToggleOption(item)}
                 index={index}
                 allowFontScaling={allowScaling}
               />
             )}
             ItemSeparatorComponent={() => <View style={{ height: listGap }} />}
-            showsVerticalScrollIndicator={true}
+            showsVerticalScrollIndicator={!isTablet} // Hide on tablets to avoid visual overlap
             indicatorStyle="black"
-            persistentScrollbar={true}
+            scrollEnabled={scrollEnabled} // Fixed list on tablets for no-scroll states
             scrollIndicatorInsets={{ right: -10 }}
-            contentContainerStyle={{ paddingBottom: 6, paddingRight: 8 }}
-            onScroll={handleScroll}
+            contentContainerStyle={{ paddingBottom: 6, paddingRight: isTabletNoScroll ? 0 : 8 }}
+            onScroll={scrollEnabled ? handleScroll : undefined}
             scrollEventThrottle={16}
           />
         </View>
