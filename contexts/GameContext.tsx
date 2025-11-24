@@ -10,7 +10,7 @@ import {
 } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
-import { debounce } from '@/utils/debounce';
+import { debounceWithCancel } from '@/utils/debounce';
 import { getStateTimer } from '@/constants/stateTimers';
 import type {
   GameState,
@@ -104,10 +104,11 @@ export function GameProvider({ children }: { children: ReactNode }) {
     latestStateRef.current = gameState;
   }, [gameState]);
 
-  // Create debounced save function (max one save per second)
-  const debouncedSaveProgress = useMemo(
+  // Create debounced save function with flush capability (max one save per second)
+  // Using debounceWithCancel to allow flushing pending saves on critical operations
+  const { debounced: debouncedSaveProgress, flush: flushSaveProgress } = useMemo(
     () =>
-      debounce((retryCount = 0) => {
+      debounceWithCancel((retryCount = 0) => {
         saveProgress(retryCount);
       }, 1000),
     []
@@ -279,7 +280,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
       // Clear any running timer when state is completed to avoid reuse
       stateTimer: null,
     }));
-  }, []);
+
+    // FIX: Flush any pending debounced save to ensure state completion is persisted
+    // This prevents the race condition where user navigates away before save completes
+    // Use setTimeout to ensure the setGameState has processed first
+    setTimeout(() => {
+      flushSaveProgress();
+    }, 50);
+  }, [flushSaveProgress]);
 
   const clearStateAnswers = (state: MalaysianState) => {
     // Clear all answers for questions belonging to this state

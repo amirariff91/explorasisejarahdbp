@@ -13,7 +13,7 @@ export const perlisQuestions: Question[] = [
     id: 'perlis-1',
     state: 'perlis',
     type: 'fillBlank',
-    question: 'Siapakah nama pengasas negeri Melaka: P_RA_E_ _RA',
+    question: 'Siapakah nama pengasas negeri Melaka: P_RA_ES_ARA',
     correctAnswer: 'Parameswara',
     acceptableAnswers: ['Parameswara', 'parameswara', 'PARAMESWARA'],
     caseSensitive: false,

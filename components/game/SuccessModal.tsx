@@ -24,9 +24,13 @@ export default function SuccessModal({ visible, totalQuestions, onContinue, onRe
     if (visible) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-      // Celebration ambient only (FeedbackOverlay already plays star SFX for correct answers)
-      // Start ambient celebration at lower volume (less overwhelming)
-      playAmbient('ambient-celebration', 0.3);
+      // Delay ambient celebration to avoid overlapping with the "Betul" star sound
+      // from FeedbackOverlay (star sound plays ~800ms). This prevents audio race condition.
+      const ambientTimer = setTimeout(() => {
+        playAmbient('ambient-celebration', 0.3);
+      }, 800);
+
+      return () => clearTimeout(ambientTimer);
     }
   }, [visible]);
 

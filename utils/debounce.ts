@@ -27,8 +27,8 @@ export function debounce<T extends (...args: any[]) => any>(
 }
 
 /**
- * Creates a debounced function with a cancel method
- * Useful when you need to cancel pending executions
+ * Creates a debounced function with cancel and flush methods
+ * Useful when you need to cancel pending executions or force immediate execution
  */
 export function debounceWithCancel<T extends (...args: any[]) => any>(
   func: T,
@@ -36,10 +36,13 @@ export function debounceWithCancel<T extends (...args: any[]) => any>(
 ): {
   debounced: (...args: Parameters<T>) => void;
   cancel: () => void;
+  flush: () => void;
 } {
   let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  let lastArgs: Parameters<T> | null = null;
 
   const debounced = (...args: Parameters<T>) => {
+    lastArgs = args;
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
@@ -47,6 +50,7 @@ export function debounceWithCancel<T extends (...args: any[]) => any>(
     timeoutId = setTimeout(() => {
       func(...args);
       timeoutId = null;
+      lastArgs = null;
     }, delay);
   };
 
@@ -54,8 +58,22 @@ export function debounceWithCancel<T extends (...args: any[]) => any>(
     if (timeoutId) {
       clearTimeout(timeoutId);
       timeoutId = null;
+      lastArgs = null;
     }
   };
 
-  return { debounced, cancel };
+  /**
+   * Immediately execute the debounced function if there's a pending call
+   * Useful for ensuring data is saved before navigation
+   */
+  const flush = () => {
+    if (timeoutId && lastArgs) {
+      clearTimeout(timeoutId);
+      func(...lastArgs);
+      timeoutId = null;
+      lastArgs = null;
+    }
+  };
+
+  return { debounced, cancel, flush };
 }

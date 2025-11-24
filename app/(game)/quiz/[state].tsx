@@ -264,27 +264,14 @@ export default function QuizScreen() {
 
     if (isLastQuestion) {
       // End of Quiz Logic
-      // Check total wrong answers from context (which includes the latest answer)
-      const totalWrong = gameState.wrongAnswerCount;
+      // FIX: Use feedbackIsCorrect (local state) to determine if there were wrong answers.
+      // This avoids stale closure issues with gameState.wrongAnswerCount which may not
+      // be updated yet due to React's batched state updates.
+      // If the last answer was wrong, we definitely have at least one wrong answer.
+      // If last answer was correct, check context for any previous wrong answers.
+      const hasWrongAnswer = !feedbackIsCorrect || gameState.wrongAnswerCount > 0;
 
-      // If answer just submitted was WRONG, local totalWrong in context might not be updated yet in this render cycle?
-      // answerQuestion updates state immediately, but gameState in this scope is from render start.
-      // However, we can't easily access the *next* state here.
-      // Better approach: We know the result of the *current* answer from feedbackIsCorrect.
-      // If current answer was WRONG, we add 1 to current count.
-      
-      // Actually, simpler: The context updates immediately. But React batches updates.
-      // Let's trust the user flow: User sees feedback overlay -> dismisses it.
-      // By the time dismiss happens, context *should* have updated?
-      // Let's use a functional state update or ref if needed, but for now let's rely on the fact that 
-      // feedback overlay showed the result, so state update definitely fired.
-      
-      // Wait, if we are in the same render cycle as when we showed feedback, gameState is stale.
-      // But handleFeedbackDismiss is a *new* event handler call (user pressed dismiss).
-      // So gameState *should* be fresh from the latest render *if* the component re-rendered.
-      // Did it re-render? answerQuestion called setGameState. Yes.
-      
-      if (totalWrong > 0) {
+      if (hasWrongAnswer) {
         // Any wrong answers -> Failure
         setShowGagalModal(true);
       } else {
@@ -294,7 +281,7 @@ export default function QuizScreen() {
           completeState(state);
         }
       }
-      
+
       setIsAnswering(false);
     } else {
       // Move to next question
@@ -330,13 +317,22 @@ export default function QuizScreen() {
   };
 
   const handleTimerExpire = () => {
-    // When timer expires, auto-complete the state
+    // When timer expires, evaluate quiz completion
     if (!isMountedRef.current || !state) return;
 
-    // Mark state as completed even if not all questions answered
+    // FIX: Check for wrong answers before completing
+    // Timer expiration should follow the same rules as normal completion:
+    // Only mark complete if there are no wrong answers (perfect score required)
     if (!hasCompletedRef.current) {
       hasCompletedRef.current = true;
-      completeState(state);
+
+      if (gameState.wrongAnswerCount > 0) {
+        // Has wrong answers -> show failure modal
+        setShowGagalModal(true);
+      } else {
+        // Perfect score (so far) -> mark as complete
+        completeState(state);
+      }
     }
   };
 
