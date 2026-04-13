@@ -54,7 +54,7 @@ export default function StateDropdownButton({ onPress, disabled = false }: State
         style={[styles.buttonText, { fontSize }]}
         allowFontScaling={allowScaling}
       >
-        Pilih Negeri ▼
+        Pilih Negeri
       </Text>
     </Pressable>
   );

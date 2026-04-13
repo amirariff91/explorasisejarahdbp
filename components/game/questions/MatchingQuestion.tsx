@@ -236,7 +236,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
             indicatorStyle="black"
             scrollEnabled={scrollEnabled} // Fixed list on tablets for no-scroll states
             scrollIndicatorInsets={{ right: -10 }}
-            contentContainerStyle={{ paddingBottom: 6, paddingRight: isTabletNoScroll ? 0 : 8 }}
+            contentContainerStyle={{ paddingBottom: 6, paddingHorizontal: listPaddingHorizontal }}
             onScroll={scrollEnabled ? handleScroll : undefined}
             scrollEventThrottle={16}
           />

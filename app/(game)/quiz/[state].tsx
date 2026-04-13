@@ -57,6 +57,7 @@ export default function QuizScreen() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [isAnswering, setIsAnswering] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [completedQuestionsCount, setCompletedQuestionsCount] = useState(0);
 
   // Feedback overlay state
   const [showFeedback, setShowFeedback] = useState(false);
@@ -104,8 +105,10 @@ export default function QuizScreen() {
         setCurrentQuestionIndex(clampedIndex);
         setError(null);
         hasCompletedRef.current = false; // Reset completion flag for new state
-        // Reset wrong answer count for fresh start (only if starting from beginning)
-        if (savedIndex === 0) {
+        // Reset wrong answer count when starting fresh OR switching to a different state.
+        // When resuming the exact same state (savedIndex > 0, currentState === state),
+        // preserve the persisted count so prior wrong answers still count against the player.
+        if (savedIndex === 0 || gameState.currentState !== state) {
           resetWrongAnswerCount();
         }
       }
@@ -278,6 +281,7 @@ export default function QuizScreen() {
         // Perfect score -> Success
         if (!hasCompletedRef.current && state) {
           hasCompletedRef.current = true;
+          setCompletedQuestionsCount(questions.length);
           completeState(state);
         }
       }
@@ -308,6 +312,7 @@ export default function QuizScreen() {
     setCurrentQuestionIndex(0);
     setQuestionIndexForState(state, 0);
     setIsAnswering(false); // Reset answer lock on restart
+    setCompletedQuestionsCount(0);
     hasCompletedRef.current = false; // Allow completion detection again after restart
     // Restart timer for states with timers
     if (state) {
@@ -331,6 +336,7 @@ export default function QuizScreen() {
         setShowGagalModal(true);
       } else {
         // Perfect score (so far) -> mark as complete
+        setCompletedQuestionsCount(currentQuestionIndex + 1);
         completeState(state);
       }
     }
@@ -344,6 +350,7 @@ export default function QuizScreen() {
     setCurrentQuestionIndex(0);
     setQuestionIndexForState(state, 0);
     setIsAnswering(false);
+    setCompletedQuestionsCount(0);
     hasCompletedRef.current = false;
     clearStateTimer();
     startStateTimer(state);
@@ -448,7 +455,7 @@ export default function QuizScreen() {
 
       <SuccessModal
         visible={showSuccessModal}
-        totalQuestions={questions.length}
+        totalQuestions={completedQuestionsCount > 0 ? completedQuestionsCount : questions.length}
         onContinue={handleSuccessContinue}
         onRestart={handleSuccessRestart}
       />

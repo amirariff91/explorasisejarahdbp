@@ -143,6 +143,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
           answers: progress.answers ?? {},
           questionIndexByState: progress.questionIndexByState ?? {},
           stateTimer: progress.stateTimer ?? null,
+          wrongAnswerCount: progress.wrongAnswerCount ?? 0,
         }));
       }
       setSaveError(null); // Clear any previous errors
@@ -171,6 +172,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         answers: current.answers,
         questionIndexByState: current.questionIndexByState,
         stateTimer: current.stateTimer,
+        wrongAnswerCount: current.wrongAnswerCount,
       };
 
       await SecureStore.setItemAsync(STORAGE_KEY, JSON.stringify(progress));

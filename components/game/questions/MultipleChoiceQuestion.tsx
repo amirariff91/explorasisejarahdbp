@@ -145,22 +145,6 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   boardHeight = Math.max(boardHeight, 220);
   const nextButtonSize = isLandscape ? ButtonSizes.next.landscape : ButtonSizes.next.portrait;
 
-  // Calculate button dimensions based on board width
-  const buttonAreaWidth = boardWidth - (offsets.boardPaddingHorizontal * 2);
-  const horizontalGap = offsets.optionRow.gap;
-  const baseButtonWidth = (buttonAreaWidth - horizontalGap) / 2;
-  const baseButtonWidthAdjusted = isSelangorTablet ? baseButtonWidth * 0.9 : baseButtonWidth;
-
-  // Apply 20% increase on tablets only
-  // Larger buttons on tablets; extra bump for Selangor
-  const tabletMultiplier = isPhone ? 1.0 : (isSelangorTablet ? 1.2 : 1.2);
-  const buttonWidth = baseButtonWidthAdjusted * tabletMultiplier;
-
-  // Clamp button width with min/max bounds (adjusted for tablets)
-  const buttonWidthMin = isTightPhone ? 130 : 140;
-  const buttonWidthMax = isTightPhone ? 230 : (isPhone ? 260 : (isSelangorTablet ? 260 : 312));
-  const clampedButtonWidth = Math.max(buttonWidthMin, Math.min(buttonWidth, buttonWidthMax));
-
   // Font size for answer text (used in height calculation)
   const baseAnswerFont = getResponsiveFontSize('answer', width);
   const answerFontSize = (isTabletTextBoost ? baseAnswerFont * 1.3 : baseAnswerFont) * 0.92; // slight trim for overflow safety
@@ -255,8 +239,11 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
         style={[
           styles.cssButton,
           {
-            width: clampedButtonWidth,
-            height: clampedButtonHeight,
+            flex: 1,
+            minHeight: clampedButtonHeight,
+            maxHeight: Number.isFinite(maxHeightPerAnswerFromBoard) && maxHeightPerAnswerFromBoard > 0
+              ? maxHeightPerAnswerFromBoard
+              : undefined,
           },
           selectedAnswer === option && styles.optionButtonSelected,
           buttonAnimatedStyles[index],
@@ -277,7 +264,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
                 lineHeight: answerFontSize * Typography.lineHeight.tight,
               },
             ]}
-            numberOfLines={3}
+            numberOfLines={5}
             adjustsFontSizeToFit
             minimumFontScale={0.8}
             allowFontScaling={allowScaling}>
@@ -416,6 +403,7 @@ const styles = StyleSheet.create({
   },
   optionRow: {
     flexDirection: 'row',
+    width: '100%',
   },
   // CSS-Styled Button (Replacements for ImageBackground)
   cssButton: {

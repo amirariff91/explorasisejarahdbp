@@ -145,6 +145,7 @@ export interface GameProgress {
   questionIndexByState?: Partial<Record<MalaysianState, number>>;
   // State timer state (for resuming timed quizzes)
   stateTimer?: StateTimerState | null;
+  wrongAnswerCount?: number;
 }
 
 // Tutorial Step

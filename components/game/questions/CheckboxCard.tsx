@@ -142,8 +142,6 @@ export default function CheckboxCard({
               color: isSelected ? Colors.textLight : Colors.textPrimary,
             },
           ]}
-          numberOfLines={1}
-          ellipsizeMode="tail"
           allowFontScaling={allowFontScaling}>
           {option}
         </Text>
@@ -154,12 +152,11 @@ export default function CheckboxCard({
 
 const styles = StyleSheet.create({
   container: {
-    width: '55%',
-    alignSelf: 'center',
+    width: '100%',
   },
   pressable: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     width: '100%',
     minHeight: 32,  // Comfortable tap target
   },
