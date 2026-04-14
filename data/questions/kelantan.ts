@@ -52,6 +52,6 @@ export const kelantanQuestions: Question[] = [
       'Menjadi Perdana Menteri pada 21 Ogos 2021',
       'Perdana Menteri ke-9',
     ],
-    explanation: 'Dato\' Seri Ismail Sabri adalah Perdana Menteri ke-9 Malaysia yang menjadi PM pada 21 Ogos 2021. Beliau dilahirkan di Temerloh, Pahang dan pernah berkhidmat sebagai peguam.',
+    explanation: 'Dato\' Seri Ismail Sabri adalah Perdana Menteri ke-9 Malaysia yang menjadi PM pada 21 Ogos 2021. Beliau dilahirkan di Temerloh, Pahang.',
   },
 ];

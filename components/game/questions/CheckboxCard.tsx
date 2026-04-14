@@ -152,7 +152,8 @@ export default function CheckboxCard({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: '95%',
+    alignSelf: 'center',
   },
   pressable: {
     flexDirection: 'row',

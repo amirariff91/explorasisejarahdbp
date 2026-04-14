@@ -2,26 +2,26 @@ import { MalaysianState } from '@/types/game';
 
 /**
  * State-level timer configuration (in seconds)
- * Based on specification document v2:
- * - Perak, WP KL, Selangor: 10 minutes (600 seconds)
- * - Negeri Sembilan, Melaka: 5 minutes (300 seconds)
- * - All others: No timer (null)
+ * All states have timers, scaled by question count:
+ * - 6+ questions: 10 minutes (600 seconds) — Selangor, Perak, WP KL, Johor
+ * - 5 questions: 10 minutes (600 seconds) — Negeri Sembilan, Melaka (legacy)
+ * - ≤4 questions: 5 minutes (300 seconds) — all others
  */
 export const STATE_TIMERS: Record<MalaysianState, number | null> = {
-  'perlis': null,
-  'kedah': null,
-  'pulau-pinang': null,
-  'perak': 600,  // 10 minutes
-  'kuala-lumpur': 600,  // 10 minutes
-  'selangor': 600,  // 10 minutes
-  'negeri-sembilan': 300,  // 5 minutes
-  'melaka': 300,  // 5 minutes
-  'johor': null,  // Crossword only, no timer
-  'pahang': null,
-  'terengganu': null,
-  'kelantan': null,
-  'sabah': null,
-  'sarawak': null,
+  'perlis': 300,       // 5 minutes (3 questions)
+  'kedah': 300,        // 5 minutes (4 questions)
+  'pulau-pinang': 300, // 5 minutes (4 questions)
+  'perak': 600,        // 10 minutes (5 questions)
+  'kuala-lumpur': 600, // 10 minutes (5 questions)
+  'selangor': 600,     // 10 minutes (7 questions)
+  'negeri-sembilan': 300, // 5 minutes
+  'melaka': 300,       // 5 minutes
+  'johor': 600,        // 10 minutes (6 questions)
+  'pahang': 300,       // 5 minutes (3 questions)
+  'terengganu': 300,   // 5 minutes (3 questions)
+  'kelantan': 300,     // 5 minutes (2 questions)
+  'sabah': 300,        // 5 minutes (4 questions)
+  'sarawak': 300,      // 5 minutes (3 questions)
 };
 
 /**
