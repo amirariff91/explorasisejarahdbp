@@ -1,11 +1,18 @@
-import { ButtonSizes, EdgeMargins, getQuestionBoardSize, getDeviceSize, getResponsiveSizeScaled, TouchTargets } from '@/constants/layout';
-import { Colors, getResponsiveFontSize, Typography } from '@/constants/theme';
-import { useGameContext } from '@/contexts/GameContext';
-import type { MatchingQuestion as MQQuestion } from '@/types';
-import { playSound } from '@/utils/audio';
-import * as Haptics from 'expo-haptics';
-import { Image } from 'expo-image';
-import { useState, useEffect } from 'react';
+import {
+  ButtonSizes,
+  EdgeMargins,
+  getQuestionBoardSize,
+  getDeviceSize,
+  getResponsiveSizeScaled,
+  TouchTargets,
+} from "@/constants/layout";
+import { Colors, getResponsiveFontSize, Typography } from "@/constants/theme";
+import { useGameContext } from "@/contexts/GameContext";
+import type { MatchingQuestion as MQQuestion } from "@/types";
+import { playSound } from "@/utils/audio";
+import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
+import { useState, useEffect } from "react";
 import {
   FlatList,
   ImageBackground,
@@ -16,10 +23,10 @@ import {
   View,
   NativeScrollEvent,
   NativeSyntheticEvent,
-} from 'react-native';
-import { ASSETS } from '@/constants/assets';
-import CheckboxCard from './CheckboxCard';
-import ScrollHintText from '@/components/ui/ScrollHintText';
+} from "react-native";
+import { ASSETS } from "@/constants/assets";
+import CheckboxCard from "./CheckboxCard";
+import ScrollHintText from "@/components/ui/ScrollHintText";
 
 interface Props {
   question: MQQuestion;
@@ -38,13 +45,20 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   const [showNext, setShowNext] = useState(false);
   const [showScrollHint, setShowScrollHint] = useState(true);
   const { width, height } = useWindowDimensions();
-  const isTablet = getDeviceSize(width) !== 'phone';
-  const isTerengganu = question.state === 'terengganu';
-  const noScrollStates = ['terengganu', 'kelantan', 'pulau-pinang', 'pahang'] as const;
-  const isTabletNoScroll = isTablet && noScrollStates.includes(question.state as typeof noScrollStates[number]);
+  const isTablet = getDeviceSize(width) !== "phone";
+  const isTerengganu = question.state === "terengganu";
+  const noScrollStates = [
+    "terengganu",
+    "kelantan",
+    "pulau-pinang",
+    "pahang",
+  ] as const;
+  const isTabletNoScroll =
+    isTablet &&
+    noScrollStates.includes(question.state as (typeof noScrollStates)[number]);
 
   // Use matching board type with taller aspect ratio for vertical checkbox list
-  const baseBoardSize = getQuestionBoardSize('matching', width);
+  const baseBoardSize = getQuestionBoardSize("matching", width);
   const boardSizeMultiplier = isTabletNoScroll ? 1.05 : 1.0; // Slightly larger board on tablets for these states (fits all rows)
 
   const boardSize = {
@@ -73,17 +87,17 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   // Board layout offsets - Account for decorative border on soalan-board.png
   // Optimized for maximum question space while keeping list compact
   const defaultOffsets = {
-    boardPaddingTop: Math.round(boardHeight * 0.04),        // 4% of height (smaller top border)
-    boardPaddingBottom: Math.round(boardHeight * 0.16),     // 16% of height (more clearance from bottom border)
-    boardPaddingHorizontal: Math.round(boardWidth * 0.04),  // 4% of width (matches ~45px border at 1140px)
-    questionAreaHeight: Math.round(boardHeight * 0.28),     // 28% of height (space for title + question)
-    listAreaTop: 0,                                         // No gap between question and list
+    boardPaddingTop: Math.round(boardHeight * 0.04), // 4% of height (smaller top border)
+    boardPaddingBottom: Math.round(boardHeight * 0.08), // 8% of height (equal to top padding)
+    boardPaddingHorizontal: Math.round(boardWidth * 0.04), // 4% of width (matches ~45px border at 1140px)
+    questionAreaHeight: Math.round(boardHeight * 0.28), // 28% of height (space for title + question)
+    listAreaTop: 0, // No gap between question and list
   };
 
   // Tablets (no-scroll states): shrink bottom padding & question area for more list height (no scrolling)
   const tabletNoScrollOffsets = {
     boardPaddingTop: Math.round(boardHeight * 0.04),
-    boardPaddingBottom: Math.round(boardHeight * 0.10),
+    boardPaddingBottom: Math.round(boardHeight * 0.08),
     boardPaddingHorizontal: Math.round(boardWidth * 0.04),
     questionAreaHeight: Math.round(boardHeight * 0.24),
     listAreaTop: 0,
@@ -97,11 +111,17 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
 
   // Calculate internal dimensions for question and list sections
   const questionSectionHeight = offsets.questionAreaHeight;
-  const availableListHeight = boardHeight - offsets.boardPaddingTop - offsets.boardPaddingBottom - questionSectionHeight - offsets.listAreaTop;
+  const availableListHeight =
+    boardHeight -
+    offsets.boardPaddingTop -
+    offsets.boardPaddingBottom -
+    questionSectionHeight -
+    offsets.listAreaTop;
 
   // Responsive sizing
-  const listGap = 2;  // Minimal 2px gap between checkboxes
-  const nextButtonSize = width < 1000 ? ButtonSizes.next.phone : ButtonSizes.next.tablet;
+  const listGap = 2; // Minimal 2px gap between checkboxes
+  const nextButtonSize =
+    width < 1000 ? ButtonSizes.next.phone : ButtonSizes.next.tablet;
   const scrollEnabled = !isTabletNoScroll;
 
   useEffect(() => {
@@ -111,7 +131,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   }, [scrollEnabled, showScrollHint]);
 
   const handleToggleOption = async (option: string) => {
-    playSound('click');
+    playSound("click");
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     setSelectedOptions((prev) => {
@@ -135,7 +155,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
   };
 
   const handleSubmit = async () => {
-    playSound('click');
+    playSound("click");
     await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     onAnswer(selectedOptions);
   };
@@ -165,36 +185,45 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
             paddingHorizontal: offsets.boardPaddingHorizontal,
           },
         ]}
-        resizeMode="contain">
+        resizeMode="contain"
+      >
         {/* Question Section - Fixed Height at Top */}
-        <View style={[styles.questionSection, { height: questionSectionHeight }]}>
+        <View
+          style={[styles.questionSection, { height: questionSectionHeight }]}
+        >
           <Text
             style={[
               styles.titleText,
               {
-                fontSize: getResponsiveFontSize('question', width),
-                lineHeight: getResponsiveFontSize('question', width) * Typography.lineHeight.tight,
+                fontSize: getResponsiveFontSize("question", width),
+                lineHeight:
+                  getResponsiveFontSize("question", width) *
+                  Typography.lineHeight.tight,
               },
             ]}
             numberOfLines={1}
             adjustsFontSizeToFit
             minimumFontScale={0.85}
-            allowFontScaling={allowScaling}>
+            allowFontScaling={allowScaling}
+          >
             {question.title}
           </Text>
           <Text
             style={[
               styles.questionText,
               {
-                fontSize: getResponsiveFontSize('answer', width),
-                lineHeight: getResponsiveFontSize('answer', width) * Typography.lineHeight.tight,
+                fontSize: getResponsiveFontSize("answer", width),
+                lineHeight:
+                  getResponsiveFontSize("answer", width) *
+                  Typography.lineHeight.tight,
                 marginTop: 6,
               },
             ]}
             numberOfLines={2}
             adjustsFontSizeToFit
             minimumFontScale={0.85}
-            allowFontScaling={allowScaling}>
+            allowFontScaling={allowScaling}
+          >
             {question.question}
           </Text>
 
@@ -216,7 +245,8 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
               height: isTabletNoScroll ? undefined : availableListHeight,
               marginTop: offsets.listAreaTop,
             },
-          ]}>
+          ]}
+        >
           <FlatList
             data={question.options}
             keyExtractor={(item, index) => `option-${index}`}
@@ -224,7 +254,10 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
               <CheckboxCard
                 option={item}
                 isSelected={selectedOptions.includes(item)}
-                isDisabled={selectedOptions.length >= question.correctAnswers.length && !selectedOptions.includes(item)}
+                isDisabled={
+                  selectedOptions.length >= question.correctAnswers.length &&
+                  !selectedOptions.includes(item)
+                }
                 onPress={() => handleToggleOption(item)}
                 index={index}
                 allowFontScaling={allowScaling}
@@ -257,7 +290,8 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
             onPress={handleSubmit}
             hitSlop={TouchTargets.hitSlop}
             accessibilityRole="button"
-            accessibilityLabel="Teruskan ke soalan seterusnya">
+            accessibilityLabel="Teruskan ke soalan seterusnya"
+          >
             <Image
               source={ASSETS.shared.buttons.next.default}
               style={styles.nextButtonImage}
@@ -273,41 +307,41 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: EdgeMargins.landscape,
   },
 
   // Question Board - Contains Everything
   questionBoard: {
-    alignSelf: 'center',
+    alignSelf: "center",
   },
 
   // Question Section - Fixed Height at Top
   questionSection: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   titleText: {
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
-    textAlign: 'center',
+    textAlign: "center",
     fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
   },
   questionText: {
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
-    textAlign: 'center',
+    textAlign: "center",
   },
 
   // List Container - Scrollable Section
   listContainer: {
-    width: '100%',
+    width: "85%",
   },
 
   // Footer: Next Button
   footer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 30,
     right: 30,
     zIndex: 20,
@@ -316,7 +350,7 @@ const styles = StyleSheet.create({
     // Size set dynamically
   },
   nextButtonImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
 });

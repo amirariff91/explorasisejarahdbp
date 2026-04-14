@@ -1,4 +1,10 @@
-import { ButtonSizes, EdgeMargins, getQuestionBoardSize, getDeviceSize, TouchTargets } from '@/constants/layout';
+import {
+  ButtonSizes,
+  EdgeMargins,
+  getQuestionBoardSize,
+  getDeviceSize,
+  TouchTargets,
+} from "@/constants/layout";
 import {
   Colors,
   getResponsiveFontSize,
@@ -6,12 +12,12 @@ import {
   Shadows,
   Typography,
   getComponentShadowStyle,
-} from '@/constants/theme';
-import { useGameContext } from '@/contexts/GameContext';
-import type { TrueFalseQuestion as TFQuestion } from '@/types';
-import { playSound } from '@/utils/audio';
-import * as Haptics from 'expo-haptics';
-import { Image } from 'expo-image';
+} from "@/constants/theme";
+import { useGameContext } from "@/contexts/GameContext";
+import type { TrueFalseQuestion as TFQuestion } from "@/types";
+import { playSound } from "@/utils/audio";
+import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
 import {
   ImageBackground,
   Pressable,
@@ -19,13 +25,13 @@ import {
   Text,
   useWindowDimensions,
   View,
-} from 'react-native';
+} from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
-} from 'react-native-reanimated';
-import { ASSETS } from '@/constants/assets';
+} from "react-native-reanimated";
+import { ASSETS } from "@/constants/assets";
 
 interface Props {
   question: TFQuestion;
@@ -44,21 +50,21 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   const { gameState } = useGameContext();
   const { width, height } = useWindowDimensions();
   const allowScaling = gameState.allowFontScaling;
-  const isPhone = getDeviceSize(width) === 'phone';
-  const isJohor = question.state === 'johor';
+  const isPhone = getDeviceSize(width) === "phone";
+  const isJohor = question.state === "johor";
 
   // Simple responsive offsets for True/False questions
   const offsets = {
     boardPaddingTop: 25,
-    boardPaddingBottom: 15,
+    boardPaddingBottom: 25,
     boardPaddingHorizontal: 30,
-    questionAreaHeight: 120,  // Increased to 120 for better text overflow handling
+    questionAreaHeight: 80,
     buttonsAreaTop: 15,
     buttonGap: 30,
   };
 
   // Use new responsive board sizing system (auto-scales by device tier)
-  const baseBoardSize = getQuestionBoardSize('standard', width);
+  const baseBoardSize = getQuestionBoardSize("standard", width);
 
   // All states except Johor: 40% larger board on tablets only
   const boardSizeMultiplier = !isJohor && !isPhone ? 1.4 : 1.0;
@@ -69,7 +75,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   };
 
   // Constrain to viewport (90% width, 88% height)
-  const maxBoardWidth = width * 0.90;
+  const maxBoardWidth = width * 0.9;
   const maxBoardHeight = height * 0.88;
   const aspectRatio = boardSize.width / boardSize.height;
 
@@ -91,12 +97,14 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   boardHeight = Math.max(boardHeight, 200);
 
   // Use new trueFalse button sizes (kid-friendly, larger)
-  const buttonSize = width < 1000 ? ButtonSizes.trueFalse.phone : ButtonSizes.trueFalse.tablet;
+  const buttonSize =
+    width < 1000 ? ButtonSizes.trueFalse.phone : ButtonSizes.trueFalse.tablet;
 
   // CSS Button Styles - Overflow Prevention
   // Ensure button fits within board width minus padding (and a small safety margin)
   // Side-by-side layout: (TotalWidth - Gap) / 2
-  const maxButtonWidth = (boardWidth - (offsets.boardPaddingHorizontal * 2) - offsets.buttonGap) / 2;
+  const maxButtonWidth =
+    (boardWidth - offsets.boardPaddingHorizontal * 2 - offsets.buttonGap) / 2;
   const clampedButtonWidth = Math.min(buttonSize.width, maxButtonWidth);
 
   // Animation values for buttons
@@ -111,7 +119,7 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
       scale.value = withSpring(1, { damping: 10, stiffness: 200 });
     }, 80); // Faster release
 
-    playSound('click', { volume: 0.5 }); // Softer for kids
+    playSound("click", { volume: 0.5 }); // Softer for kids
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); // Light feedback (not Medium)
     // Small delay for visual feedback
     setTimeout(() => {
@@ -142,21 +150,33 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
               paddingHorizontal: offsets.boardPaddingHorizontal,
             },
           ]}
-          resizeMode="contain">
+          resizeMode="contain"
+        >
           {/* Question Section - Top */}
-          <View style={[styles.questionSection, { height: offsets.questionAreaHeight, marginBottom: offsets.buttonsAreaTop }]}>
+          <View
+            style={[
+              styles.questionSection,
+              {
+                height: offsets.questionAreaHeight,
+                marginBottom: offsets.buttonsAreaTop,
+              },
+            ]}
+          >
             <Text
               style={[
                 styles.questionText,
                 {
-                  fontSize: getResponsiveFontSize('question', width),
-                  lineHeight: getResponsiveFontSize('question', width) * Typography.lineHeight.normal,
+                  fontSize: getResponsiveFontSize("question", width),
+                  lineHeight:
+                    getResponsiveFontSize("question", width) *
+                    Typography.lineHeight.normal,
                 },
               ]}
-              numberOfLines={5}
+              numberOfLines={2}
               adjustsFontSizeToFit
               minimumFontScale={0.9}
-              allowFontScaling={allowScaling}>
+              allowFontScaling={allowScaling}
+            >
               {question.question}
             </Text>
           </View>
@@ -177,18 +197,20 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
               onPress={() => handleAnswer(true)}
               hitSlop={TouchTargets.hitSlop}
               accessibilityRole="button"
-              accessibilityLabel="Jawapan: Betul">
+              accessibilityLabel="Jawapan: Betul"
+            >
               <View style={styles.cssButtonInner}>
                 <Text
                   style={[
                     styles.buttonText,
-                    { fontSize: getResponsiveFontSize('answer', width) * 1.15 },
+                    { fontSize: getResponsiveFontSize("answer", width) * 1.15 },
                   ]}
                   allowFontScaling={allowScaling}
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
                   minimumFontScale={0.75}
-                  ellipsizeMode="tail">
+                  ellipsizeMode="tail"
+                >
                   BETUL
                 </Text>
               </View>
@@ -208,18 +230,20 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
               onPress={() => handleAnswer(false)}
               hitSlop={TouchTargets.hitSlop}
               accessibilityRole="button"
-              accessibilityLabel="Jawapan: Salah">
+              accessibilityLabel="Jawapan: Salah"
+            >
               <View style={styles.cssButtonInner}>
                 <Text
                   style={[
                     styles.buttonText,
-                    { fontSize: getResponsiveFontSize('answer', width) * 1.15 },
+                    { fontSize: getResponsiveFontSize("answer", width) * 1.15 },
                   ]}
                   allowFontScaling={allowScaling}
                   numberOfLines={1}
                   adjustsFontSizeToFit={true}
                   minimumFontScale={0.75}
-                  ellipsizeMode="tail">
+                  ellipsizeMode="tail"
+                >
                   SALAH
                 </Text>
               </View>
@@ -235,76 +259,76 @@ const styles = StyleSheet.create({
   // Container
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: EdgeMargins.landscape,
   },
   boardContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   board: {
-    justifyContent: 'flex-start',
-    alignItems: 'center',
+    justifyContent: "flex-start",
+    alignItems: "center",
   },
 
   // Question Section (Top of board)
   questionSection: {
-    width: '100%',
-    maxWidth: '85%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    maxWidth: "85%",
+    justifyContent: "center",
+    alignItems: "center",
   },
   questionText: {
     fontFamily: Typography.fontFamily,
     color: Colors.textPrimary,
-    textAlign: 'center',
+    textAlign: "center",
     // lineHeight calculated dynamically inline
   },
 
   // Buttons Section (Bottom of board - Horizontal Side-by-Side)
   buttonsSection: {
-    width: '100%',
+    width: "100%",
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  
+
   // CSS Styled Button Base
   cssButton: {
     borderRadius: 12,
     borderWidth: 3,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     ...getComponentShadowStyle(Shadows.component.small),
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   cssButtonInner: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    backgroundColor: 'rgba(255,255,255,0.1)', // Slight gloss
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
+    backgroundColor: "rgba(255,255,255,0.1)", // Slight gloss
   },
-  
+
   // Theme-specific styles
   betulButton: {
-    backgroundColor: '#4CAF50', // Green
-    borderColor: '#2E7D32',     // Darker green border
+    backgroundColor: "#4CAF50", // Green
+    borderColor: "#2E7D32", // Darker green border
   },
   salahButton: {
-    backgroundColor: '#F44336', // Red
-    borderColor: '#C62828',     // Darker red border
+    backgroundColor: "#F44336", // Red
+    borderColor: "#C62828", // Darker red border
   },
-  
+
   buttonText: {
     fontFamily: Typography.fontFamily,
     fontWeight: Typography.fontWeight.normal, // Changed from bold - Galindo only has 400 Regular weight
     color: Colors.textLight,
     ...getTextShadowStyle(Shadows.text.strong),
-    textShadowColor: 'rgba(0, 0, 0, 0.4)',
+    textShadowColor: "rgba(0, 0, 0, 0.4)",
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
