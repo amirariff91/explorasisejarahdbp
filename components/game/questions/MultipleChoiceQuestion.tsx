@@ -123,13 +123,6 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const boardSizeMultiplier =
     !isJohor && !isPhone ? (isSelangorTablet ? 1.5 : 1.4) : 1.0;
 
-  // Scale internal offsets proportionally for large-board states (perlis, perak, kedah)
-  const largeBoardScale = isLargeBoardPhone
-    ? phoneBoardMultiplier
-    : isLargeBoardTablet
-      ? boardSizeMultiplier * tabletBoardMultiplier
-      : 1.0;
-
   const boardSize = {
     width:
       baseBoardSize.width *
@@ -184,14 +177,6 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
       }
     : {
         ...baseOffsets,
-        ...(largeBoardScale > 1.0 && {
-          boardPaddingTop: Math.round(baseOffsets.boardPaddingTop * largeBoardScale),
-          boardPaddingBottom: Math.round(baseOffsets.boardPaddingBottom * largeBoardScale),
-          questionAreaHeight: Math.round(baseOffsets.questionAreaHeight * largeBoardScale),
-          answerAreaTop: Math.round(baseOffsets.answerAreaTop * largeBoardScale),
-          optionsContainer: { gap: Math.round(baseOffsets.optionsContainer.gap * largeBoardScale) },
-          optionRow: { gap: Math.round(baseOffsets.optionRow.gap * largeBoardScale) },
-        }),
         ...(isTabletTextBoost && {
           questionAreaHeight: Math.round(baseOffsets.questionAreaHeight * 1.1),
           answerAreaTop: baseOffsets.answerAreaTop + Math.round(boardHeight * 0.1),
@@ -249,16 +234,6 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
       clampedButtonHeight,
       maxHeightPerAnswerFromBoard,
     );
-  }
-  // Scale button height proportionally on large-board states so buttons fill the bigger board
-  if (largeBoardScale > 1.0) {
-    clampedButtonHeight = Math.round(clampedButtonHeight * largeBoardScale);
-    if (
-      Number.isFinite(maxHeightPerAnswerFromBoard) &&
-      maxHeightPerAnswerFromBoard > 0
-    ) {
-      clampedButtonHeight = Math.min(clampedButtonHeight, maxHeightPerAnswerFromBoard);
-    }
   }
   // Slight upward shift for Sabah/Sarawak/Melaka on phones to keep answers centered on the board
   const answerYOffset = isTightPhone ? -boardHeight * 0.1 : 0;

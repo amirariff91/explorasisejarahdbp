@@ -1,8 +1,20 @@
-import { getResponsiveSizeScaled } from '@/constants/layout';
-import { Colors, getResponsiveFontSize, Opacity, Typography } from '@/constants/theme';
-import * as Haptics from 'expo-haptics';
-import { useEffect, useRef } from 'react';
-import { Animated, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { getResponsiveSizeScaled } from "@/constants/layout";
+import {
+  Colors,
+  getResponsiveFontSize,
+  Opacity,
+  Typography,
+} from "@/constants/theme";
+import * as Haptics from "expo-haptics";
+import { useEffect, useRef } from "react";
+import {
+  Animated,
+  Pressable,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+} from "react-native";
 
 interface Props {
   option: string;
@@ -32,9 +44,9 @@ export default function CheckboxCard({
   const checkmarkAnim = useRef(new Animated.Value(isSelected ? 1 : 0)).current;
 
   // Responsive sizing - comfortable tap target
-  const itemHeight = getResponsiveSizeScaled(32, width);  // Comfortable height
+  const itemHeight = getResponsiveSizeScaled(32, width); // Comfortable height
   const checkboxSize = getResponsiveSizeScaled(18, width);
-  const fontSize = getResponsiveFontSize('gridCell', width);
+  const fontSize = getResponsiveFontSize("gridCell", width);
   const horizontalPadding = getResponsiveSizeScaled(10, width);
   const borderRadius = getResponsiveSizeScaled(10, width, 1.3);
 
@@ -78,13 +90,14 @@ export default function CheckboxCard({
           transform: [{ scale: scaleAnim }],
           minHeight: itemHeight,
         },
-      ]}>
+      ]}
+    >
       <Pressable
         style={({ pressed }) => [
           styles.pressable,
           {
             paddingHorizontal: horizontalPadding,
-            paddingVertical: horizontalPadding * 0.5,  // Reduced from 0.75 for more compact cards
+            paddingVertical: horizontalPadding * 0.5, // Reduced from 0.75 for more compact cards
             borderRadius,
             backgroundColor: isSelected ? Colors.primary : Colors.background,
             borderWidth: 2,
@@ -97,7 +110,8 @@ export default function CheckboxCard({
         disabled={isDisabled}
         accessibilityRole="checkbox"
         accessibilityState={{ checked: isSelected, disabled: isDisabled }}
-        accessibilityLabel={`Pilihan ${index + 1}: ${option}`}>
+        accessibilityLabel={`Pilihan ${index + 1}: ${option}`}
+      >
         {/* Checkbox Icon */}
         <View
           style={[
@@ -106,11 +120,12 @@ export default function CheckboxCard({
               width: checkboxSize,
               height: checkboxSize,
               borderRadius: checkboxSize * 0.25,
-              backgroundColor: isSelected ? Colors.textLight : 'transparent',
+              backgroundColor: isSelected ? Colors.textLight : "transparent",
               borderWidth: 2,
               borderColor: isSelected ? Colors.textLight : Colors.textSecondary,
             },
-          ]}>
+          ]}
+        >
           {/* Checkmark */}
           <Animated.Text
             style={[
@@ -127,7 +142,8 @@ export default function CheckboxCard({
                   },
                 ],
               },
-            ]}>
+            ]}
+          >
             ✓
           </Animated.Text>
         </View>
@@ -142,7 +158,8 @@ export default function CheckboxCard({
               color: isSelected ? Colors.textLight : Colors.textPrimary,
             },
           ]}
-          allowFontScaling={allowFontScaling}>
+          allowFontScaling={allowFontScaling}
+        >
           {option}
         </Text>
       </Pressable>
@@ -152,21 +169,21 @@ export default function CheckboxCard({
 
 const styles = StyleSheet.create({
   container: {
-    width: '95%',
-    alignSelf: 'center',
+    width: "85%",
+    alignSelf: "center",
   },
   pressable: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    width: '100%',
-    minHeight: 32,  // Comfortable tap target
+    flexDirection: "row",
+    alignItems: "flex-start",
+    width: "100%",
+    minHeight: 32, // Comfortable tap target
   },
   pressed: {
     opacity: Opacity.pressed,
   },
   checkbox: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginRight: 12,
   },
   checkmark: {
