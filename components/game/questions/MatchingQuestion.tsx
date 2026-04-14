@@ -101,7 +101,6 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
 
   // Responsive sizing
   const listGap = 2;  // Minimal 2px gap between checkboxes
-  const listPaddingHorizontal = getResponsiveSizeScaled(16, width);
   const nextButtonSize = width < 1000 ? ButtonSizes.next.phone : ButtonSizes.next.tablet;
   const scrollEnabled = !isTabletNoScroll;
 
@@ -236,7 +235,7 @@ export default function MatchingQuestion({ question, onAnswer }: Props) {
             indicatorStyle="black"
             scrollEnabled={scrollEnabled} // Fixed list on tablets for no-scroll states
             scrollIndicatorInsets={{ right: -10 }}
-            contentContainerStyle={{ paddingBottom: 6, paddingHorizontal: listPaddingHorizontal }}
+            contentContainerStyle={{ paddingBottom: 6 }}
             onScroll={scrollEnabled ? handleScroll : undefined}
             scrollEventThrottle={16}
           />

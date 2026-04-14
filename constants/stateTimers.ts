@@ -2,10 +2,8 @@ import { MalaysianState } from '@/types/game';
 
 /**
  * State-level timer configuration (in seconds)
- * All states have timers, scaled by question count:
- * - 6+ questions: 10 minutes (600 seconds) — Selangor, Perak, WP KL, Johor
- * - 5 questions: 10 minutes (600 seconds) — Negeri Sembilan, Melaka (legacy)
- * - ≤4 questions: 5 minutes (300 seconds) — all others
+ * - 600s (10 min): Perak, WP KL, Selangor, Johor — longer/harder state quizzes
+ * - 300s (5 min): all other states
  */
 export const STATE_TIMERS: Record<MalaysianState, number | null> = {
   'perlis': 300,       // 5 minutes (3 questions)
