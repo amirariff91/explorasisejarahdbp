@@ -45,7 +45,7 @@ export const kelantanQuestions: Question[] = [
       'Menteri Ekonomi',
       'Melanjutkan pelajaran ke SM Sains Muar',
       'Perdana Menteri ke-9',
-      'Pernah berkhidmat sebagai peguam',
+      'Pernah menjadi Menteri Besar Pahang',
     ],
     correctAnswers: [
       'Dilahirkan di Temerloh, Pahang',

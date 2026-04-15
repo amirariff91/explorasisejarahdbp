@@ -337,6 +337,7 @@ const styles = StyleSheet.create({
   // List Container - Scrollable Section
   listContainer: {
     width: "85%",
+    alignSelf: "center",
   },
 
   // Footer: Next Button
