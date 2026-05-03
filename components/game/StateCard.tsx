@@ -7,6 +7,7 @@ import Animated, {
   withSequence,
   withRepeat,
   withTiming,
+  cancelAnimation,
 } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 import { playSound } from '@/utils/audio';
@@ -78,6 +79,7 @@ export default function StateCard({
       );
     } else {
       pulseScale.value = 1;
+      cancelAnimation(pulseScale);
     }
   }, [isCompleted, pulseScale]);
 
@@ -119,8 +121,8 @@ export default function StateCard({
       ]}
       onPress={handlePress}
       accessibilityRole="button"
-      accessibilityLabel={`${stateName} state, ${isCompleted ? 'completed with checkmark' : 'not started, tap to begin quiz'}`}
-      accessibilityHint="Double tap to start quiz for this state"
+      accessibilityLabel={`Pilih negeri ${stateName}${isCompleted ? ', selesai' : ', belum mula'}`}
+      accessibilityHint="Ketik dua kali untuk mulakan kuiz negeri ini"
     >
       {/* Big Emoji Icon */}
       <Text style={[styles.emoji, { fontSize: dimensions.emojiSize, marginBottom: dimensions.emojiMargin }]}>

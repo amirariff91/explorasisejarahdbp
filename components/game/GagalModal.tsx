@@ -185,6 +185,7 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: '#8B3030',
     ...getComponentShadowStyle(Shadows.component.large),
+    boxShadow: '0 4px 8px rgba(0,0,0,0.4)',
   },
   content: {
     alignItems: 'center',

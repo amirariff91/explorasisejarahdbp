@@ -10,7 +10,7 @@ import Animated, {
   withDelay,
   Easing,
 } from 'react-native-reanimated';
-import { Colors, Typography, getResponsiveFontSize, getTextShadowStyle, Shadows, getComponentShadowStyle } from '@/constants/theme';
+import { Colors, Typography, getResponsiveFontSize, getTextShadowStyle, Shadows } from '@/constants/theme';
 import { ButtonSizes, TouchTargets, Spacing, getResponsiveSizeScaled, getDeviceSize } from '@/constants/layout';
 import type { CongratsOverlayProps } from '@/types';
 
@@ -227,6 +227,8 @@ export default function CongratsOverlay({
               style={[styles.button, styles.primaryButton, buttonDimensions]}
               onPress={onContinue}
               hitSlop={TouchTargets.hitSlop}
+              accessibilityRole="button"
+              accessibilityLabel="Teruskan ke negeri seterusnya"
             >
               <Image source={BUTTON_ASSET} style={styles.buttonImage} contentFit="contain" />
               <Text
@@ -250,6 +252,8 @@ export default function CongratsOverlay({
               style={[styles.button, styles.secondaryButton, buttonDimensions]}
               onPress={onRestart}
               hitSlop={TouchTargets.hitSlop}
+              accessibilityRole="button"
+              accessibilityLabel="Mulakan semula negeri ini"
             >
               <Image source={BUTTON_ASSET} style={styles.buttonImage} contentFit="contain" />
               <Text

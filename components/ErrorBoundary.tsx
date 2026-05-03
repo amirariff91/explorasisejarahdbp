@@ -101,11 +101,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     maxWidth: 400,
     width: '90%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 8,
+    boxShadow: '0 4px 10px rgba(0,0,0,0.3)',
   },
   errorIcon: {
     fontSize: 60,
