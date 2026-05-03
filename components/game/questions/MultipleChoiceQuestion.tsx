@@ -163,8 +163,9 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   const offsets = isTightPhone
     ? {
         ...baseOffsets,
+        boardPaddingTop: Math.max(baseOffsets.boardPaddingTop, 38),
         boardPaddingBottom: Math.min(baseOffsets.boardPaddingBottom, 12),
-        questionAreaHeight: Math.min(baseOffsets.questionAreaHeight, 55),
+        questionAreaHeight: Math.min(baseOffsets.questionAreaHeight, 80),
         answerAreaTop: Math.min(baseOffsets.answerAreaTop, 12),
         optionsContainer: {
           ...baseOffsets.optionsContainer,
@@ -235,8 +236,7 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
       maxHeightPerAnswerFromBoard,
     );
   }
-  // Slight upward shift for Sabah/Sarawak/Melaka on phones to keep answers centered on the board
-  const answerYOffset = isTightPhone ? -boardHeight * 0.1 : 0;
+  const answerYOffset = 0;
 
   // Force long prompts into two lines on tight phone layouts
   const wrapQuestionText = (text: string): string => {
@@ -491,7 +491,7 @@ const styles = StyleSheet.create({
   questionSection: {
     width: "85%",
     maxWidth: "85%",
-    justifyContent: "flex-start",
+    justifyContent: "center",
     alignItems: "center",
   },
   questionText: {
