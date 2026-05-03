@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
   },
 
   errorText: {
-    color: '#ff6b6b',
+    color: Colors.warning,
     marginTop: 4,
     marginLeft: 4,
   },

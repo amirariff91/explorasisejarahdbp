@@ -1,5 +1,11 @@
 import React, { useEffect, useRef } from 'react';
-import { StyleSheet, Animated, useWindowDimensions } from 'react-native';
+import { StyleSheet, useWindowDimensions } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  runOnJS,
+} from 'react-native-reanimated';
 import { getResponsiveFontSize } from '@/constants/theme';
 
 interface ScrollHintTextProps {
@@ -43,21 +49,6 @@ interface ScrollHintTextProps {
   bold?: boolean;
 }
 
-/**
- * Reusable auto-dismissing hint text component for scroll affordance.
- * Fades in on mount, stays visible for specified duration, then fades out.
- *
- * Usage:
- * ```tsx
- * const [showHint, setShowHint] = useState(true);
- *
- * <ScrollHintText
- *   text="Leret untuk lihat semua pilihan ↓"
- *   visible={showHint}
- *   onDismiss={() => setShowHint(false)}
- * />
- * ```
- */
 export default function ScrollHintText({
   text,
   visible,
@@ -68,36 +59,22 @@ export default function ScrollHintText({
   bold = false,
 }: ScrollHintTextProps) {
   const { width } = useWindowDimensions();
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const opacity = useSharedValue(0);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (visible) {
-      // Fade in
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      opacity.value = withTiming(1, { duration: 300 });
 
-      // Auto-dismiss after delay
       timeoutRef.current = setTimeout(() => {
-        // Fade out
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }).start(() => {
-          onDismiss?.();
+        opacity.value = withTiming(0, { duration: 300 }, (finished) => {
+          if (finished && onDismiss) {
+            runOnJS(onDismiss)();
+          }
         });
       }, autoDismissDelay);
     } else {
-      // Immediate fade out if visible changes to false
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      opacity.value = withTiming(0, { duration: 300 });
     }
 
     return () => {
@@ -105,11 +82,11 @@ export default function ScrollHintText({
         clearTimeout(timeoutRef.current);
       }
     };
-  }, [visible, autoDismissDelay, fadeAnim, onDismiss]);
+  }, [visible, autoDismissDelay, opacity, onDismiss]);
 
-  if (!visible && fadeAnim._value === 0) {
-    return null;
-  }
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+  }));
 
   const fontSize = getResponsiveFontSize(fontSizeContext, width);
 
@@ -121,8 +98,8 @@ export default function ScrollHintText({
           fontSize,
           color,
           fontWeight: bold ? 'bold' : 'normal',
-          opacity: fadeAnim,
         },
+        animatedStyle,
       ]}
     >
       {text}

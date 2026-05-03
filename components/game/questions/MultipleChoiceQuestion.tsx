@@ -520,6 +520,7 @@ const styles = StyleSheet.create({
   cssButton: {
     backgroundColor: "#5D4037", // Wood texture color
     borderRadius: 12,
+    borderCurve: 'continuous',
     borderWidth: 2,
     borderColor: "#FFD700", // Gold border
     ...getComponentShadowStyle(Shadows.component.small),

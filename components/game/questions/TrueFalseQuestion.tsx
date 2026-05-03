@@ -299,6 +299,7 @@ const styles = StyleSheet.create({
   // CSS Styled Button Base
   cssButton: {
     borderRadius: 12,
+    borderCurve: 'continuous',
     borderWidth: 3,
     justifyContent: "center",
     alignItems: "center",

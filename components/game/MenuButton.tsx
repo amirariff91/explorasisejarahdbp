@@ -104,7 +104,11 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
           },
         ]}
         onPress={handleOpenMenu}
-        hitSlop={TouchTargets.hitSlop}>
+        hitSlop={TouchTargets.hitSlop}
+        accessibilityRole="button"
+        accessibilityLabel="Buka menu"
+        accessibilityHint="Buka menu permainan"
+      >
         <Image
           source={ASSETS.shared.buttons.menu.default}
           style={styles.menuButtonImage}
@@ -140,7 +144,9 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
               pressed && { transform: [{ scale: 0.96 }] }
             ]}
             onPress={handleResume}
-            hitSlop={TouchTargets.hitSlop}>
+            hitSlop={TouchTargets.hitSlop}
+            accessibilityRole="button"
+            accessibilityLabel="Teruskan permainan">
             <Text
               style={[styles.menuItemText, { fontSize: getResponsiveFontSize('answer', width) }]}
               allowFontScaling={gameState.allowFontScaling}
@@ -155,7 +161,9 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
               pressed && { transform: [{ scale: 0.96 }] }
             ]}
             onPress={handleRestart}
-            hitSlop={TouchTargets.hitSlop}>
+            hitSlop={TouchTargets.hitSlop}
+            accessibilityRole="button"
+            accessibilityLabel="Mulakan semula negeri ini">
             <Text
               style={[styles.menuItemText, { fontSize: getResponsiveFontSize('answer', width) }]}
               allowFontScaling={gameState.allowFontScaling}
@@ -170,7 +178,9 @@ export default function MenuButton({ size = 'default' }: MenuButtonProps) {
               pressed && { transform: [{ scale: 0.96 }] }
             ]}
             onPress={handleQuit}
-            hitSlop={TouchTargets.hitSlop}>
+            hitSlop={TouchTargets.hitSlop}
+            accessibilityRole="button"
+            accessibilityLabel="Keluar ke peta negeri">
             <Text
               style={[styles.menuItemText, { fontSize: getResponsiveFontSize('answer', width) }]}
               allowFontScaling={gameState.allowFontScaling}
@@ -209,6 +219,7 @@ const styles = StyleSheet.create({
   menuContainer: {
     backgroundColor: Colors.cardBackground,
     borderRadius: BorderRadius.large,
+    borderCurve: 'continuous',
     padding: 30,
     alignItems: 'center',
     ...getComponentShadowStyle(Shadows.component.large),

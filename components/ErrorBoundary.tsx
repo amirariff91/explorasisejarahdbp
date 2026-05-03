@@ -138,13 +138,13 @@ const styles = StyleSheet.create({
   errorDetails: {
     fontFamily: 'monospace',
     fontSize: 12,
-    color: '#d32f2f',
+    color: Colors.warning,
     marginBottom: 8,
   },
   errorStack: {
     fontFamily: 'monospace',
     fontSize: 10,
-    color: '#666',
+    color: Colors.textTertiary,
   },
   button: {
     backgroundColor: Colors.primary,

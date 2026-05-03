@@ -106,6 +106,8 @@ export default function GagalModal({
               style={[styles.button, styles.primaryButton, buttonDimensions]}
               onPress={onRetry}
               hitSlop={TouchTargets.hitSlop}
+              accessibilityRole="button"
+              accessibilityLabel="Cuba lagi"
             >
               <Image source={BUTTON_ASSET} style={styles.buttonImage} contentFit="contain" />
               <Text
@@ -129,6 +131,8 @@ export default function GagalModal({
               style={[styles.button, styles.secondaryButton, buttonDimensions]}
               onPress={onBackToMap}
               hitSlop={TouchTargets.hitSlop}
+              accessibilityRole="button"
+              accessibilityLabel="Kembali ke peta"
             >
               <Image source={BUTTON_ASSET} style={styles.buttonImage} contentFit="contain" />
               <Text
@@ -177,6 +181,7 @@ const styles = StyleSheet.create({
   panelBackground: {
     backgroundColor: 'rgba(60, 20, 20, 0.95)',
     borderRadius: 20,
+    borderCurve: 'continuous',
     borderWidth: 3,
     borderColor: '#8B3030',
     ...getComponentShadowStyle(Shadows.component.large),
@@ -189,7 +194,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: Typography.fontFamily,
     fontWeight: Typography.fontWeight.normal,
-    color: '#FF6B6B', // Red color for GAGAL
+    color: Colors.warning, // Red color for GAGAL
     letterSpacing: 1.5,
     ...getTextShadowStyle(Shadows.text.medium),
   },

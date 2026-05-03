@@ -1,5 +1,13 @@
-import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, useWindowDimensions } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, StyleSheet, useWindowDimensions } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+  cancelAnimation,
+} from 'react-native-reanimated';
 import { getResponsiveSizeScaled } from '@/constants/layout';
 
 interface ScrollArrowIndicatorProps {
@@ -39,26 +47,6 @@ interface ScrollArrowIndicatorProps {
   pulse?: boolean;
 }
 
-/**
- * Reusable arrow indicator for scroll affordance.
- * Shows a pulsing arrow to indicate scrollable content in a direction.
- *
- * Usage:
- * ```tsx
- * const [hasMoreContent, setHasMoreContent] = useState(true);
- *
- * <View style={{ position: 'relative' }}>
- *   <ScrollView>
- *     {content}
- *   </ScrollView>
- *   <ScrollArrowIndicator
- *     visible={hasMoreContent}
- *     direction="down"
- *     color="#4169E1"
- *   />
- * </View>
- * ```
- */
 export default function ScrollArrowIndicator({
   visible,
   direction = 'down',
@@ -68,36 +56,28 @@ export default function ScrollArrowIndicator({
   pulse = true,
 }: ScrollArrowIndicatorProps) {
   const { width } = useWindowDimensions();
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const opacity = useSharedValue(1);
 
   useEffect(() => {
     if (visible && pulse) {
-      // Create pulsing loop animation
-      const pulseAnimation = Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, {
-            toValue: 0.5,
-            duration: 800,
-            useNativeDriver: true,
-          }),
-          Animated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 800,
-            useNativeDriver: true,
-          }),
-        ])
+      opacity.value = withRepeat(
+        withSequence(
+          withTiming(0.5, { duration: 800 }),
+          withTiming(1, { duration: 800 })
+        ),
+        -1,
+        false
       );
-
-      pulseAnimation.start();
-
-      return () => {
-        pulseAnimation.stop();
-        pulseAnim.setValue(1);
-      };
     } else {
-      pulseAnim.setValue(1);
+      cancelAnimation(opacity);
+      opacity.value = 1;
     }
-  }, [visible, pulse, pulseAnim]);
+  }, [visible, pulse, opacity]);
+
+  // Must be above early return (hooks rules)
+  const animatedStyle = useAnimatedStyle(() => ({
+    opacity: pulse ? opacity.value : 1,
+  }));
 
   if (!visible) {
     return null;
@@ -115,12 +95,7 @@ export default function ScrollArrowIndicator({
 
   return (
     <View
-      style={[
-        styles.container,
-        {
-          bottom: responsiveBottom,
-        },
-      ]}
+      style={[styles.container, { bottom: responsiveBottom }]}
       pointerEvents="none"
     >
       <Animated.Text
@@ -129,8 +104,8 @@ export default function ScrollArrowIndicator({
           {
             fontSize: responsiveSize,
             color,
-            opacity: pulse ? pulseAnim : 1,
           },
+          animatedStyle,
         ]}
       >
         {arrowSymbols[direction]}

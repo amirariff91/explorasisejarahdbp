@@ -16,8 +16,7 @@ import type { CongratsOverlayProps } from '@/types';
 
 // Confetti colors - celebratory palette
 const CONFETTI_COLORS = [
-  '#FFD700', // Gold
-  '#FF6B6B', // Red
+  Colors.gold, // Gold
   '#4ECDC4', // Teal
   '#45B7D1', // Blue
   '#96CEB4', // Green
@@ -304,13 +303,10 @@ const styles = StyleSheet.create({
   panelBackground: {
     backgroundColor: '#5D4037', // Wood color
     borderRadius: 20,
+    borderCurve: 'continuous',
     borderWidth: 4,
-    borderColor: '#FFD700', // Gold border
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.5,
-    shadowRadius: 15,
-    elevation: 10,
+    borderColor: Colors.gold,
+    boxShadow: '0 10px 15px rgba(0,0,0,0.5)',
   },
   content: {
     alignItems: 'center',
@@ -320,7 +316,7 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: Typography.fontFamily,
     fontWeight: Typography.fontWeight.normal,
-    color: '#FFD700', // Gold
+    color: Colors.gold, // Gold
     letterSpacing: 1.5,
     ...getTextShadowStyle(Shadows.text.strong),
     textShadowColor: 'rgba(0,0,0,0.5)',

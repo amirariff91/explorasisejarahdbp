@@ -113,8 +113,7 @@ export default function StateCard({
           padding: dimensions.padding,
           backgroundColor: visuals.color,
           borderColor: visuals.borderColor,
-          shadowOffset: { width: dimensions.shadowOffset, height: dimensions.shadowOffset },
-          shadowRadius: dimensions.shadowRadius,
+          boxShadow: `${dimensions.shadowOffset}px ${dimensions.shadowOffset}px ${dimensions.shadowRadius * 2}px rgba(0,0,0,0.5)`,
         },
         animatedStyle,
       ]}
@@ -179,10 +178,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
-    // Outer shadow (bottom-right depth) - illustrated button style
-    shadowColor: '#000',
-    shadowOpacity: 0.5,
-    elevation: 6,
+    // boxShadow set dynamically above from dimensions
   },
   emoji: {
     // Dynamic: fontSize, marginBottom

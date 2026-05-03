@@ -1,8 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Text, StyleSheet, useWindowDimensions, Animated, View } from 'react-native';
+import { Text, StyleSheet, useWindowDimensions, View } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withRepeat,
+  withSequence,
+  withTiming,
+  cancelAnimation,
+} from 'react-native-reanimated';
 import { getDeviceSize, getResponsiveSizeScaled } from '@/constants/layout';
 import { useGameContext } from '@/contexts/GameContext';
-import { getResponsiveFontSize, Typography } from '@/constants/theme';
+import { Colors, getResponsiveFontSize, Typography } from '@/constants/theme';
 import { formatTime, getTimerColor } from '@/constants/stateTimers';
 
 interface CountdownTimerProps {
@@ -20,7 +28,15 @@ export default function CountdownTimer({
   const { width } = useWindowDimensions();
   const isPhone = getDeviceSize(width) === 'phone';
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
-  const [pulseAnim] = useState(new Animated.Value(1));
+  const scale = useSharedValue(1);
+
+  // Derived sizing — must be above early return (hooks rules)
+  const fontSize = getResponsiveFontSize('stateLabel', width);
+  const containerPadding = getResponsiveSizeScaled(isPhone ? 10 : 12, width);
+  const borderRadius = getResponsiveSizeScaled(isPhone ? 14 : 10, width);
+  const iconSize = getResponsiveSizeScaled(isPhone ? 18 : 20, width);
+  const topOffset = isPhone ? 12 : 16;
+  const rightOffset = isPhone ? width * 0.10 : 18;
 
   // Update time remaining every second
   useEffect(() => {
@@ -32,45 +48,37 @@ export default function CountdownTimer({
     const updateTimer = () => {
       const remaining = getTimeRemaining();
       setTimeRemaining(remaining);
-
-      // Check if timer expired
       if (remaining !== null && remaining <= 0 && onExpire) {
         onExpire();
       }
     };
 
-    // Update immediately
     updateTimer();
-
-    // Then update every second
     const interval = setInterval(updateTimer, 1000);
-
     return () => clearInterval(interval);
   }, [gameState.stateTimer, getTimeRemaining, onExpire]);
 
-  // Pulse animation when < 30 seconds
+  // Pulse animation when < 30 seconds — must be above early return
   useEffect(() => {
     if (timeRemaining !== null && timeRemaining <= 30 && timeRemaining > 0) {
-      // Start pulsing animation
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(pulseAnim, {
-            toValue: 1.1,
-            duration: 500,
-            useNativeDriver: true,
-          }),
-          Animated.timing(pulseAnim, {
-            toValue: 1,
-            duration: 500,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
+      scale.value = withRepeat(
+        withSequence(
+          withTiming(1.1, { duration: 500 }),
+          withTiming(1, { duration: 500 })
+        ),
+        -1,
+        false
+      );
     } else {
-      // Stop pulsing
-      pulseAnim.setValue(1);
+      cancelAnimation(scale);
+      scale.value = withTiming(1, { duration: 150 });
     }
-  }, [timeRemaining, pulseAnim]);
+  }, [timeRemaining, scale]);
+
+  // Must be above early return (hooks rules)
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
 
   // Don't render if no timer
   if (!gameState.stateTimer || timeRemaining === null) {
@@ -81,14 +89,6 @@ export default function CountdownTimer({
   const timerColor = getTimerColor(timeRemaining, totalDuration);
   const formattedTime = formatTime(timeRemaining);
 
-  // Responsive sizing
-  const fontSize = getResponsiveFontSize('stateLabel', width);
-  const containerPadding = getResponsiveSizeScaled(isPhone ? 10 : 12, width);
-  const borderRadius = getResponsiveSizeScaled(isPhone ? 14 : 10, width);
-  const iconSize = getResponsiveSizeScaled(isPhone ? 18 : 20, width);
-  const topOffset = isPhone ? 12 : 16;
-  const rightOffset = isPhone ? width * 0.10 : 18;
-
   const content = (
     <Animated.View
       style={[
@@ -97,9 +97,11 @@ export default function CountdownTimer({
           paddingHorizontal: containerPadding,
           paddingVertical: containerPadding * 0.6,
           borderRadius,
+          borderCurve: 'continuous',
           borderColor: timerColor,
-          transform: [{ scale: pulseAnim }],
+          boxShadow: '0 3px 6px rgba(0,0,0,0.35)',
         },
+        animatedStyle,
       ]}>
       <Text
         style={[styles.icon, { fontSize: iconSize }]}
@@ -112,9 +114,12 @@ export default function CountdownTimer({
           {
             fontSize,
             color: timerColor,
+            fontVariant: ['tabular-nums'],
           },
         ]}
-        allowFontScaling={allowFontScaling}>
+        allowFontScaling={allowFontScaling}
+        accessibilityLabel={`Masa tinggal ${formattedTime}`}
+        accessibilityRole="text">
         {formattedTime}
       </Text>
     </Animated.View>
@@ -145,17 +150,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.65)',
     borderWidth: 2,
     gap: 8,
-    shadowColor: '#000',
-    shadowOpacity: 0.35,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 6,
   },
   icon: {
-    color: '#FFFFFF',
+    color: Colors.textLight,
   },
   time: {
-    fontFamily: Typography.fontFamily, // Galindo
-    // fontWeight: '700', // Galindo doesn't have bold weight, handled by font file
+    fontFamily: Typography.fontFamily,
   },
 });
