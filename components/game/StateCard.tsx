@@ -210,9 +210,9 @@ const styles = StyleSheet.create({
   recommendedBadge: {
     // Dynamic: top, right, paddingHorizontal, paddingVertical, borderWidth
     position: 'absolute',
-    backgroundColor: '#2196F3',
+    backgroundColor: Colors.secondary,
     borderRadius: BorderRadius.small,
-    borderColor: '#fff',
+    borderColor: Colors.textLight,
   },
   recommendedText: {
     // Dynamic: fontSize

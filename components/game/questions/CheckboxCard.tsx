@@ -6,15 +6,20 @@ import {
   Typography,
 } from "@/constants/theme";
 import * as Haptics from "expo-haptics";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import {
-  Animated,
   Pressable,
   StyleSheet,
   Text,
   useWindowDimensions,
   View,
 } from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  withSequence,
+} from "react-native-reanimated";
 
 interface Props {
   option: string;
@@ -39,9 +44,9 @@ export default function CheckboxCard({
 }: Props) {
   const { width } = useWindowDimensions();
 
-  // Animation values
-  const scaleAnim = useRef(new Animated.Value(1)).current;
-  const checkmarkAnim = useRef(new Animated.Value(isSelected ? 1 : 0)).current;
+  // Animation values (reanimated shared values)
+  const scaleAnim = useSharedValue(1);
+  const checkmarkAnim = useSharedValue(isSelected ? 1 : 0);
 
   // Responsive sizing - comfortable tap target
   const itemHeight = getResponsiveSizeScaled(32, width); // Comfortable height
@@ -52,12 +57,18 @@ export default function CheckboxCard({
 
   // Animate checkmark on selection change
   useEffect(() => {
-    Animated.timing(checkmarkAnim, {
-      toValue: isSelected ? 1 : 0,
-      duration: 150,
-      useNativeDriver: true,
-    }).start();
+    checkmarkAnim.value = withTiming(isSelected ? 1 : 0, { duration: 150 });
   }, [isSelected, checkmarkAnim]);
+
+  // Animated styles
+  const containerStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scaleAnim.value }],
+  }));
+
+  const checkmarkStyle = useAnimatedStyle(() => ({
+    opacity: checkmarkAnim.value,
+    transform: [{ scale: 0.5 + checkmarkAnim.value * 0.5 }],
+  }));
 
   const handlePress = async () => {
     if (isDisabled) return;
@@ -66,18 +77,10 @@ export default function CheckboxCard({
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
     // Press animation
-    Animated.sequence([
-      Animated.timing(scaleAnim, {
-        toValue: 0.98,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: 100,
-        useNativeDriver: true,
-      }),
-    ]).start();
+    scaleAnim.value = withSequence(
+      withTiming(0.98, { duration: 100 }),
+      withTiming(1, { duration: 100 }),
+    );
 
     onPress();
   };
@@ -87,9 +90,9 @@ export default function CheckboxCard({
       style={[
         styles.container,
         {
-          transform: [{ scale: scaleAnim }],
           minHeight: itemHeight,
         },
+        containerStyle,
       ]}
     >
       <Pressable
@@ -104,7 +107,7 @@ export default function CheckboxCard({
             borderColor: isSelected ? Colors.primary : Colors.border,
             opacity: isDisabled ? Opacity.disabled : 1,
           },
-          pressed && !isDisabled && styles.pressed,
+          pressed && !isDisabled && { opacity: Opacity.selected },
         ]}
         onPress={handlePress}
         disabled={isDisabled}
@@ -132,16 +135,8 @@ export default function CheckboxCard({
               styles.checkmark,
               {
                 fontSize: checkboxSize * 0.7,
-                opacity: checkmarkAnim,
-                transform: [
-                  {
-                    scale: checkmarkAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [0.5, 1],
-                    }),
-                  },
-                ],
               },
+              checkmarkStyle,
             ]}
           >
             ✓
@@ -177,9 +172,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     width: "100%",
     minHeight: 32, // Comfortable tap target
-  },
-  pressed: {
-    opacity: Opacity.pressed,
   },
   checkbox: {
     justifyContent: "center",

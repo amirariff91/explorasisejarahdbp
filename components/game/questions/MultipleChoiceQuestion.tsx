@@ -518,11 +518,11 @@ const styles = StyleSheet.create({
   },
   // CSS-Styled Button (Replacements for ImageBackground)
   cssButton: {
-    backgroundColor: "#5D4037", // Wood texture color
+    backgroundColor: Colors.woodDark, // Wood texture color
     borderRadius: 12,
     borderCurve: 'continuous',
     borderWidth: 2,
-    borderColor: "#FFD700", // Gold border
+    borderColor: Colors.gold, // Gold border
     ...getComponentShadowStyle(Shadows.component.small),
     overflow: "hidden",
   },
@@ -535,8 +535,8 @@ const styles = StyleSheet.create({
   optionButtonSelected: {
     opacity: Opacity.selected,
     transform: [{ scale: 0.95 }],
-    backgroundColor: "#4E342E", // Darker wood on select
-    borderColor: "#FFF176", // Lighter gold
+    backgroundColor: Colors.woodDeep, // Darker wood on select
+    borderColor: Colors.goldLight, // Lighter gold
   },
   optionText: {
     // Dynamic: paddingHorizontal

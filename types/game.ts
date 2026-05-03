@@ -27,7 +27,8 @@ export type QuestionType =
   | 'multipleChoice' // 4 options
   | 'trueFalse' // BETUL/SALAH
   | 'fillBlank' // Text input
-  | 'matching'; // 9-grid matching
+  | 'matching' // 9-grid matching
+  | 'crossword'; // Crossword puzzle
 
 // Base Question Interface
 export interface BaseQuestion {
@@ -68,12 +69,60 @@ export interface MatchingQuestion extends BaseQuestion {
   correctAnswers: string[]; // Subset of correct options
 }
 
+// Crossword Clue (used in puzzle definitions)
+export interface CrosswordClue {
+  number: number;
+  direction: 'across' | 'down';
+  clue: string;
+  answer: string;
+  startRow: number;
+  startCol: number;
+}
+
+// Crossword Puzzle Word (placement in the grid)
+export interface CrosswordPuzzleWord {
+  id: string;
+  answer: string;
+  direction: 'across' | 'down';
+  startRow: number;
+  startCol: number;
+  clueId: string;
+}
+
+// Crossword Puzzle Clue (displayed to the user)
+export interface CrosswordPuzzleClue {
+  id: string;
+  number: number;
+  label: string;
+  text: string;
+  direction: 'across' | 'down';
+  wordId: string;
+}
+
+// Crossword Puzzle Definition (full puzzle data)
+export interface CrosswordPuzzleDefinition {
+  id: string;
+  gridSize: { rows: number; cols: number };
+  clues: {
+    across: CrosswordPuzzleClue[];
+    down: CrosswordPuzzleClue[];
+  };
+  words: CrosswordPuzzleWord[];
+}
+
+// Crossword Question
+export interface CrosswordQuestion extends BaseQuestion {
+  type: 'crossword';
+  crosswordData: CrosswordPuzzleDefinition;
+}
+
 // Union type for all questions
 export type Question =
   | MultipleChoiceQuestion
   | TrueFalseQuestion
   | FillBlankQuestion
-  | MatchingQuestion;
+  | MatchingQuestion
+  | CrosswordQuestion;
 
 // Answer value types for different question types
 export type AnswerValue =

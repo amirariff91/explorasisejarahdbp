@@ -1,6 +1,6 @@
 import { getDeviceSize } from "@/constants/layout";
 import { statePaths } from "@/constants/mapPaths";
-import { StateVisuals } from "@/constants/theme";
+import { StateVisuals, Colors } from "@/constants/theme";
 import { useGameContext } from "@/contexts/GameContext";
 import type { MalaysianState } from "@/types";
 import { playSound } from "@/utils/audio";
@@ -146,10 +146,10 @@ export default function MalaysiaMapSVG({ onStateSelect, disabled = false }: Mala
   const getStateColor = (state: MalaysianState): string => {
     const isCompleted = gameState.completedStates.includes(state);
     if (isCompleted) {
-      return "#4CAF50"; // Green for completed
+      return Colors.success; // Green for completed
     }
     // Use existing StateVisuals colors
-    return StateVisuals[state]?.color || "#FFD700";
+    return StateVisuals[state]?.color || Colors.gold;
   };
 
   // Separate peninsula and Borneo states for different scaling
@@ -178,7 +178,7 @@ export default function MalaysiaMapSVG({ onStateSelect, disabled = false }: Mala
         key={state}
         d={pathData}
         fill={getStateColor(state)}
-        stroke={isPressed ? "#FFD700" : "#2c3e50"}
+        stroke={isPressed ? Colors.gold : Colors.strokeDark}
         strokeWidth={isPressed ? "2" : "1"}
         // Reduced opacity when disabled to provide visual feedback
         opacity={isDisabled ? 0.5 : (isPressed ? 0.95 : 0.85)}

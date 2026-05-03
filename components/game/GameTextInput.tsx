@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
 
   // Outer container - same blue as panel
   outerContainer: {
-    backgroundColor: '#1E8EEA',
+    backgroundColor: Colors.accent,
     borderRadius: BorderRadius.small,
     padding: 4,
     ...Shadows.component.small,
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
 
   // Inner slot - darker blue with inset appearance
   innerSlot: {
-    backgroundColor: '#1680D7',
+    backgroundColor: Colors.accentDark,
     borderRadius: BorderRadius.small - 2,
     justifyContent: 'center',
     // Inset shadow effect

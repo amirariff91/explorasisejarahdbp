@@ -13,6 +13,19 @@ export const Colors = {
   success: '#4CAF50', // Green - Success states
   warning: '#FFC107', // Yellow/Gold - Warnings, completed states
   gold: '#FFD700', // Bright gold - Celebration, highlights
+  goldLight: '#FFF176', // Light gold - Selected state alternative
+  error: '#F44336', // Red - Error states, wrong answers
+  errorDark: '#C62828', // Dark red - Error borders
+  errorDeep: '#8B3030', // Deep red - Failure modal borders
+  successDark: '#2E7D32', // Dark green - Success borders
+  accent: '#1E8EEA', // Blue accent - Input panels
+  accentDark: '#1680D7', // Dark blue accent - Input insets
+  woodDark: '#5D4037', // Dark wood - Button backgrounds
+  woodDeep: '#4E342E', // Deeper wood - Selected button state
+  strokeDark: '#2c3e50', // Dark stroke - Map borders
+
+  // Confetti Colors
+  confetti: ['#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'],
 
   // Background Colors
   backgroundOverlay: 'rgba(0, 0, 0, 0.7)', // Modal overlays

@@ -15,15 +15,7 @@ import { ButtonSizes, TouchTargets, Spacing, getResponsiveSizeScaled, getDeviceS
 import type { CongratsOverlayProps } from '@/types';
 
 // Confetti colors - celebratory palette
-const CONFETTI_COLORS = [
-  Colors.gold, // Gold
-  '#4ECDC4', // Teal
-  '#45B7D1', // Blue
-  '#96CEB4', // Green
-  '#FFEAA7', // Yellow
-  '#DDA0DD', // Plum
-  '#98D8C8', // Mint
-];
+const CONFETTI_COLORS = Colors.confetti;
 
 // Generate confetti particle configurations
 function generateConfettiParticles(count: number, screenWidth: number, screenHeight: number) {
@@ -305,7 +297,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xxxl,
   },
   panelBackground: {
-    backgroundColor: '#5D4037', // Wood color
+    backgroundColor: Colors.woodDark, // Wood color
     borderRadius: 20,
     borderCurve: 'continuous',
     borderWidth: 4,

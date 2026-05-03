@@ -316,12 +316,12 @@ const styles = StyleSheet.create({
 
   // Theme-specific styles
   betulButton: {
-    backgroundColor: "#4CAF50", // Green
-    borderColor: "#2E7D32", // Darker green border
+    backgroundColor: Colors.success, // Green
+    borderColor: Colors.successDark, // Darker green border
   },
   salahButton: {
-    backgroundColor: "#F44336", // Red
-    borderColor: "#C62828", // Darker red border
+    backgroundColor: Colors.error, // Red
+    borderColor: Colors.errorDark, // Darker red border
   },
 
   buttonText: {

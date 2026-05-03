@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderCurve: 'continuous',
     borderWidth: 3,
-    borderColor: '#8B3030',
+    borderColor: Colors.errorDeep,
     ...getComponentShadowStyle(Shadows.component.large),
     boxShadow: '0 4px 8px rgba(0,0,0,0.4)',
   },

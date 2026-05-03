@@ -196,12 +196,7 @@ export default function FillBlankQuestion({ question, onAnswer }: Props) {
                     borderRadius: getResponsiveSizeScaled(14, width),
                     minWidth: getResponsiveSizeScaled(120, width),
                     minHeight: getResponsiveSizeScaled(45, width),
-                    // Add shadow for polish
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 3 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 3,
-                    elevation: 3,
+                    boxShadow: '0px 3px 3px rgba(0,0,0,0.2)',
                   },
                   !answer.trim() && styles.buttonDisabled,
                 ]}
@@ -294,13 +289,13 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   teruskanTextButton: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: Colors.success,
     alignItems: "center",
     justifyContent: "center",
   },
   teruskanButtonText: {
     fontFamily: Typography.fontFamily,
-    color: "#FFFFFF",
+    color: Colors.textLight,
     textAlign: "center",
     fontWeight: "normal",
   },
