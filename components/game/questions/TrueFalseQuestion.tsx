@@ -53,16 +53,6 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   const isPhone = getDeviceSize(width) === "phone";
   const isJohor = question.state === "johor";
 
-  // Simple responsive offsets for True/False questions
-  const offsets = {
-    boardPaddingTop: 25,
-    boardPaddingBottom: 25,
-    boardPaddingHorizontal: 30,
-    questionAreaHeight: 80,
-    buttonsAreaTop: 15,
-    buttonGap: 30,
-  };
-
   // Use new responsive board sizing system (auto-scales by device tier)
   const baseBoardSize = getQuestionBoardSize("standard", width);
 
@@ -95,6 +85,17 @@ export default function TrueFalseQuestion({ question, onAnswer }: Props) {
   // Ensure minimum size for usability
   boardWidth = Math.max(boardWidth, 300);
   boardHeight = Math.max(boardHeight, 200);
+
+  // soalanBoard blue frame is ~7.7% of image height; 13% clears it with buffer.
+  // frame scales 1:1 with boardHeight because the image is height-constrained in resizeMode="contain"
+  const offsets = {
+    boardPaddingTop: Math.round(boardHeight * 0.13),
+    boardPaddingBottom: Math.round(boardHeight * 0.13),
+    boardPaddingHorizontal: Math.round(boardWidth * 0.08),
+    questionAreaHeight: 80,
+    buttonsAreaTop: 15,
+    buttonGap: 30,
+  };
 
   // Use new trueFalse button sizes (kid-friendly, larger)
   const buttonSize =

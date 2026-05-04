@@ -434,22 +434,24 @@ export const QuestionOffsets = {
       footerContainer: { marginBottom: 15, marginRight: 30 },
     },
   },
+  // @deprecated — TrueFalseQuestion computes padding proportionally from boardHeight * 0.13
+  // (fixed pixel values here are too small for tablets; kept for reference only)
   trueFalseSingle: {
     landscape: {
       boardPaddingTop: 35,
-      boardPaddingBottom: 30, // Increased bottom padding
+      boardPaddingBottom: 30,
       boardPaddingHorizontal: 40,
-      questionAreaHeight: 130, // Increased area for question
-      buttonsAreaTop: 30, // Increased top gap for centered row
-      buttonGap: 20, // Increased horizontal gap for better separation
+      questionAreaHeight: 130,
+      buttonsAreaTop: 30,
+      buttonGap: 20,
     },
     portrait: {
       boardPaddingTop: 30,
-      boardPaddingBottom: 25, // Increased bottom padding
+      boardPaddingBottom: 25,
       boardPaddingHorizontal: 30,
-      questionAreaHeight: 120, // Increased area for question
-      buttonsAreaTop: 25, // Increased top gap
-      buttonGap: 16, // Horizontal gap
+      questionAreaHeight: 120,
+      buttonsAreaTop: 25,
+      buttonGap: 16,
     },
   },
 } as const;

@@ -159,12 +159,19 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
   boardWidth = Math.max(boardWidth, 300);
   boardHeight = Math.max(boardHeight, 220);
 
+  // soalanBoard blue frame is ~7.7% of image height; 13% clears it with buffer.
+  // frame scales 1:1 with boardHeight because the image is height-constrained in resizeMode="contain"
+  const mcPaddingTop = Math.round(boardHeight * 0.13);
+  const mcPaddingBottom = Math.round(boardHeight * 0.13);
+  const mcPaddingHorizontal = Math.round(boardWidth * 0.08);
+
   // Slightly tighter layout on phones for Sabah, Sarawak & Melaka so buttons stay on the board
   const offsets = isTightPhone
     ? {
         ...baseOffsets,
-        boardPaddingTop: Math.max(baseOffsets.boardPaddingTop, 38),
-        boardPaddingBottom: Math.min(baseOffsets.boardPaddingBottom, 12),
+        boardPaddingTop: Math.max(mcPaddingTop, 38),
+        boardPaddingBottom: mcPaddingBottom,
+        boardPaddingHorizontal: mcPaddingHorizontal,
         questionAreaHeight: Math.min(baseOffsets.questionAreaHeight, 80),
         answerAreaTop: Math.min(baseOffsets.answerAreaTop, 12),
         optionsContainer: {
@@ -178,6 +185,9 @@ export default function MultipleChoiceQuestion({ question, onAnswer }: Props) {
       }
     : {
         ...baseOffsets,
+        boardPaddingTop: mcPaddingTop,
+        boardPaddingBottom: mcPaddingBottom,
+        boardPaddingHorizontal: mcPaddingHorizontal,
         ...(isTabletTextBoost && {
           questionAreaHeight: Math.round(baseOffsets.questionAreaHeight * 1.1),
           answerAreaTop: baseOffsets.answerAreaTop + Math.round(boardHeight * 0.1),
