@@ -41,3 +41,9 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Claude Code Game Studios session logs
+production/
+
+# Client feedback PDFs (kept locally as reference)
+docs/Pembetulan*
