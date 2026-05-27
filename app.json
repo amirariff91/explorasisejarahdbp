@@ -45,7 +45,8 @@
       "statusBar": {
         "translucent": true,
         "backgroundColor": "transparent"
-      }
+      },
+      "versionCode": 3
     },
     "web": {
       "output": "static",
